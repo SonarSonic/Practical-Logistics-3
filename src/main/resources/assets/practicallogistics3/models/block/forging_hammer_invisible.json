@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end":"practicallogistics3:model/forging_hammer_rope_bottom",
+    "side": "practicallogistics3:model/forging_hammer_rope"
+  }
+}

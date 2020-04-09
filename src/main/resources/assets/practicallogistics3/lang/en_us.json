@@ -1,0 +1,20 @@
+{
+  "item.practicallogistics3.sapphire_gem": "Sapphire",
+  "item.practicallogistics3.sapphire_dust": "Sapphire Dust",
+  "item.practicallogistics3.stone_plate": "Stone Plate",
+  "item.practicallogistics3.etched_plate": "Etched Plate",
+  "item.practicallogistics3.signalling_plate": "Signalling Plate",
+  "item.practicallogistics3.wireless_plate": "Wireless Plate",
+
+  "block.practicallogistics3.sapphire_ore": "Sapphire Ore",
+  "block.practicallogistics3.forging_hammer": "Forging Hammer",
+
+  "block.practicallogistics3.data_cable": "Data Cable",
+  "block.practicallogistics3.mini_display_screen": "Mini Display Screen",
+  "block.practicallogistics3.display_screen": "Display Screen",
+  "block.practicallogistics3.large_display_screen": "Large Display Screen",
+  "block.practicallogistics3.multipart_host": "PL3 Network Host",
+
+  "_comment": "Creative Tabs",
+  "itemGroup.practicallogistics3": "Practical Logistics 3"
+}

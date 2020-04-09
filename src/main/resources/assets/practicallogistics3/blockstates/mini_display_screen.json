@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": {"model": "practicallogistics3:block/mini_display_screen", "x": 90, "y": 180},
+    "facing=south": {"model": "practicallogistics3:block/mini_display_screen", "x": 90, "y": 0},
+    "facing=west": {"model": "practicallogistics3:block/mini_display_screen", "x": 90, "y": 90},
+    "facing=east": {"model": "practicallogistics3:block/mini_display_screen", "x": 90, "y": 270},
+    "facing=up": { "model": "practicallogistics3:block/mini_display_screen", "x": 180},
+    "facing=down": {"model": "practicallogistics3:block/mini_display_screen"}
+  }
+}

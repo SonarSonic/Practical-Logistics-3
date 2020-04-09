@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "fhpos=0": { "model": "practicallogistics3:block/forging_hammer_weight" },
+    "fhpos=1": { "model": "practicallogistics3:block/forging_hammer" },
+    "fhpos=2": { "model": "practicallogistics3:block/forging_hammer_invisible" }
+  }
+}

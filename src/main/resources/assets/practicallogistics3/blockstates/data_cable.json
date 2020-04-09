@@ -1,0 +1,24 @@
+{
+  "multipart": [
+    {   "apply": { "model": "practicallogistics3:block/data_cable_centre" }},
+
+    {   "when": { "down": "true" },
+      "apply": { "model": "practicallogistics3:block/data_cable_connector" }
+    },
+    {   "when": { "up": "true" },
+      "apply": { "model": "practicallogistics3:block/data_cable_connector", "x": 180 }
+    },
+    {   "when": { "north": "true" },
+      "apply": { "model": "practicallogistics3:block/data_cable_connector", "x": 90, "y": 180 }
+    },
+    {   "when": { "east": "true" },
+      "apply": { "model": "practicallogistics3:block/data_cable_connector", "x": 90, "y": 90 }
+    },
+    {   "when": { "south": "true" },
+      "apply": { "model": "practicallogistics3:block/data_cable_connector", "x": 90, "y": 0 }
+    },
+    {   "when": { "west": "true" },
+      "apply": { "model": "practicallogistics3:block/data_cable_connector", "x": 90, "y": 270 }
+    }
+  ]
+}
