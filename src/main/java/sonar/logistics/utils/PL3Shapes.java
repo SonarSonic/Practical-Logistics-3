@@ -11,9 +11,9 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 public class PL3Shapes {
 
     //// DATA CABLE
-    public static final VoxelShape DATA_CABLE_CENTRE_VOXEL = VoxelShapes.create(getBBFromPixels(6, 6, 6, 10, 10, 10));
+    public static final VoxelShape DATA_CABLE_CENTRE_VOXEL = VoxelShapes.create(getBBFromPixels(6.5, 6.5, 6.5, 9.5, 9.5, 9.5));
 
-    public static final AxisAlignedBB DATA_CABLE_CONNECTOR_BB_SHAPE = getBBFromPixels(7, 0, 7, 9, 6, 9);
+    public static final AxisAlignedBB DATA_CABLE_CONNECTOR_BB_SHAPE = getBBFromPixels(7, 0, 7, 9, 7, 9);
     public static final VoxelShape[] DATA_CABLE_CONNECTOR_ROTATED_VOXELS = getRotatedVoxels(DATA_CABLE_CONNECTOR_BB_SHAPE, Direction.values());
 
     //// MINI DISPLAY SCREEN
@@ -22,9 +22,9 @@ public class PL3Shapes {
     public static final Vec3d MINI_DISPLAY_SCREEN_SCALING = getVec3DFromPixels(6, 6,  0);
 
     //// DISPLAY SCREEN
-    public static final AxisAlignedBB DISPLAY_BB_SHAPE = getBBFromPixels(0, 0, 4, 16, 1, 12);
+    public static final AxisAlignedBB DISPLAY_BB_SHAPE = getBBFromPixels(1, 0, 4, 15, 1, 12);
     public static final VoxelShape[] DISPLAY_ROTATED_VOXELS = getRotatedVoxels(DISPLAY_BB_SHAPE, Direction.values());
-    public static final Vec3d DISPLAY_SCREEN_SCALING = getVec3DFromPixels(14, 6,  0);
+    public static final Vec3d DISPLAY_SCREEN_SCALING = getVec3DFromPixels(12, 6,  0);
 
     //// LARGE DISPLAY SCREEN
     public static final AxisAlignedBB LARGE_DISPLAY_BB_SHAPE = getBBFromPixels(0, 0, 0, 16, 1, 16);
@@ -38,7 +38,7 @@ public class PL3Shapes {
         return new Vec3d(x * PIXEL, y * PIXEL, z * PIXEL);
     }
 
-    public static AxisAlignedBB getBBFromPixels(int minX, int minY, int minZ, int maxX, int maxY, int maxZ){
+    public static AxisAlignedBB getBBFromPixels(double minX, double minY, double minZ, double maxX, double maxY, double maxZ){
         return new AxisAlignedBB(minX*PIXEL, minY*PIXEL, minZ*PIXEL, maxX*PIXEL, maxY*PIXEL, maxZ*PIXEL);
     }
 

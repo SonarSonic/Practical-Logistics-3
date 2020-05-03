@@ -27,12 +27,9 @@ import sonar.logistics.blocks.host.MultipartHostTile;
 import sonar.logistics.multiparts.base.IMultipartBlock;
 import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.multiparts.utils.EnumMultipartSlot;
-import sonar.logistics.server.cables.CableHelper;
-import sonar.logistics.server.cables.LocalCableData;
-import sonar.logistics.server.cables.WorldCableData;
-import sonar.logistics.server.cables.GlobalCableData;
-import sonar.logistics.server.networks.PL3Network;
-import sonar.logistics.server.networks.PL3NetworkManager;
+import sonar.logistics.server.cables.*;
+import sonar.logistics.server.caches.network.PL3Network;
+import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.utils.PL3Shapes;
 
 import javax.annotation.Nullable;
@@ -72,7 +69,7 @@ public class DataCableBlock extends Block implements IMultipartBlock {
 
     public BlockState getConnectedState(BlockState state, IBlockReader reader, BlockPos pos){
         for(Direction dir : Direction.values()){
-            state = state.with(CONNECTIONS[dir.ordinal()], CableHelper.canRenderDataCables(reader, pos, pos.offset(dir), dir));
+            state = state.with(CONNECTIONS[dir.ordinal()], PL3NetworkManager.INSTANCE.canRenderCables(reader, pos, pos.offset(dir), dir, EnumCableTypes.NETWORK_CABLE));
         }
         return state;
     }
@@ -86,7 +83,7 @@ public class DataCableBlock extends Block implements IMultipartBlock {
     }
 
     public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos currentPos, BlockPos facingPos) {
-       return state.with(CONNECTIONS[facing.ordinal()], CableHelper.canRenderDataCables(world, currentPos, facingPos, facing));
+       return state.with(CONNECTIONS[facing.ordinal()], PL3NetworkManager.INSTANCE.canRenderCables(world, currentPos, facingPos, facing, EnumCableTypes.NETWORK_CABLE));
     }
 
     ///// MULTIPART STATES \\\\\
@@ -115,14 +112,14 @@ public class DataCableBlock extends Block implements IMultipartBlock {
         if(!world.isRemote){
             if(player.isShiftKeyDown()) {
                 WorldCableData worldData = GlobalCableData.getWorldData(world);//TESTING
-                LocalCableData networkCableData = worldData.getCableData(pos, CableHelper.DATA_CABLE_TYPE);//TESTING
+                LocalCableData networkCableData = worldData.getCableData(pos, EnumCableTypes.NETWORK_CABLE);//TESTING
                 if (networkCableData == null) {
                     player.sendMessage(new StringTextComponent(pos.toString() + ": " + "NO NETWORK FOUND"));
                 } else {
                     player.sendMessage(new StringTextComponent(pos.toString() + ": " + networkCableData.globalNetworkID + " Cable Count: " + networkCableData.cables.size()));
                 }
             }else{
-                PL3Network.dump(PL3NetworkManager.INSTANCE.getNetwork(world, pos));
+                PL3Network.dump(PL3NetworkManager.INSTANCE.getCableCache(world, pos, EnumCableTypes.NETWORK_CABLE));
             }
         }
         return ActionResultType.SUCCESS;
@@ -134,21 +131,21 @@ public class DataCableBlock extends Block implements IMultipartBlock {
     public void addCable(World world, BlockPos pos){
         if(!world.isRemote) {
             WorldCableData worldData = GlobalCableData.getWorldData(world);
-            worldData.addCable(world, pos, CableHelper.DATA_CABLE_TYPE);
+            worldData.addCable(world, pos, EnumCableTypes.NETWORK_CABLE);
         }
     }
 
     public void removeCable(World world, BlockPos pos){
         if(!world.isRemote) {
             WorldCableData worldData = GlobalCableData.getWorldData(world);
-            worldData.removeCable(world, pos, CableHelper.DATA_CABLE_TYPE);
+            worldData.removeCable(world, pos, EnumCableTypes.NETWORK_CABLE);
         }
     }
 
     public void checkConnection(World world, BlockPos pos, Direction dir){
         if(!world.isRemote) {
             WorldCableData worldData = GlobalCableData.getWorldData(world);
-            worldData.checkCableConnection(world, pos, dir, CableHelper.DATA_CABLE_TYPE);
+            worldData.checkCableConnection(world, pos, dir, EnumCableTypes.NETWORK_CABLE);
         }
     }
 
@@ -180,19 +177,21 @@ public class DataCableBlock extends Block implements IMultipartBlock {
     ///// MULTIPART CONNECTING \\\\\
 
     @Override
-    public void onPlaced(World world, BlockPos pos){
+    public void onPlaced(World world, BlockState state, BlockPos pos){
         addCable(world, pos);
     }
 
     @Override
-    public void onDestroyed(World world, BlockPos pos){
+    public void onDestroyed(World world, BlockState state, BlockPos pos){
         removeCable(world, pos);
     }
 
+    @Override
     public void onNeighborChange(MultipartEntry entry, IWorldReader world, BlockPos pos, BlockPos neighbor){
         entry.host.queueSyncPacket();
     }
 
+    @Override
     public void neighborChanged(MultipartEntry entry, World world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving){
         entry.host.queueSyncPacket();
     }

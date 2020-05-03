@@ -15,11 +15,11 @@ public class LocalCableData implements ISyncable {
 
     public final WorldCableData worldData;
     public final int globalNetworkID;
-    public final byte cableType;
+    public final EnumCableTypes cableType;
 
     public HashSet<BlockPos> cables = new HashSet<>();
 
-    protected LocalCableData(WorldCableData worldData, int globalNetworkID, byte cableType) {
+    protected LocalCableData(WorldCableData worldData, int globalNetworkID, EnumCableTypes cableType) {
         this.worldData = worldData;
         this.globalNetworkID = globalNetworkID;
         this.cableType = cableType;
@@ -29,14 +29,12 @@ public class LocalCableData implements ISyncable {
         return cables.contains(pos);
     }
 
-    public void doAddCable(World world, BlockPos pos, byte cableType){
+    public void doAddCable(World world, BlockPos pos, EnumCableTypes cableType){
         cables.add(pos);
-        worldData.onCableAdded(world, pos, cableType);
     }
 
-    public void doRemoveCable(World world, BlockPos pos, byte cableType){
+    public void doRemoveCable(World world, BlockPos pos, EnumCableTypes cableType){
         cables.remove(pos);
-        worldData.onCableRemoved(world, pos, cableType);
     }
 
     public void merge(LocalCableData merging) {

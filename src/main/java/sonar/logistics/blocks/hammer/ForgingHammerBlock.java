@@ -34,7 +34,7 @@ public class ForgingHammerBlock extends Block {
     public static final IntegerProperty POS = IntegerProperty.create("fhpos", 0, 2);
 
     public ForgingHammerBlock() {
-        super(Properties.create(Material.WOOD).sound(SoundType.WOOD).hardnessAndResistance(2.0f));
+        super(Properties.create(Material.WOOD).sound(SoundType.WOOD).hardnessAndResistance(2.0f).notSolid());
         setDefaultState(this.stateContainer.getBaseState().with(POS, 0));
         setRegistryName("forging_hammer");
     }

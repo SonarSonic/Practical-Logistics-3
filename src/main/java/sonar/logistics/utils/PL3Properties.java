@@ -1,6 +1,7 @@
 package sonar.logistics.utils;
 
 import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.EnumProperty;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 

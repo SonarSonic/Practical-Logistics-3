@@ -1,27 +1,22 @@
 package sonar.logistics.multiparts.displays;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.fluids.FluidStack;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
+import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.properties.ColourProperty;
 
 public class DisplayRenderHelper {
 
     public static final int FULL_LIGHT = 15728880;
+
 
     public static void translate(MatrixStack matrixStack, Vec3d vec3d){
         matrixStack.translate(vec3d.x, vec3d.y, vec3d.z);
@@ -31,6 +26,9 @@ public class DisplayRenderHelper {
         matrixStack.scale((float)vec3d.x, (float)vec3d.y, (float)vec3d.z);
     }
 
+    public static void colouredRect(ScaleableRenderContext context, float left, float top, float width, float height, int red, int green, int blue, int alpha) {
+        colouredRect(context.matrix.getLast(), context.buffer, context.light, context.overlay, left, top, width, height, red, green, blue, alpha);
+    }
 
     public static void colouredRect(MatrixStack.Entry matrix, IRenderTypeBuffer renderer, int light, int overlayLight, float left, float top, float width, float height, int red, int green, int blue, int alpha) {
 
@@ -50,7 +48,7 @@ public class DisplayRenderHelper {
 
 
         ////// RENDERING \\\\\
-
+        RenderSystem.enableAlphaTest();
         RenderSystem.disableTexture();
         Minecraft.getInstance().gameRenderer.getLightTexture().enableLightmap();
         RenderSystem.enableDepthTest();
@@ -60,28 +58,8 @@ public class DisplayRenderHelper {
         RenderSystem.disableDepthTest();
         Minecraft.getInstance().gameRenderer.getLightTexture().disableLightmap();
         RenderSystem.enableTexture();
+        RenderSystem.disableAlphaTest();
 
-    }
-
-
-    public static TextureAtlasSprite getSprite(ResourceLocation spriteLocation) {
-        return Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(spriteLocation);
-    }
-
-    public static float getRed(int color) {
-        return (color >> 16 & 0xFF) / 255.0F;
-    }
-
-    public static float getGreen(int color) {
-        return (color >> 8 & 0xFF) / 255.0F;
-    }
-
-    public static float getBlue(int color) {
-        return (color & 0xFF) / 255.0F;
-    }
-
-    public static float getAlpha(int color) {
-        return (color >> 24 & 0xFF) / 255.0F;
     }
 
     public static void fluidRect(FluidStack fluidStack, MatrixStack.Entry matrix, IRenderTypeBuffer renderer, int light, int overlayLight, float startX, float startY, float width, float height) {
@@ -92,7 +70,7 @@ public class DisplayRenderHelper {
         TextureAtlasSprite sprite = getSprite(fluidStack.getFluid().getAttributes().getStillTexture(fluidStack));
         int color = fluidStack.getFluid().getAttributes().getColor(fluidStack);
         int luminosity = Math.max(light, fluidStack.getFluid().getAttributes().getLuminosity(fluidStack));
-        float red = getRed(color), green = getGreen(color), blue = getBlue(color), alpha = getAlpha(color);
+        float red = ColourProperty.getRed(color), green = ColourProperty.getGreen(color), blue = ColourProperty.getBlue(color), alpha = ColourProperty.getAlpha(color);
 
         int blockLight = LightTexture.getLightBlock(light);
         int skyLight = LightTexture.getLightSky(light);
@@ -160,4 +138,10 @@ public class DisplayRenderHelper {
 
 
 
+
+    ///// HELPER METHODS \\\\\\
+
+    public static TextureAtlasSprite getSprite(ResourceLocation spriteLocation) {
+        return Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(spriteLocation);
+    }
 }

@@ -5,8 +5,9 @@ import sonar.logistics.blocks.PL3Blocks;
 import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.multiparts.networking.INetworkedTile;
 import sonar.logistics.multiparts.utils.EnumMultipartSlot;
-import sonar.logistics.server.networks.PL3Network;
-import sonar.logistics.server.networks.PL3NetworkManager;
+import sonar.logistics.server.cables.EnumCableTypes;
+import sonar.logistics.server.caches.network.PL3Network;
+import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.utils.network.EnumSyncType;
 
 import javax.annotation.Nullable;
@@ -28,13 +29,13 @@ public class NetworkedHostTile extends MultipartHostTile {
 
     public void connectNetwork(){
         if(!world.isRemote && canConnect()) {
-            PL3NetworkManager.INSTANCE.connectHost(this);
+            PL3NetworkManager.INSTANCE.connectHost(this, EnumCableTypes.NETWORK_CABLE);
         }
     }
 
     public void disconnectNetwork(){
         if(!world.isRemote) {
-            PL3NetworkManager.INSTANCE.disconnectHost(this);
+            PL3NetworkManager.INSTANCE.disconnectHost(this, EnumCableTypes.NETWORK_CABLE);
         }
     }
 

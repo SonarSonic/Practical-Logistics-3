@@ -69,13 +69,13 @@ public class MultipartTile implements ICapabilityProvider, ISyncable {
 
     public void onLoadTick(){}
 
-    public final void onLoad(){
+    public void onLoad(){
         if(!hadLoadTick){
             onLoadTick();
         }
     }
 
-    public final void onUnload(){
+    public void onUnload(){
         if(hadLoadTick){
             hadLoadTick = false;
         }

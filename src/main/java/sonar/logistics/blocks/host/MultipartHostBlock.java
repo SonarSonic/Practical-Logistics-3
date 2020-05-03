@@ -110,7 +110,7 @@ public class MultipartHostBlock extends Block {
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
         MultipartEntry entry = MultipartHostHelper.getRayTraceMultipart(world, pos, player);
         if(entry != null){
-            return entry.getBlockState().onBlockActivated(world, player, hand, rayTraceResult);
+            return entry.multipart.onMultipartActivated(entry, world, pos, player, hand, rayTraceResult);
         }
         return ActionResultType.FAIL;
     }

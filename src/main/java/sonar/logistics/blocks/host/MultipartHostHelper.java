@@ -16,12 +16,15 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 import sonar.logistics.PL3;
 import sonar.logistics.multiparts.base.MultipartEntry;
+import sonar.logistics.multiparts.base.MultipartTile;
+import sonar.logistics.multiparts.utils.EnumMultipartSlot;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class MultipartHostHelper {
 
+    @Nullable
     public static NetworkedHostTile getNetworkedHostTile(IBlockReader reader, BlockPos pos){
         TileEntity tile = reader.getTileEntity(pos);
         if(tile instanceof NetworkedHostTile){
@@ -30,10 +33,29 @@ public class MultipartHostHelper {
         return null;
     }
 
+    @Nullable
     public static MultipartHostTile getMultipartHostTile(IBlockReader reader, BlockPos pos){
         TileEntity tile = reader.getTileEntity(pos);
         if(tile instanceof MultipartHostTile){
             return (MultipartHostTile) tile;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static MultipartEntry getMultipartEntry(IBlockReader reader, BlockPos pos, EnumMultipartSlot slot){
+        MultipartHostTile hostTile = getMultipartHostTile(reader, pos);
+        if(hostTile != null){
+           return hostTile.getMultipart(slot);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static MultipartTile getMultipartTile(IBlockReader reader, BlockPos pos, EnumMultipartSlot slot){
+        MultipartEntry entry = getMultipartEntry(reader, pos, slot);
+        if(entry != null){
+            return entry.getMultipartTile();
         }
         return null;
     }

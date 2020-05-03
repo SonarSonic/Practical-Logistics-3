@@ -28,7 +28,7 @@ public class GlobalCableData extends WorldSavedData {
         PL3.LOGGER.debug("PL3: Global Cable Data - " + action);
         long estimated_bytes = 0;
         for(Map.Entry<Integer, WorldCableData> worldData :  worldDataMap.entrySet()){
-            for(Map.Entry<Byte, HashSet<LocalCableData>> localData : worldData.getValue().localCableDataMap.entrySet()){
+            for(Map.Entry<EnumCableTypes, HashSet<LocalCableData>> localData : worldData.getValue().localCableDataMap.entrySet()){
                 PL3.LOGGER.debug("PL3: Cable Type: {} Network Count: {}", localData.getKey(), localData.getValue().size());
                 estimated_bytes += 5; //for NetworkCable Variables.
                 for(LocalCableData cableData : localData.getValue()){

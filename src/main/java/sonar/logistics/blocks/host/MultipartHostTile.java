@@ -91,10 +91,6 @@ public class MultipartHostTile extends SyncableTile {
     public boolean doAddMultipart(MultipartEntry entry){
         if(canAddMultipart(entry)){
             MULTIPARTS.add(entry);
-
-            if(entry.hasMultipartTile()) {
-                validateMultipartTile(entry.getMultipartTile());
-            }
             setRenderBlockState = true;
             if(!isNBTLoading){
                 queueMarkDirty();
@@ -102,8 +98,11 @@ public class MultipartHostTile extends SyncableTile {
 
                 entry.onPlaced();
                 MULTIPARTS.forEach(M -> M.onMultipartAdded(entry));
-            }
 
+                if(entry.hasMultipartTile()) {
+                    validateMultipartTile(entry.getMultipartTile());
+                }
+            }
             return true;
         }
         return false;
@@ -118,10 +117,6 @@ public class MultipartHostTile extends SyncableTile {
     public boolean doRemoveMultipart(MultipartEntry entry){
         if(canRemoveMultipart(entry)){
             MULTIPARTS.remove(entry);
-
-            if(entry.hasMultipartTile()) {
-                invalidateMultipartTile(entry.getMultipartTile());
-            }
             queueIntegrityCheck();
 
             setRenderBlockState = true;
@@ -131,8 +126,11 @@ public class MultipartHostTile extends SyncableTile {
 
                 entry.onDestroyed();
                 MULTIPARTS.forEach(M -> M.onMultipartRemoved(entry));
-            }
 
+                if(entry.hasMultipartTile()) {
+                    invalidateMultipartTile(entry.getMultipartTile());
+                }
+            }
             return true;
         }
         return false;
@@ -261,7 +259,7 @@ public class MultipartHostTile extends SyncableTile {
     //// MULTIPART TILE METHODS \\\\
 
     public void validateMultipartTile(MultipartTile tile){
-        if(!tile.isValid()) {
+        if(!isRemoved() && !tile.isValid()) {
             tile.validate();
             tile.onLoad();
         }
@@ -273,6 +271,7 @@ public class MultipartHostTile extends SyncableTile {
         }
     }
 
+    @Override
     public void onLoad(){
         super.onLoad();
         forEachTile(MultipartTile::onLoad);
@@ -284,11 +283,13 @@ public class MultipartHostTile extends SyncableTile {
         forEachTile(MultipartTile::onUnload);
     }
 
+    @Override
     public void remove() {
         super.remove();
         forEachTile(this::invalidateMultipartTile);
     }
 
+    @Override
     public void validate() {
        super.validate();
        forEachTile(this::validateMultipartTile);

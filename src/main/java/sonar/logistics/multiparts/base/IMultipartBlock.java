@@ -2,8 +2,12 @@ package sonar.logistics.multiparts.base;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import sonar.logistics.blocks.host.MultipartHostTile;
@@ -30,9 +34,9 @@ public interface IMultipartBlock {
 
     //// TILE \\\\
 
-    default void onPlaced(World world, BlockPos pos){}
+    default void onPlaced(World world, BlockState state, BlockPos pos){}
 
-    default void onDestroyed(World world, BlockPos pos){}
+    default void onDestroyed(World world, BlockState state, BlockPos pos){}
 
     default void onMultipartAdded(MultipartHostTile host, MultipartEntry entry, MultipartEntry added){}
 
@@ -62,6 +66,10 @@ public interface IMultipartBlock {
 
 
     //// BLOCK METHODS \\\\
+
+    default ActionResultType onMultipartActivated(MultipartEntry entry, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
+        return entry.getBlockState().onBlockActivated(world, player, hand, rayTraceResult);
+    }
 
     default void onNeighborChange(MultipartEntry entry, IWorldReader world, BlockPos pos, BlockPos neighbor){
         entry.getBlockState().onNeighborChange(world, pos, neighbor);

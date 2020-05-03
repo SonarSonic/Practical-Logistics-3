@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.multiparts.displays.DisplayVectorHelper;
 import sonar.logistics.multiparts.displays.gsi.CommonGSI;
-import sonar.logistics.multiparts.displays.old.gsi.containers.ScaleableElement;
+import sonar.logistics.multiparts.displays.containers.ScaleableElement;
 import sonar.logistics.multiparts.displays.old.gsi.storage.DisplayElementContainer;
 import sonar.logistics.utils.network.EnumSyncType;
 

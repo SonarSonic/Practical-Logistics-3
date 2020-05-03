@@ -2,12 +2,10 @@ package sonar.logistics.blocks.host;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class MultipartHostRenderer extends TileEntityRenderer<MultipartHostTile> {
@@ -19,7 +17,6 @@ public class MultipartHostRenderer extends TileEntityRenderer<MultipartHostTile>
     @Override
     public void render(MultipartHostTile multipartHostTile, float partialTicks, MatrixStack matrix, IRenderTypeBuffer renderer, int light, int overlayLight) {
 
-
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 
         ///// RENDER BASIC BLOCK STATES \\\\\
@@ -30,7 +27,7 @@ public class MultipartHostRenderer extends TileEntityRenderer<MultipartHostTile>
 
         ///// RENDER SPECIAL RENDERERS \\\\\
         multipartHostTile.MULTIPARTS.stream().filter(E -> E.renderer != null).forEach((multipart) -> {
-            //multipart.renderer.render(renderDispatcher, multipart.tile, multipart, partialTicks, matrix, renderer, light, overlayLight);
+            multipart.renderer.render(renderDispatcher, multipart.getMultipartTile(), multipart, partialTicks, matrix, renderer, light, overlayLight, null);
         });
 
 

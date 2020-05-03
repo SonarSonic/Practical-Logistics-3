@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import sonar.logistics.blocks.ores.SapphireOreGen;
 import sonar.logistics.multiparts.PL3Multiparts;
 import sonar.logistics.networking.PL3PacketHandler;
-import sonar.logistics.server.networks.PL3NetworkManager;
+import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.setup.ClientProxy;
 import sonar.logistics.setup.IProxy;
 import sonar.logistics.setup.ServerProxy;

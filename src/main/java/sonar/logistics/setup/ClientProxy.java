@@ -3,12 +3,18 @@ package sonar.logistics.setup;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import sonar.logistics.PL3;
 import sonar.logistics.blocks.PL3Blocks;
 import sonar.logistics.blocks.hammer.ForgingHammerRenderer;
 import sonar.logistics.blocks.hammer.ForgingHammerScreen;
@@ -20,6 +26,7 @@ import sonar.logistics.multiparts.displays.DisplayScreenTile;
 import sonar.logistics.multiparts.base.IMultipartRenderer;
 import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.multiparts.base.MultipartTile;
+import sonar.logistics.multiparts.displays.LargeDisplayScreenTile;
 import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.MultipartRemovePacket;
 import sonar.logistics.server.data.DataManager;
@@ -36,12 +43,14 @@ public class ClientProxy implements IProxy {
         MinecraftForge.EVENT_BUS.register(this);
         ScreenManager.registerFactory(PL3Blocks.FORGING_HAMMER_CONTAINER, ForgingHammerScreen::new);
         multipartRenderers.put(DisplayScreenTile.class, new DisplayScreenRenderer());
+        multipartRenderers.put(LargeDisplayScreenTile.class, new DisplayScreenRenderer());
     }
 
     @Override
     public void clientOnly() {
         ClientRegistry.bindTileEntityRenderer(PL3Blocks.FORGING_HAMMER_TILE, ForgingHammerRenderer::new);
         ClientRegistry.bindTileEntityRenderer(PL3Blocks.MULTIPART_HOST_TILE, MultipartHostRenderer::new);
+        RenderTypeLookup.setRenderLayer(PL3Blocks.FORGING_HAMMER_BLOCK, RenderType.getCutoutMipped());
     }
 
     @Override

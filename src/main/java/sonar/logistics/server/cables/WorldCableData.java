@@ -7,7 +7,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import sonar.logistics.server.networks.PL3NetworkManager;
+import sonar.logistics.server.caches.displays.ConnectedDisplayManager;
+import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.utils.ListHelper;
 import sonar.logistics.utils.network.EnumSyncType;
 import sonar.logistics.utils.network.ISyncable;
@@ -19,7 +20,7 @@ import java.util.function.Consumer;
 public class WorldCableData implements ISyncable {
 
     public final int dimension;
-    protected final HashMap<Byte, HashSet<LocalCableData>> localCableDataMap = new HashMap<>();
+    protected final HashMap<EnumCableTypes, HashSet<LocalCableData>> localCableDataMap = new HashMap<>();
     protected final GlobalCableData globalData;
 
     public WorldCableData(GlobalCableData globalData, int dimension) {
@@ -27,17 +28,17 @@ public class WorldCableData implements ISyncable {
         this.dimension = dimension;
     }
 
-    public boolean hasCableType(byte cableType){
+    public boolean hasCableType(EnumCableTypes cableType){
         return localCableDataMap.containsKey(cableType);
     }
 
-    public HashSet<LocalCableData> getOrCreateLocalCableDataList(byte cableType){
+    public HashSet<LocalCableData> getOrCreateLocalCableDataList(EnumCableTypes cableType){
         localCableDataMap.putIfAbsent(cableType, new HashSet<>());
         return localCableDataMap.get(cableType);
     }
 
     @Nullable
-    public LocalCableData getCableData(int networkID, byte cableType){
+    public LocalCableData getCableData(int networkID, EnumCableTypes cableType){
         if(!hasCableType(cableType)){
             return null;
         }
@@ -51,7 +52,7 @@ public class WorldCableData implements ISyncable {
     }
 
     @Nullable
-    public LocalCableData getCableData(BlockPos pos, byte cableType){
+    public LocalCableData getCableData(BlockPos pos, EnumCableTypes cableType){
         for(LocalCableData localData : getOrCreateLocalCableDataList(cableType)){
             if(localData.isConnected(pos)){
                 return localData;
@@ -61,7 +62,7 @@ public class WorldCableData implements ISyncable {
     }
 
 
-    public void addCable(World world, BlockPos pos, byte cableType){
+    public void addCable(World world, BlockPos pos, EnumCableTypes cableType){
         LocalCableData existing = getCableData(pos, cableType);
         if(existing != null){
             return;
@@ -73,7 +74,7 @@ public class WorldCableData implements ISyncable {
 
         for(Direction dir : Direction.values()){
             BlockPos adjPos = pos.offset(dir);
-            if(CableHelper.canConnect(world, pos, adjPos, dir, cableType)){
+            if(cableType.getCableHelper().canConnectCables(world, pos, adjPos, dir, cableType)){
                 LocalCableData data = getCableData(adjPos, cableType);
                 if(data != null) {
                     ListHelper.addWithCheck(adjacent, data);
@@ -94,13 +95,17 @@ public class WorldCableData implements ISyncable {
 
             localData.doAddCable(world, pos, cableType);
 
-            onLocalDataCreated(localData.globalNetworkID, cableType);
+            cableType.getCableListener().onCableAdded(world, pos, cableType);
+            cableType.getCableListener().onCableDataCreated(localData.globalNetworkID, cableType);
+
         }else if(adjacent.size() == 1){
             ////one adjacent local: connect to it
             LocalCableData localData  = adjacent.get(0);
             localData.doAddCable(world, pos, cableType);
 
-            onLocalDataGrown(localData.globalNetworkID, cableType);
+            cableType.getCableListener().onCableAdded(world, pos, cableType);
+            cableType.getCableListener().onCableDataGrown(localData.globalNetworkID, cableType);
+
         }else{
             ////multiple adjacent locals: join them together!
             LocalCableData localData  = null;
@@ -116,35 +121,37 @@ public class WorldCableData implements ISyncable {
             }
 
             localData.doAddCable(world, pos, cableType);
-            onLocalDataGrown(localData.globalNetworkID, cableType);
+            cableType.getCableListener().onCableAdded(world, pos, cableType);
+            cableType.getCableListener().onCableDataGrown(localData.globalNetworkID, cableType);
 
             for(Integer mergedId : merged){
-                onLocalDataMerged(localData.globalNetworkID, mergedId, cableType);
+                cableType.getCableListener().onCableDataMerged(localData.globalNetworkID, mergedId, cableType);
             }
 
         }
         globalData.markDirty();
     }
 
-    public void removeCable(World world, BlockPos pos, byte cableType){
+    public void removeCable(World world, BlockPos pos, EnumCableTypes cableType){
         LocalCableData localData = getCableData(pos, cableType);
         if(localData == null){
             return;
         }
+
         localData.doRemoveCable(world, pos, cableType);
+        cableType.getCableListener().onCableRemoved(world, pos, cableType);
+
         if(localData.cables.isEmpty()){
             getOrCreateLocalCableDataList(cableType).remove(localData);
-            onLocalDataDeleted(localData.globalNetworkID, cableType);
+            cableType.getCableListener().onCableDataDeleted(localData.globalNetworkID, cableType);
             return;
         }
-
         redistributeNetwork(world, cableType, localData);
-
         globalData.markDirty();
     }
 
     /**removes all of the cables on the network and adds them back*/
-    public void redistributeNetwork(World world, byte cableType, LocalCableData localData){
+    public void redistributeNetwork(World world, EnumCableTypes cableType, LocalCableData localData){
         HashSet<BlockPos> oldCables = localData.cables;
 
         localData.clear();
@@ -159,25 +166,25 @@ public class WorldCableData implements ISyncable {
             });
             addToExisting = false;
         }
-        onLocalDataShrunk(localData.globalNetworkID, cableType);
+        cableType.getCableListener().onCableDataShrunk(localData.globalNetworkID, cableType);
     }
 
-    public void addRemainingLocalPos(World world, BlockPos origin, byte cableType, HashSet<BlockPos> oldPos, Consumer<BlockPos> add){
+    public void addRemainingLocalPos(World world, BlockPos origin, EnumCableTypes cableType, HashSet<BlockPos> oldPos, Consumer<BlockPos> add){
         add.accept(origin);
         oldPos.remove(origin);
         for(Direction dir : Direction.values()){
             BlockPos adjPos = origin.offset(dir);
-            if(oldPos.contains(adjPos) && CableHelper.canConnect(world, origin, adjPos, dir, cableType)){
+            if(oldPos.contains(adjPos) && cableType.getCableHelper().canConnectCables(world, origin, adjPos, dir, cableType)){
                 addRemainingLocalPos(world, adjPos, cableType, oldPos, add);
             }
         }
     }
 
     /**only to be called when the connections of a specific cable have been changed.*/
-    public void checkCableConnection(World world, BlockPos pos, Direction changedDir, byte cableType){
+    public void checkCableConnection(World world, BlockPos pos, Direction changedDir, EnumCableTypes cableType){
         LocalCableData existing = getCableData(pos, cableType);
         BlockPos adjPos = pos.offset(changedDir);
-        boolean canConnect = CableHelper.canConnect(world, pos, adjPos, changedDir, cableType);
+        boolean canConnect = cableType.getCableHelper().canConnectCables(world, pos, adjPos, changedDir, cableType);
         LocalCableData cableData = getCableData(adjPos, cableType);
 
         if(cableData != null && canConnect && cableData != existing){
@@ -189,56 +196,6 @@ public class WorldCableData implements ISyncable {
         }
     }
 
-    public void onCableAdded(World world, BlockPos pos, byte cableType){
-        if(cableType == CableHelper.DATA_CABLE_TYPE){
-            PL3NetworkManager.INSTANCE.onCableAdded(world, pos, cableType);
-        }
-    }
-
-    public void onCableRemoved(World world, BlockPos pos, byte cableType){
-        if(cableType == CableHelper.DATA_CABLE_TYPE){
-            PL3NetworkManager.INSTANCE.onCableRemoved(world, pos, cableType);
-        }
-    }
-
-    /** the global id of the new network.
-     * @param globalID the global id of the new created network*/
-    public void onLocalDataCreated(int globalID, byte cableType){
-        ///network creation is handled by the first NetworkMultipartHost connecting
-    }
-
-    /** called when there are no longer any cables on the network
-     * @param globalID the global id of the network which has been deleted */
-    public void onLocalDataDeleted(int globalID, byte cableType){
-        if(cableType == CableHelper.DATA_CABLE_TYPE){
-            PL3NetworkManager.INSTANCE.deleteNetwork(globalID);
-        }
-    }
-
-    /** called when a cable or cables have been added to the network
-     * @param globalID the global id of the network which has grown */
-    public void onLocalDataGrown(int globalID, byte cableType){
-        ///normal network growth is handled by the NetworkMultipartHost connecting
-    }
-
-    /** called when a cable or cables have been removed from the network
-     * @param globalID the global id of the network which has shrunk */
-    public void onLocalDataShrunk(int globalID, byte cableType){
-        if(cableType == CableHelper.DATA_CABLE_TYPE){
-            PL3NetworkManager.INSTANCE.shrinkNetwork(globalID);
-        }
-    }
-
-    /** called when two networks have been combined, resulting in one.
-     * @param globalID the global id of the network which all merged networks are now connected to
-     * @param mergedID the global id of the network which has now been removed
-     */
-    public void onLocalDataMerged(int globalID, int mergedID, byte cableType){
-        if(cableType == CableHelper.DATA_CABLE_TYPE){
-            PL3NetworkManager.INSTANCE.mergeNetworks(globalID, mergedID);
-        }
-    }
-
     @Override
     public CompoundNBT read(CompoundNBT nbt, EnumSyncType syncType) {
         ListNBT list = nbt.getList("locals", Constants.NBT.TAG_COMPOUND);
@@ -246,7 +203,7 @@ public class WorldCableData implements ISyncable {
         for(int i = 0; i < list.size(); i++){
             CompoundNBT tag = list.getCompound(i);
             int networkID = tag.getInt("id");
-            byte cableType = tag.getByte("type");
+            EnumCableTypes cableType = EnumCableTypes.values()[tag.getByte("type")];
             LocalCableData localData = new LocalCableData(this, networkID, cableType);
             localData.read(tag, EnumSyncType.SAVE);
             getOrCreateLocalCableDataList(cableType).add(localData);
@@ -258,11 +215,11 @@ public class WorldCableData implements ISyncable {
     @Override
     public CompoundNBT write(CompoundNBT nbt, EnumSyncType syncType) {
         ListNBT list = new ListNBT();
-        for(Map.Entry<Byte, HashSet<LocalCableData>> networkData : localCableDataMap.entrySet()){
+        for(Map.Entry<EnumCableTypes, HashSet<LocalCableData>> networkData : localCableDataMap.entrySet()){
             for(LocalCableData localData : networkData.getValue()) {
                 CompoundNBT tag = new CompoundNBT();
                 tag.putInt("id", localData.globalNetworkID);
-                tag.putByte("type", localData.cableType);
+                tag.putByte("type", (byte)localData.cableType.ordinal());
                 localData.write(tag, EnumSyncType.SAVE);
                 list.add(tag);
             }

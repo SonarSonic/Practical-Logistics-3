@@ -4,11 +4,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Tuple;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import sonar.logistics.client.gsi.context.DisplayClickContext;
+import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.multiparts.displays.api.IDisplay;
-import sonar.logistics.multiparts.displays.old.gsi.containers.IScaleable;
+import sonar.logistics.client.gsi.api.IScaleable;
+import sonar.logistics.client.gsi.api.BlockInteractionType;
 import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 import javax.annotation.Nullable;
@@ -111,12 +113,18 @@ public class DisplayVectorHelper {
         return new Vec3d(scaleX, scaleY, scaleZ);
     }
 
-    /** scales the unscaled width and height to match the given scaling returned in the form, actual width, actual height, scale factor */
+    /** scales the unscaled width and height to fit the given scaling */
     public static Vec3d scaleFromUnscaledSize(Vec3d unscaled, Vec3d scaling, double percentageFill) { //FIXME returns scaling in Z, check this out.
         double actualElementScale = Math.min(scaling.x / unscaled.x, scaling.y / unscaled.y);
         double actualElementWidth = (unscaled.x * actualElementScale) * percentageFill;
         double actualElementHeight = (unscaled.y * actualElementScale) * percentageFill;
         return new Vec3d ( actualElementWidth, actualElementHeight, actualElementScale );
+    }
+
+    /** scales the unscaled width and height to fit the given scaling, maintaining uniform scaling */
+    public static Vec3d scaleUnscaledSizeToFit(Vec3d unscaled, Vec3d scaling, double percentageFill) { //FIXME returns scaling in Z, check this out.
+        double actualElementScale = Math.min(scaling.x / unscaled.x, scaling.y / unscaled.y) * percentageFill;
+        return new Vec3d ( actualElementScale, actualElementScale, actualElementScale );
     }
 
     /** @param providers an iterable of objects which can provide vectors
@@ -134,18 +142,9 @@ public class DisplayVectorHelper {
         return new Vec3d(maxX, maxY, maxZ);
     }
 
-    public static Vec3d getHostAlignment(IScaleable scaleable){
-        Vec3d alignment = new Vec3d(0,0,0);
-        while(scaleable.getHost() != null){
-            alignment = alignment.add(scaleable.getHost().getSizing());
-            scaleable = scaleable.getHost();
-        }
-        return alignment;
-    }
-
     public static Vec3d alignArrayWithin(Vec3d scale, Vec3d max, ElementAlignment xAlign, ElementAlignment yAlign, ElementAlignment zAlign) {
-        double x = alignValue(scale.y, max.x, xAlign);
-        double y = alignValue(scale.y, max.x,  yAlign);
+        double x = alignValue(scale.x, max.x, xAlign);
+        double y = alignValue(scale.y, max.y,  yAlign);
         double z = alignValue(scale.z, max.z,  zAlign);
         return new Vec3d(x, y, z);
     }
@@ -374,7 +373,7 @@ public class DisplayVectorHelper {
      * @param maxDist the maximum block reach of the player
      * @return the exact click position, taking into account the origin*/
     @Nullable
-    public static double[] getDisplayLook(Entity from, IDisplay to, double maxDist){
+    public static double[] getEntityLook(Entity from, IDisplay to, double maxDist){
         if(from == null || to == null){
             return null;
         }
@@ -393,22 +392,40 @@ public class DisplayVectorHelper {
         }
         return null;
     }
-    /*
+
     @Nullable
-    public static DisplayScreenClick createClick(PlayerEntity player, IDisplay display, BlockInteractionType type){
-        DisplayScreenClick position = new DisplayScreenClick();
-        double[] clickPosition = getDisplayLook(player, display, 8);
+    public static DisplayClickContext createClickContext(BlockInteractionType type, PlayerEntity player, IDisplay display){
+        return createClickContext(type, player, display, 8);
+    }
+
+    @Nullable
+    public static DisplayClickContext createClickContext(BlockInteractionType type, PlayerEntity player, IDisplay display, int maxDist){
+        double[] clickPosition = getEntityLook(player, display, maxDist);
         if(clickPosition != null) {
-            position.identity = display.getInfoContainerID();
-            position.setClickPosition(clickPosition);
-            position.gsi = display.getGSI();
-            position.type = type;
-            position.intersect = intersect;
-            return position;
+            DisplayClickContext clickContext = new DisplayClickContext(type, display.getGSI(), player, false);
+            clickContext.setIntersect((float)clickPosition[0], (float)clickPosition[1]);
+            return clickContext;
         }
         return null;
     }
 
+    @Nullable
+    public static DisplayInteractionContext createHoverContext(PlayerEntity player, IDisplay display){
+        return createHoverContext(player, display, 8);
+    }
+
+    @Nullable
+    public static DisplayInteractionContext createHoverContext(PlayerEntity player, IDisplay display, int maxDist){
+        double[] hoverPosition = getEntityLook(player, display, maxDist);
+        if(hoverPosition != null) {
+            DisplayInteractionContext hoverContext = new DisplayInteractionContext(display.getGSI(), player, false);
+            hoverContext.setIntersect((float)hoverPosition[0], (float)hoverPosition[1]);
+            return hoverContext;
+        }
+        return null;
+    }
+
+    /*
     @Nullable
     public static DisplayScreenLook createLook(PlayerEntity player, IDisplay display){
         DisplayScreenLook look = new DisplayScreenLook();

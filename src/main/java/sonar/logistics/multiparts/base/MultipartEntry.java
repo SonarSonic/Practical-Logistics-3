@@ -34,11 +34,11 @@ public class MultipartEntry {
     }
 
     public void onPlaced(){
-        multipart.onPlaced(host.getWorld(), host.getPos());
+        multipart.onPlaced(host.getWorld(), getBlockState(), host.getPos());
     }
 
     public void onDestroyed(){
-        multipart.onDestroyed(host.getWorld(), host.getPos());
+        multipart.onDestroyed(host.getWorld(), getBlockState(), host.getPos());
     }
 
     public void onMultipartAdded(MultipartEntry added){
@@ -58,8 +58,7 @@ public class MultipartEntry {
 
     public BlockState getBlockState(){
         if(state == null){
-            state = multipart.getMultipartStateFromSlot(slot); //set the base state to avoid infinite loop.
-            updateRenderState();
+            state = multipart.getMultipartStateFromSlot(slot);
         }
         return state;
     }

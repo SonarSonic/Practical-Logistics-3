@@ -6,7 +6,7 @@ import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.multiparts.base.MultipartTile;
 import sonar.logistics.utils.PL3Shapes;
 
-public class DisplayScreenBlock extends OrientatedMultipart implements IMultipartBlock {
+public class DisplayScreenBlock extends AbstractScreenBlock implements IMultipartBlock {
 
     public DisplayScreenBlock(Properties props) {
         super(props, PL3Shapes.DISPLAY_ROTATED_VOXELS);
