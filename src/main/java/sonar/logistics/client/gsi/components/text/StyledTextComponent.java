@@ -22,7 +22,7 @@ import java.util.List;
 public class StyledTextComponent extends AbstractStyledScaleable implements IScaleableComponent, IGlyphRenderer {
 
     @OnlyIn(Dist.CLIENT)
-    public ScaledFontType fontType = ScaledFontType.RALEWAY;
+    public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
 
     public List<IGlyphString> glyphStrings = new ArrayList<>();
     public StyledTextWrapper textWrapper = new StyledTextWrapper();

@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import sonar.logistics.PL3;
+import sonar.logistics.client.design.gui.ScreenUtils;
 
 public class ForgingHammerScreen extends ContainerScreen<ForgingHammerContainer> {
 
@@ -38,31 +39,12 @@ public class ForgingHammerScreen extends ContainerScreen<ForgingHammerContainer>
         this.minecraft.getTextureManager().bindTexture(GUI);
         int relX = (this.width - this.xSize) / 2;
         int relY = (this.height - this.ySize) / 2;
-        this.blit(relX, relY, 0, 0, this.xSize, this.ySize);
+        ScreenUtils.blit(relX, relY, 0, 0, this.xSize, this.ySize);
 
         double l = ((double)tileEntity.progress + partialTicks) * 23 / ForgingHammerTile.processSpeed;
-        blit(guiLeft + 76, guiTop + 24, 176, 0, l, 16);
+        ScreenUtils.blit(guiLeft + 76, guiTop + 24, 176, 0, l, 16);
     }
 
 
 
-    public void blit(double left, double top, int uv_left, int uvTop, double width, double height) {
-        int texX = 256;
-        int texY = 256;
-        accurateBlit(left, left + width, top, top + height, (uv_left + 0.0F) / (float)texX, (uv_left + (float)width) / (float)texX, (uvTop + 0.0F) / (float)texY, (uvTop + (float)height) / (float)texY);
-    }
-
-    public static void accurateBlit(double left, double right, double bottom, double top, float uvLeft, float uvTop, float uvRight, float uvBottom) {
-
-        double z = 0;
-        BufferBuilder builder = Tessellator.getInstance().getBuffer();
-        builder.begin(7, DefaultVertexFormats.POSITION_TEX);
-        builder.pos(left, top, z).tex(uvLeft, uvBottom).endVertex();
-        builder.pos(right, top, z).tex(uvTop, uvBottom).endVertex();
-        builder.pos(right, bottom, z).tex(uvTop, uvRight).endVertex();
-        builder.pos(left, bottom, z).tex(uvLeft, uvRight).endVertex();
-        builder.finishDrawing();
-        RenderSystem.enableAlphaTest();
-        WorldVertexBufferUploader.draw(builder);
-    }
 }

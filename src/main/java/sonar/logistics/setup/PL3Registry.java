@@ -25,6 +25,7 @@ import sonar.logistics.blocks.host.NetworkedHostTile;
 import sonar.logistics.blocks.ores.SapphireOreBlock;
 import sonar.logistics.blocks.hammer.ForgingHammerBlock;
 import sonar.logistics.blocks.hammer.ForgingHammerTile;
+import sonar.logistics.client.design.gui.GSIDesignContainer;
 import sonar.logistics.items.crafting.*;
 import sonar.logistics.multiparts.cable.DataCableBlock;
 import sonar.logistics.multiparts.displays.DisplayScreenBlock;
@@ -99,5 +100,7 @@ public class PL3Registry {
                 BlockPos pos = data.readBlockPos();
                 return new ForgingHammerContainer(windowId, inv, pos, PL3.proxy.getClientWorld());
             }).setRegistryName("forging_hammer"));
+
+        event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new GSIDesignContainer(inv)).setRegistryName("gsi_container"));
     }
 }

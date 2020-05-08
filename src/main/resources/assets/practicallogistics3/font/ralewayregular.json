@@ -3,7 +3,9 @@
     {
       "type": "ttf",
       "file": "practicallogistics3:ralewayregular.ttf",
-      "size": 64
+      "size": 11,
+      "shift": [0,0],
+      "oversample": 8.0
     }
   ]
 }

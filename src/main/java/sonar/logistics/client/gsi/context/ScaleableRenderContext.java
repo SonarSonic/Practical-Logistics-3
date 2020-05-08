@@ -20,7 +20,7 @@ public class ScaleableRenderContext {
     public int light;
     public int overlay;
 
-    public Matrix4f lightingMatrix;
+    private Matrix4f lightingMatrix;
     public boolean isGui;
 
     public int bakedLight;
@@ -48,7 +48,11 @@ public class ScaleableRenderContext {
     }
 
     public void resetLightingMatrix(){
-        RenderSystem.setupLevelDiffuseLighting(lightingMatrix);
+        if(lightingMatrix != null && !isGui){
+            RenderSystem.setupLevelDiffuseLighting(lightingMatrix);
+        }else if(isGui) {
+            RenderSystem.setupGuiFlatDiffuseLighting();
+        }
     }
 
     public Matrix4f getMatrix4f(){

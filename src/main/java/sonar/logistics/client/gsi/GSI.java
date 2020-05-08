@@ -1,10 +1,11 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.Vec3d;
+import sonar.logistics.client.design.gui.GSIDesignScreen;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
-import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.string.GlyphString;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
@@ -41,10 +42,12 @@ public class GSI {
 
     public boolean onClicked(DisplayClickContext context){
         if(context.type.isShifting() && context.type.isRight()){
+            Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this, Minecraft.getInstance().player)));
             testStructure();
             queueRebuild(); //TODO REMOVE!!! THIS IS JUST FOR TESTING
             return true;
         }
+
         IScaleableComponent component = getInteractedComponent(context);
         if(component != null){
             context.setOffset((float)component.getAlignment().getRenderAlignment().getX(), (float)component.getAlignment().getRenderAlignment().getY());

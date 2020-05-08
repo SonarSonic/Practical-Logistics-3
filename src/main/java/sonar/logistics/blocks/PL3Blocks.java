@@ -10,6 +10,7 @@ import sonar.logistics.blocks.host.MultipartHostBlock;
 import sonar.logistics.blocks.host.MultipartHostTile;
 import sonar.logistics.blocks.host.NetworkedHostTile;
 import sonar.logistics.blocks.ores.SapphireOreBlock;
+import sonar.logistics.client.design.gui.GSIDesignContainer;
 import sonar.logistics.multiparts.cable.DataCableBlock;
 import sonar.logistics.multiparts.displays.DisplayScreenBlock;
 import sonar.logistics.multiparts.displays.LargeDisplayScreenBlock;
@@ -52,5 +53,9 @@ public class PL3Blocks {
     @ObjectHolder("large_display_screen")
     public static final LargeDisplayScreenBlock LARGE_DISPLAY_SCREEN = null;
 
+    ///// GSI
+
+    @ObjectHolder("gsi_container")
+    public static final ContainerType<GSIDesignContainer> GSI_DESIGN_CONTAINER = null;
 
 }

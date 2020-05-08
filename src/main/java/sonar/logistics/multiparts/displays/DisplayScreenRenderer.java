@@ -28,15 +28,9 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
         matrix.translate((double)tile.getPos().getX() - d0, (double)tile.getPos().getY() - d1, (double)tile.getPos().getZ() - d2);
 
-
-
-        ////// TEST CONSTRUCTION \\\\\\
-
         Vec3d sizing = tile.getScreenSizing();
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5);
         origin = origin.add(DisplayVectorHelper.getFaceOffset(tile.getFacing(), 0.5));
-
-        /////// END TEST CONSTRUCTION \\\\\\
 
 
         ///// START DISPLAY RENDERING \\\\\
@@ -54,18 +48,12 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
 
 
-        ///// START ELEMENT RENDERING \\\\\
+        ///// START GSI RENDERING \\\\\
 
-        ////items
         ScaleableRenderContext renderContext = new ScaleableRenderContext(tile.getGSI(), partialTicks, matrix, renderer, light, overlayLight, worldMatrix, false);
         tile.getGSI().render(renderContext);
-        ///progress bars
 
-        //DisplayRenderHelper.colouredRect(matrix.getLast(), renderer, light, overlayLight, 0,0F, (float)element.getSizing().x, (float)element.getSizing().y, 255, 255, 255, 255);
-
-        //DisplayRenderHelper.fluidRect(new FluidStack(Fluids.LAVA, 500), matrix.getLast(), renderer, light, overlayLight, 0,0, (float)element.getSizing().x, (float)element.getSizing().y);
-
-        ///// END ELEMENT RENDERING \\\\\
+        ///// END GSI RENDERING \\\\\
 
 
         matrix.pop();

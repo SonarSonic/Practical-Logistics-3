@@ -41,6 +41,8 @@ public class ScaleableAlignment {
         this.renderAlignment = properties.getRenderAlignment(this).add(alignment);
     }
 
+
+
     public Vec3d getSizing(){
         return sizing;
     }

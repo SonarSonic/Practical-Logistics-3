@@ -1,9 +1,11 @@
 package sonar.logistics.client.gsi.components.text.fonts;
 
+import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.fonts.Font;
 import net.minecraft.client.gui.fonts.TexturedGlyph;
+import net.minecraft.client.gui.fonts.providers.TrueTypeGlyphProvider;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.PL3;
@@ -13,6 +15,11 @@ public abstract class ScaledFontType {
 
     public static ScaledFontType DEFAULT_MINECRAFT = new ScaledFontType(Minecraft.DEFAULT_FONT_RENDERER_NAME) {
         ResourceLocation loc = Minecraft.DEFAULT_FONT_RENDERER_NAME;
+
+        @Override
+        public void initFont(Font font) {
+            
+        }
 
         @Override
         public RenderType getRenderType(TexturedGlyph glyph) {
@@ -38,23 +45,28 @@ public abstract class ScaledFontType {
         RenderType type = DisplayRenderTypes.getScaledTextType(new ResourceLocation(PL3.MODID, "ralewayregular" + "/" + 1));
 
         @Override
+        public void initFont(Font font) {
+
+        }
+
+        @Override
         public RenderType getRenderType(TexturedGlyph glyph) {
             return type;
         }
 
         @Override
         public float getMinimumSpaceSize() {
-            return (4.0F / 9F) * 64F;
+            return (4.0F / 9F) * getFontScaling();
         }
 
         @Override
         public int getFontScaling() {
-            return 64;
+            return 9;
         }
 
         @Override
         public int getElementScaling() {
-            return (int)(64F * (8F/9F));
+            return (int)(getFontScaling() * (8F/9F));
         }
     };
 
@@ -62,6 +74,7 @@ public abstract class ScaledFontType {
 
     public ScaledFontType(ResourceLocation loc){
         this.font = getFont(loc);
+        this.initFont(font);
     }
 
     public Font getFont(){
@@ -76,6 +89,8 @@ public abstract class ScaledFontType {
         FontRenderer renderer = Minecraft.getInstance().getFontResourceManager().getFontRenderer(loc);
         return renderer == null ? getDefaultMinecraftFont() : renderer.font; ///access transformed renderer.font
     }
+
+    public abstract void initFont(Font font);
 
     public abstract RenderType getRenderType(TexturedGlyph glyph);
 
