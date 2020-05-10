@@ -27,6 +27,7 @@ public class GridContainer extends AbstractContainer {
 
     @Override
     public void render(ScaleableRenderContext context) {
+        super.render(context);
         for(int r = 0; r < rows; r ++) {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r*columns) + c;
@@ -57,7 +58,7 @@ public class GridContainer extends AbstractContainer {
                 IScaleableComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
                 if(component != null){
                     Vec3d componentAlignment = alignment.add(new Vec3d((c * cellSizing.getX()), (r * cellSizing.getY()), 0));
-                    component.build(componentAlignment, cellSizing);
+                    component.build(componentAlignment.add(this.alignment.getRenderAlignment()), cellSizing);
                 }
             }
         }

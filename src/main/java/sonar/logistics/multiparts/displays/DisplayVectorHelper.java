@@ -9,7 +9,6 @@ import net.minecraft.util.math.Vec3i;
 import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.multiparts.displays.api.IDisplay;
-import sonar.logistics.client.gsi.api.IScaleable;
 import sonar.logistics.client.gsi.api.BlockInteractionType;
 import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
 
@@ -21,6 +20,7 @@ import java.util.function.Function;
  * SIZING VECTOR = WIDTH = X, HEIGHT = Y, DEPTH = Z
  * TRANSLATION VECTOR = X-Translate = X, Y-Translate = Z, X-Translate = Z
  * SCALING VECTOR = X-Scale = X, Y-Scale = Z, X-Scale = Z */
+//TODO SWITCH TO MUTABLE VECTORS
 public class DisplayVectorHelper {
 
     public static final Vec3d X_VEC = new Vec3d(1, 0, 0);
@@ -92,10 +92,10 @@ public class DisplayVectorHelper {
         }
         return new Vec3d(x, y, z);
     }
-
+    /*
     /**@param scale the scale of the original vector
      * @param max the maximum size of the vector
-     * @return a new vector of the percentages of fill  */
+     * @return a new vector of the percentages of fill
     public static Vec3d percentageFromScale(Vec3d scale, Vec3d max){
         double percX = (Math.min(scale.x, max.x) / Math.max(scale.x, max.x)) * 100D;
         double percY = (Math.min(scale.y, max.y) / Math.max(scale.y, max.y)) * 100D;
@@ -105,13 +105,14 @@ public class DisplayVectorHelper {
 
     /** @param percentage the percentage of the max vector
      * @param max the maximum size of the vector
-     * @return a new vector with the exact values of fill  */
+     * @return a new vector with the exact values of fill
     public static Vec3d scaleFromPercentage(Vec3d percentage, Vec3d max) {
         double scaleX = (max.x / 100D) * percentage.x;
         double scaleY = (max.y / 100D) * percentage.y;
         double scaleZ = (max.z / 100D) * percentage.z;
         return new Vec3d(scaleX, scaleY, scaleZ);
     }
+    */
 
     /** scales the unscaled width and height to fit the given scaling */
     public static Vec3d scaleFromUnscaledSize(Vec3d unscaled, Vec3d scaling, double percentageFill) { //FIXME returns scaling in Z, check this out.
@@ -387,7 +388,7 @@ public class DisplayVectorHelper {
                intersect = getIntersection(lookOrigin, playerV, distance);
                Vec3d[] vectors = getScreenVectors(to.getScreenRotation(), screenV);
                horizontal = vectors[0]; vertical = vectors[1];
-               return getClickedPosition(to.getScreenSizing(), origin, intersect, horizontal, vertical);
+               return getClickedPosition(to.getGSISizing(), origin, intersect, horizontal, vertical);
             }
         }
         return null;
@@ -403,7 +404,7 @@ public class DisplayVectorHelper {
         double[] clickPosition = getEntityLook(player, display, maxDist);
         if(clickPosition != null) {
             DisplayClickContext clickContext = new DisplayClickContext(type, display.getGSI(), player, false);
-            clickContext.setIntersect((float)clickPosition[0], (float)clickPosition[1]);
+            clickContext.setDisplayClick((float)clickPosition[0], (float)clickPosition[1]);
             return clickContext;
         }
         return null;
@@ -419,7 +420,7 @@ public class DisplayVectorHelper {
         double[] hoverPosition = getEntityLook(player, display, maxDist);
         if(hoverPosition != null) {
             DisplayInteractionContext hoverContext = new DisplayInteractionContext(display.getGSI(), player, false);
-            hoverContext.setIntersect((float)hoverPosition[0], (float)hoverPosition[1]);
+            hoverContext.setDisplayClick((float)hoverPosition[0], (float)hoverPosition[1]);
             return hoverContext;
         }
         return null;

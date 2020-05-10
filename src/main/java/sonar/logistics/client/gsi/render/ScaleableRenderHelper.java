@@ -16,8 +16,8 @@ import sonar.logistics.client.gsi.properties.ColourProperty;
 public class ScaleableRenderHelper {
 
     public static final int FULL_LIGHT = 15728880;
-    public static final Vec3d DEFAULT_TRANSLATION_PERCENTAGE =  new Vec3d(0F, 0F, 0F);
-    public static final Vec3d DEFAULT_SCALE_PERCENTAGE =  new Vec3d(100F, 100F, 100F);
+    public static final Vec3d DEFAULT_ALIGNMENT_PERCENTAGE =  new Vec3d(0, 0, 0);
+    public static final Vec3d DEFAULT_SIZING_PERCENTAGE =  new Vec3d(1, 1, 1);
 
     //// Z OFFSETS \\\\
     public static final float TEXTURE_OFFSET = -0.001F;
@@ -41,7 +41,7 @@ public class ScaleableRenderHelper {
     }
 
     public static void renderColouredRect(ScaleableRenderContext context, float startX, float startY, float endX, float endY, int r, int g, int b, int a){
-        IVertexBuilder builder = context.buffer.getBuffer(DisplayRenderTypes.COLOURED_RECT);
+        IVertexBuilder builder = context.getWorldBuffer().getBuffer(DisplayRenderTypes.COLOURED_RECT);
         Matrix4f matrix4f = context.getMatrix4f();
         builder.pos(matrix4f, startX, endY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).lightmap(context.light).endVertex();
         builder.pos(matrix4f, endX, endY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).lightmap(context.light).endVertex();

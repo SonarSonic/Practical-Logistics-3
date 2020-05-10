@@ -1,13 +1,13 @@
 package sonar.logistics.client.gsi.properties;
 
 import net.minecraft.util.math.Vec3d;
+import org.joml.Rectangled;
 import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
-import sonar.logistics.multiparts.displays.DisplayVectorHelper;
 
 public class ScaleableAlignment {
 
-    private Vec3d sizingPercentage = ScaleableRenderHelper.DEFAULT_SCALE_PERCENTAGE;
-    private Vec3d alignmentPercentage = ScaleableRenderHelper.DEFAULT_TRANSLATION_PERCENTAGE;
+    private Vec3d sizingPercentage = ScaleableRenderHelper.DEFAULT_SIZING_PERCENTAGE;
+    private Vec3d alignmentPercentage = ScaleableRenderHelper.DEFAULT_ALIGNMENT_PERCENTAGE;
 
     private Vec3d sizing;
     private Vec3d alignment;
@@ -15,33 +15,24 @@ public class ScaleableAlignment {
     private Vec3d renderSizing;
     private Vec3d renderAlignment;
 
-    public void setSizingFromPercentage(Vec3d sizingPercentage, Vec3d alignmentPercentage){
-        this.sizingPercentage = sizingPercentage;
+    public void setAlignmentPercentages(Vec3d alignmentPercentage, Vec3d sizingPercentage){
         this.alignmentPercentage = alignmentPercentage;
+        this.sizingPercentage = sizingPercentage;
     }
-
-    /*
-    public void setSizingFromScale(Vec3d scalePercentage, Vec3d translationPercentage){
-        this.containerTranslationPercentage = DisplayVectorHelper.percentageFromScale(translationPercentage, host.getSizing());
-        this.containerSizingPercentage = DisplayVectorHelper.percentageFromScale(scalePercentage, host.getSizing());
-    }
-     */
 
     public void build(Vec3d alignment, Vec3d maxSizing){
-        this.sizing = DisplayVectorHelper.scaleFromPercentage(sizingPercentage, maxSizing);
-        this.alignment = DisplayVectorHelper.scaleFromPercentage(alignmentPercentage, maxSizing).add(alignment);
+        this.sizing = maxSizing.mul(sizingPercentage);
+        this.alignment = maxSizing.mul(alignmentPercentage).add(alignment);
         this.renderSizing = sizing;
         this.renderAlignment = this.alignment;
     }
 
     public void build(Vec3d alignment, Vec3d maxSizing, ScaleableStyling properties){
-        this.sizing = DisplayVectorHelper.scaleFromPercentage(sizingPercentage, maxSizing);
-        this.alignment = DisplayVectorHelper.scaleFromPercentage(alignmentPercentage, maxSizing).add(alignment);
+        this.sizing = maxSizing.mul(sizingPercentage);
+        this.alignment = maxSizing.mul(alignmentPercentage).add(alignment);
         this.renderSizing = properties.getRenderSizing(this);
-        this.renderAlignment = properties.getRenderAlignment(this).add(alignment);
+        this.renderAlignment = properties.getRenderAlignment(this).add(this.alignment);
     }
-
-
 
     public Vec3d getSizing(){
         return sizing;

@@ -1,9 +1,8 @@
 package sonar.logistics.client.design.windows;
 
-import sonar.logistics.client.design.gui.Window;
+import sonar.logistics.client.design.api.Window;
 
 import javax.annotation.Nullable;
-import java.util.function.Function;
 
 public enum EnumRescaleType {
     TOP_LEFT_RESCALE(0.0F, 0.0F),

@@ -1,13 +1,19 @@
 package sonar.logistics.client.gsi.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import sonar.logistics.blocks.PL3Blocks;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.multiparts.displays.DisplayVectorHelper;
 
@@ -32,23 +38,20 @@ public class BatchedItemStackRenderer {
             renderBatchedItemStacks(context, batched3DItemStacks, true, ScaleableRenderHelper.ITEM_OFFSET,0.002F);
         }
         if(!batchedFlatItemStacks.isEmpty()){
-            renderBatchedItemStacks(context, batched3DItemStacks, false, ScaleableRenderHelper.ITEM_OFFSET,0.001F);
+            renderBatchedItemStacks(context, batchedFlatItemStacks, false, ScaleableRenderHelper.ITEM_OFFSET,0.001F);
         }
     }
 
     public static void renderBatchedItemStacks(ScaleableRenderContext context, List<BatchedItemStack> batchedItemStacks, boolean isGui3D, float zOffset, float zScale){
-
-        IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-
-        for (BatchedItemStack stack : batchedItemStacks) {
-            context.matrix.push();
-            context.matrix.translate(stack.alignment.getX(), stack.alignment.getY(), zOffset);
-            context.matrix.scale(1, -1, -1); ////
-            context.matrix.scale((float) stack.scaling.x, (float) stack.scaling.y, zScale);
-            context.matrix.getLast().getNormal().set(Matrix3f.makeScaleMatrix(1, -1, -1)); //scale the lighting too.
-            itemRenderer.renderItem(stack.toRender, ItemCameraTransforms.TransformType.GUI, false, context.matrix, buffer, context.light, OverlayTexture.NO_OVERLAY, stack.model);// GUI LIGHT: 15728880
-            context.matrix.pop();
+        if(context.isGui){
+            RenderSystem.enableRescaleNormal();
+            RenderSystem.enableAlphaTest();
+            RenderSystem.defaultAlphaFunc();
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         }
+
 
         if(isGui3D) {
             RenderHelper.setupGui3DDiffuseLighting();
@@ -56,8 +59,27 @@ public class BatchedItemStackRenderer {
             RenderHelper.setupGuiFlatDiffuseLighting();
         }
 
+        IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+
+        for (BatchedItemStack stack : batchedItemStacks) {
+            context.matrix.push();
+            context.matrix.translate(stack.alignment.getX(), stack.alignment.getY(), zOffset);
+            context.matrix.scale(1, -1, context.isGui ? 1 : -1); ////
+            context.matrix.scale((float) stack.scaling.x, (float) stack.scaling.y, zScale);
+            context.matrix.getLast().getNormal().set(Matrix3f.makeScaleMatrix(1, -1, 1)); //scale the normals
+            itemRenderer.renderItem(stack.toRender, ItemCameraTransforms.TransformType.GUI, false, context.matrix, buffer, context.light, OverlayTexture.NO_OVERLAY, stack.model);
+            context.matrix.pop();
+        }
+
         buffer.finish();
         context.resetLightingMatrix();
+
+        if(context.isGui) {
+            //RenderSystem.enableDepthTest();
+
+            RenderSystem.disableAlphaTest();
+            RenderSystem.disableRescaleNormal();
+        }
     }
 
 

@@ -1,17 +1,21 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
+import sonar.logistics.blocks.PL3Blocks;
 import sonar.logistics.client.design.gui.GSIDesignScreen;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
+import sonar.logistics.client.gsi.components.ElementComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
 import sonar.logistics.client.gsi.components.text.string.GlyphString;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
+import sonar.logistics.client.gsi.containers.GridContainer;
 import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.elements.ItemStackElement;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 import sonar.logistics.multiparts.displays.DisplayVectorHelper;
 import sonar.logistics.multiparts.displays.api.IDisplay;
@@ -34,7 +38,7 @@ public class GSI {
     public boolean onHover(DisplayInteractionContext context){
         IScaleableComponent component = getInteractedComponent(context);
         if(component != null){
-            context.setOffset((float)component.getAlignment().getRenderAlignment().getX(), (float)component.getAlignment().getRenderAlignment().getY());
+            context.setComponentClick(component.getAlignment().getRenderAlignment().getX(), component.getAlignment().getRenderAlignment().getY());
             return component.onHovered(context);
         }
         return false;
@@ -50,7 +54,7 @@ public class GSI {
 
         IScaleableComponent component = getInteractedComponent(context);
         if(component != null){
-            context.setOffset((float)component.getAlignment().getRenderAlignment().getX(), (float)component.getAlignment().getRenderAlignment().getY());
+            context.setComponentClick((float)component.getAlignment().getRenderAlignment().getX(), (float)component.getAlignment().getRenderAlignment().getY());
             return component.onClicked(context);
         }
         return false;
@@ -64,7 +68,7 @@ public class GSI {
 
         DisplayInteractionContext hover = DisplayVectorHelper.createHoverContext(Minecraft.getInstance().player, display);
         if(hover != null){
-            onHover(hover);
+            //onHover(hover);
         }
 
         context.preRender();
@@ -79,9 +83,10 @@ public class GSI {
     ///TODO REMOVE ME!
     public void testStructure(){
         components.clear();
-        //addComponent(new RenderSpeedTest());
 
         StyledTextComponent lines = new StyledTextComponent();
+        lines.alignment.setAlignmentPercentages(new Vec3d(0, 0, 0), new Vec3d(1, 1, 1));
+
         GlyphString element = new GlyphString();
 
 
@@ -117,13 +122,14 @@ public class GSI {
         addComponent(lines);
 
         /*
-        GridContainer subGrid = new GridContainer(null);
-        subGrid.setGridSize(3, 3);
+        GridContainer subGrid = new GridContainer();
+        subGrid.alignment.setAlignmentPercentages(new Vec3d(0, 0.5, 0), new Vec3d(1, 0.5 , 1));
+        subGrid.setGridSize(2, 1);
 
-        subGrid.addComponent(new ElementComponent(subGrid, new ItemStackElement(new ItemStack(Items.REDSTONE), 200)));
-        subGrid.addComponent(new ElementComponent(subGrid, new ItemStackElement(new ItemStack(PL3Items.SAPPHIRE_GEM), 200)));
-
-
+        subGrid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK), 200)));
+        addComponent(subGrid);
+        */
+        /*
 
         GridContainer subsubGrid = new GridContainer(subGrid);
         subGrid.addComponent(subsubGrid);
@@ -167,7 +173,7 @@ public class GSI {
     }
 
     public void rebuild(){
-        components.forEach(c -> c.build(new Vec3d(0,0,0), display.getScreenSizing()));
+        components.forEach(c -> c.build(new Vec3d(0,0,0), display.getGSISizing()));
     }
 
     public void addComponent(IScaleableComponent component){

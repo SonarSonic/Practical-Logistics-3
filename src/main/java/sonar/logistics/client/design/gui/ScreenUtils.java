@@ -2,18 +2,23 @@ package sonar.logistics.client.design.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
+import sonar.logistics.PL3;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 
 public class ScreenUtils {
 
-    public static ColourProperty grey_base = new ColourProperty(5, 5, 2, 50);
-    public static ColourProperty blue_overlay = new ColourProperty(8, 8, 32, 50);
+    public static ColourProperty transparent_grey_bgd = new ColourProperty(5, 5, 2, 50);
+    public static ColourProperty transparent_blue_bgd = new ColourProperty(8, 8, 32, 50);
+
+    public static ColourProperty transparent_grey_button = new ColourProperty(80, 80, 80, 80);
+    public static ColourProperty transparent_red_button = new ColourProperty(255, 120, 120, 120);
+    public static ColourProperty transparent_green_button = new ColourProperty(120, 255, 120, 120);
+
     public static ColourProperty light_grey = new ColourProperty(120, 120, 120);
-    public static ColourProperty resize_green = new ColourProperty(120, 255, 120, 120);
     public static ColourProperty white = new ColourProperty(255, 255, 255);
 
     // display screen colours
@@ -21,7 +26,22 @@ public class ScreenUtils {
     public static ColourProperty display_blue_border = new ColourProperty(128, 190, 213);
     public static ColourProperty display_grey_bgd = new ColourProperty(68, 68, 68);
 
-    public static void fill(double x1, double y1, double x2, double y2, int rgba) {
+    // textures
+    public static ResourceLocation BUTTONS_ALPHA = new ResourceLocation(PL3.MODID,"textures/gui/buttons_alpha.png" );
+
+    ////DEPTH VALUES \\\\
+    /*
+    GL_NEVER    = 0x200, - 512
+    GL_LESS     = 0x201, - 513
+    GL_EQUAL    = 0x202, - 514
+    GL_LEQUAL   = 0x203, - 515
+    GL_GREATER  = 0x204, - 516
+    GL_NOTEQUAL = 0x205, - 517
+    GL_GEQUAL   = 0x206, - 518
+    GL_ALWAYS   = 0x207; - 519
+    */
+
+    public static void fillDouble(double x1, double y1, double x2, double y2, int rgba) {
         double value;
         if (x1 < x2) {
             value = x1;
@@ -35,32 +55,32 @@ public class ScreenUtils {
             y2 = value;
         }
 
-        float lvt_6_3_ = (float)(rgba >> 24 & 255) / 255.0F;
-        float lvt_7_1_ = (float)(rgba >> 16 & 255) / 255.0F;
-        float lvt_8_1_ = (float)(rgba >> 8 & 255) / 255.0F;
-        float lvt_9_1_ = (float)(rgba & 255) / 255.0F;
-        BufferBuilder lvt_10_1_ = Tessellator.getInstance().getBuffer();
+        float alpha = (float)(rgba >> 24 & 255) / 255.0F;
+        float red = (float)(rgba >> 16 & 255) / 255.0F;
+        float green = (float)(rgba >> 8 & 255) / 255.0F;
+        float blue = (float)(rgba & 255) / 255.0F;
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.defaultBlendFunc();
-        lvt_10_1_.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        lvt_10_1_.pos(x1, y2, 0).color(lvt_7_1_, lvt_8_1_, lvt_9_1_, lvt_6_3_).endVertex();
-        lvt_10_1_.pos(x2, y2, 0).color(lvt_7_1_, lvt_8_1_, lvt_9_1_, lvt_6_3_).endVertex();
-        lvt_10_1_.pos( x2, y1, 0).color(lvt_7_1_, lvt_8_1_, lvt_9_1_, lvt_6_3_).endVertex();
-        lvt_10_1_.pos( x1, y1, 0).color(lvt_7_1_, lvt_8_1_, lvt_9_1_, lvt_6_3_).endVertex();
-        lvt_10_1_.finishDrawing();
-        WorldVertexBufferUploader.draw(lvt_10_1_);
+        buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        buffer.pos(x1, y2, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(x2, y2, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos( x2, y1, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos( x1, y1, 0).color(red, green, blue, alpha).endVertex();
+        buffer.finishDrawing();
+        WorldVertexBufferUploader.draw(buffer);
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 
-    public static void blit(double left, double top, int uv_left, int uvTop, double width, double height) {
+    public static void blitDouble(double left, double top, int uv_left, int uvTop, double width, double height) {
         int texX = 256;
         int texY = 256;
-        accurateBlit(left, left + width, top, top + height, (uv_left + 0.0F) / (float)texX, (uv_left + (float)width) / (float)texX, (uvTop + 0.0F) / (float)texY, (uvTop + (float)height) / (float)texY);
+        blitDouble(left, left + width, top, top + height, (uv_left + 0.0F) / (float)texX, (uv_left + (float)width) / (float)texX, (uvTop + 0.0F) / (float)texY, (uvTop + (float)height) / (float)texY);
     }
 
-    public static void accurateBlit(double left, double right, double bottom, double top, float uvLeft, float uvTop, float uvRight, float uvBottom) {
+    public static void blitDouble(double left, double right, double bottom, double top, float uvLeft, float uvTop, float uvRight, float uvBottom) {
         double z = 0;
         BufferBuilder builder = Tessellator.getInstance().getBuffer();
         builder.begin(7, DefaultVertexFormats.POSITION_TEX);

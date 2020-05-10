@@ -36,19 +36,16 @@ public class StyledTextWrapper {
     List<CachedGlyphLine> currentPage;
     boolean isBuildingPage = false;
 
-    private void startPage(boolean lineBreak){
+    private void startPage(){
         if(!isBuildingPage) {
             currentPage = new ArrayList<>();
             pageYOffset = 0;
             isBuildingPage = true;
-            startLine(lineBreak);
         }
     }
 
-    private void finishPage(boolean lineBreak){
+    private void finishPage(){
         if(isBuildingPage) {
-            finishLine(lineBreak);
-
             if (!currentPage.isEmpty()) {
                 cachedGlyphPages.add(currentPage);
             }
@@ -62,10 +59,9 @@ public class StyledTextWrapper {
     CachedGlyphLine currentLine;
     boolean isBuildingLine = false;
 
-    private void startLine(boolean lineBreak){
+    private void startLine(){
         if(!isBuildingLine) {
-            currentLine = new CachedGlyphLine(currentLineStyling, currentGlyphStyling);
-            currentLine.parentStyling = currentGlyphStyling.copy();
+            currentLine = new CachedGlyphLine(currentLineStyling.copy(), currentGlyphStyling.copy());
             isBuildingLine = true;
         }
     }
@@ -75,14 +71,21 @@ public class StyledTextWrapper {
             lastLine = currentLine;
             if (!currentLine.glyphs.isEmpty()) {
                 currentLine.finish(this, lineBreak);
+
+                if(pageYOffset + currentLine.lineHeight > currentSizing.getY()){
+                    ///the line is too big for the current page
+                    finishPage();
+                    startPage();
+                }
+
                 currentPage.add(currentLine);
                 currentLine.offsetY = pageYOffset;
                 pageYOffset += lastLine.lineHeight;
+
             }
             isBuildingLine = false;
-
-            if(currentLine.remainder != null){
-                startLine(false);
+            if(lastLine.remainder != null){
+                startLine();
                 lastLine.remainder.forEach(this::addGlyph); // the line we checked is now the last line...
             }
         }
@@ -102,11 +105,11 @@ public class StyledTextWrapper {
         currentGlyphStyling = parentStyling;
         currentSizing = maxSizing;
         startWrapping();
-        startPage(false);
+        startPage();
 
         glyphElements.forEach(strings -> strings.getGlyphs().forEach(this::addGlyph));
 
-        finishPage(true);
+        finishPage();
         finishWrapping();
     }
 
@@ -117,11 +120,14 @@ public class StyledTextWrapper {
         if(glyph instanceof LineBreakGlyph){
             currentLineStyling = ((LineBreakGlyph) glyph).styling;
             if(((LineBreakGlyph) glyph).page){
-                finishPage(true);
-                startPage(true);
+                finishLine(false);
+                finishPage();
+
+                startPage();
+                startLine();
             }else{
                 finishLine(true);
-                startLine(true);
+                startLine();
             }
             return;
         }
@@ -159,12 +165,7 @@ public class StyledTextWrapper {
             }
 
             finishLine(false);
-            startLine(false);
-        }
-        if(pageYOffset + renderHeight > currentSizing.getY()){
-            ///glyph is too big for the current page
-            finishPage(false);
-            startPage(false);
+            startLine();
         }
         currentLine.addGlyph(this, glyph, renderWidth, renderHeight);
     }
@@ -229,8 +230,6 @@ public class StyledTextWrapper {
             if(!lineBreak && lineStyling.breakPreference.shouldBreakAtSpace()){
 
                 //// finds the last space, removes it then adds to the next line. also has the effect of removing stray spaces from the end of broken lines
-                ///TODO this ignores styling and doesn't change line width.
-
                 if(lastSpaceIndex != -1){
                     remainder = new ArrayList<>();
                     List<IGlyphType> newGlyphs = new ArrayList<>();
@@ -273,6 +272,7 @@ public class StyledTextWrapper {
                     if(!lineBreak) {
                         float size = (float) (wrapper.currentSizing.getX() - (lineWidth - justifyTotalWidth));
                         justifySpaceSize = size / justifySpaceCount;
+                        lineWidth = (float)wrapper.currentSizing.getX(); //justified lines should always take up the max width
                     }
                     break;
             }

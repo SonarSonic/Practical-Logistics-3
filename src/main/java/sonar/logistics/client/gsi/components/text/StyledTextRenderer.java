@@ -2,8 +2,6 @@ package sonar.logistics.client.gsi.components.text;
 
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.gui.fonts.*;
-import net.minecraft.util.ResourceLocation;
-import sonar.logistics.PL3;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
@@ -11,7 +9,6 @@ import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
-import sonar.logistics.client.gsi.render.DisplayRenderTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +37,7 @@ public class StyledTextRenderer {
             context.offsetX += renderer.renderGlyph(glyph, context);
             context.renderContext.matrix.pop();
         }
+
         context.finishLine(line);
         context.renderContext.matrix.pop();
     }
@@ -76,7 +74,7 @@ public class StyledTextRenderer {
         if (!(texturedGlyph instanceof EmptyGlyph)) {
             float boldOffset = context.parentStyling.bold ? glyph.getBoldOffset() : 0.0F;
             float shadowOffset = renderingShadow ? glyph.getShadowOffset() : 0.0F;
-            IVertexBuilder builder = context.renderContext.buffer.getBuffer(context.getScaledFont().getRenderType(texturedGlyph));
+            IVertexBuilder builder = context.renderContext.getTessellatorBuffer().getBuffer(context.getScaledFont().getRenderType(texturedGlyph));
             texturedGlyph.render(context.parentStyling.italic, shadowOffset, shadowOffset, context.renderContext.getMatrix4f(), builder, context.red, context.green, context.blue, context.alpha, context.renderContext.light);
             if (context.parentStyling.bold) {
                 texturedGlyph.render(context.parentStyling.italic, shadowOffset + boldOffset, shadowOffset, context.renderContext.getMatrix4f(), builder, context.red, context.green, context.blue, context.alpha, context.renderContext.light);
@@ -120,6 +118,13 @@ public class StyledTextRenderer {
         }
     }
 
+    public static void addCursorToGlyph(GlyphRenderContext context, float downscale, float glyphWidth){
+        context.addScaledTextureEffect(downscale, glyphWidth - 1.0F, 9.0F * (context.getScaledFont().getElementScaling() / 9F), glyphWidth, 0, -0.01F, 1.0F, 1.0F, 1.0F, 1.0F);
+     }
+
+    public static void addHighlightToGlyph(GlyphRenderContext context, float downscale, float glyphWidth){
+        context.addScaledTextureEffect(downscale, 0, 9.0F * (context.getScaledFont().getElementScaling() / 9F), glyphWidth, 0, 0.01F, 1.0F, 1.0F, 1.0F, 0.5F);
+    }
 
     ///// SIZING \\\\\\
 
@@ -166,6 +171,7 @@ public class StyledTextRenderer {
             this.effects = new ArrayList<>();
             this.offsetX = line.offsetX;
             this.offsetY = line.offsetY;
+            changeStyling(parentStyling);
         }
 
         public void finishLine(StyledTextWrapper.CachedGlyphLine line){
@@ -181,7 +187,7 @@ public class StyledTextRenderer {
         public void flushEffects(){
             if (!effects.isEmpty()) {
                 TexturedGlyph whiteGlyph = ScaledFontType.DEFAULT_MINECRAFT.getFont().getWhiteGlyph();
-                IVertexBuilder builder = renderContext.buffer.getBuffer(ScaledFontType.DEFAULT_MINECRAFT.getRenderType(whiteGlyph));
+                IVertexBuilder builder = renderContext.getTessellatorBuffer().getBuffer(ScaledFontType.DEFAULT_MINECRAFT.getRenderType(whiteGlyph));
                 for (TexturedGlyph.Effect effect : effects) {
                     whiteGlyph.renderEffect(effect, renderContext.getMatrix4f(), builder, renderContext.light);
                 }

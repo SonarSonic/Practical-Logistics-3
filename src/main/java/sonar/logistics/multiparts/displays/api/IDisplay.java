@@ -16,7 +16,7 @@ public interface IDisplay {
 
     /**returns the screens scaling vector in the form WIDTH / HEIGHT / DEPTH
      * this must be implemented on every screen*/
-    Vec3d getScreenSizing();
+    Vec3d getGSISizing();
 
     /**returns the screens rotational vector in the form PITCH / YAW / ROLL
      * by default this is calculated using the screens {@link #getFacing()}*/
@@ -39,7 +39,7 @@ public interface IDisplay {
 
     /**gets the transform required to start the rendering at the top left of the screen*/
     default Vec3d getRenderOffset(){
-        Vec3d size = getScreenSizing();
+        Vec3d size = getGSISizing();
         return new Vec3d(-size.x/2, -size.y/2, 0);
     }
 

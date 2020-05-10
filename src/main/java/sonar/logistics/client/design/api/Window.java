@@ -1,4 +1,4 @@
-package sonar.logistics.client.design.gui;
+package sonar.logistics.client.design.api;
 
 /*a simple rescaleable window which has position and size*/
 public class Window {

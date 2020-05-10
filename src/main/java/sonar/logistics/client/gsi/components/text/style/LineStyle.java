@@ -12,6 +12,11 @@ public class LineStyle {
 
     public LineStyle copy() {
         LineStyle copy = new LineStyle();
+        copy.lineSpacing = lineSpacing;
+        copy.charSpacing = charSpacing;
+        copy.wrappingType = wrappingType;
+        copy.alignType = alignType;
+        copy.breakPreference = breakPreference;
         return copy;
     }
 

@@ -49,7 +49,7 @@ public class DisplayScreenTile extends MultipartTile implements IDisplay {
     }
 
     @Override
-    public Vec3d getScreenSizing() {
+    public Vec3d getGSISizing() {
         return scaling;
     }
 }

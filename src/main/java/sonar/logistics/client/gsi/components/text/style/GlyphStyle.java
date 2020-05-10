@@ -24,8 +24,8 @@ public class GlyphStyle {
 	public GlyphStyle copy() {
 		GlyphStyle style = new GlyphStyle();
 		style.fontHeight = fontHeight;
-		style.textColour = textColour;
-		style.backgroundColour = backgroundColour;
+		style.textColour = new ColourProperty(textColour.rgba);
+		style.backgroundColour = new ColourProperty(backgroundColour.rgba);;
 		style.bold = bold;
 		style.italic = italic;
 		style.underlined = underlined;

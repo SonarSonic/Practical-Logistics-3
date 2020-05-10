@@ -1,10 +1,11 @@
-package sonar.logistics.client.design.gui;
+package sonar.logistics.client.design.gui.widgets;
 
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import sonar.logistics.client.design.api.Window;
+import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.design.windows.EnumRescaleType;
 
 @OnlyIn(Dist.CLIENT)
@@ -39,8 +40,6 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
         return this.active && this.visible && (box != null || currentRescaleType != null) || (mouseX >= window.x && mouseY >= window.y && mouseX < (window.x + window.width) && mouseY < (window.y + window.height));
     }
 
-    double startDragX = 0;
-    double startDragY = 0;
     double dragX = 0;
     double dragY = 0;
 
@@ -62,7 +61,7 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
         if(currentRescaleType != null) {
             window = currentRescaleType.rescaleWindow(window, bounds, snapToGrid(dragX, snapToPixels), snapToGrid(dragY, snapToPixels), isShifting);
             currentRescaleType = null;
-            startDragX = startDragY = dragX = dragY = 0;
+            dragX = dragY = 0;
             return true;
         }
         return false;
@@ -77,8 +76,6 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
         }
         if(this.focused){
             currentRescaleType = EnumRescaleType.getRescaleTypeFromMouse(window, mouseX, mouseY, 4.0F);
-            startDragX = mouseX;
-            startDragY = mouseY;
             dragX = dragY = 0;
             return true;
         }
@@ -106,20 +103,20 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
 
     @Override
     public void render(int i, int i1, float v) {
-        ScreenUtils.fill(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, ScreenUtils.grey_base.rgba);
-        ScreenUtils.fill(window.x, window.y, window.x + window.width, window.y + window.height, ScreenUtils.light_grey.rgba);
+        ScreenUtils.fillDouble(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height, ScreenUtils.transparent_grey_bgd.rgba);
+        ScreenUtils.fillDouble(window.x, window.y, window.x + window.width, window.y + window.height, ScreenUtils.light_grey.rgba);
         if(focused){
             float boxWidth = 3.0F;
             for(EnumRescaleType type : EnumRescaleType.values()){
                 if(type.xPos != -1) {
                     double[] clickBox = type.getClickBox(window, boxWidth);
-                    ScreenUtils.fill(clickBox[0], clickBox[1], clickBox[2], clickBox[3], ScreenUtils.white.rgba);
+                    ScreenUtils.fillDouble(clickBox[0], clickBox[1], clickBox[2], clickBox[3], ScreenUtils.white.rgba);
                 }
             }
         }
         if(currentRescaleType != null){
             Window rescaledWindow = currentRescaleType.rescaleWindow(window, bounds, snapToGrid(dragX, snapToPixels), snapToGrid(dragY, snapToPixels), isShifting);
-            ScreenUtils.fill(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.resize_green.rgba);
+            ScreenUtils.fillDouble(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.transparent_green_button.rgba);
         }
     }
 
@@ -129,7 +126,7 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
     double snapToGrid1 = snapToPixels*4;
     double snapToGrid2 = snapToPixels*8;
 
-    public double snapToGrid(double value, double gridSize){
+    public static double snapToGrid(double value, double gridSize){
         return gridSize * (Math.round(value / gridSize));
     }
 

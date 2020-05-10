@@ -1,13 +1,10 @@
 package sonar.logistics.multiparts.displays;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
 import sonar.logistics.multiparts.base.IMultipartRenderer;
 import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
@@ -28,7 +25,7 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
         matrix.translate((double)tile.getPos().getX() - d0, (double)tile.getPos().getY() - d1, (double)tile.getPos().getZ() - d2);
 
-        Vec3d sizing = tile.getScreenSizing();
+        Vec3d sizing = tile.getGSISizing();
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5);
         origin = origin.add(DisplayVectorHelper.getFaceOffset(tile.getFacing(), 0.5));
 

@@ -1,8 +1,9 @@
 package sonar.logistics.client.gsi.api;
 
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+
+import javax.annotation.Nullable;
 
 public interface IRenderableElement {
 

@@ -2,10 +2,6 @@ package sonar.logistics.blocks.hammer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
@@ -39,10 +35,10 @@ public class ForgingHammerScreen extends ContainerScreen<ForgingHammerContainer>
         this.minecraft.getTextureManager().bindTexture(GUI);
         int relX = (this.width - this.xSize) / 2;
         int relY = (this.height - this.ySize) / 2;
-        ScreenUtils.blit(relX, relY, 0, 0, this.xSize, this.ySize);
+        ScreenUtils.blitDouble(relX, relY, 0, 0, this.xSize, this.ySize);
 
         double l = ((double)tileEntity.progress + partialTicks) * 23 / ForgingHammerTile.processSpeed;
-        ScreenUtils.blit(guiLeft + 76, guiTop + 24, 176, 0, l, 16);
+        ScreenUtils.blitDouble(guiLeft + 76, guiTop + 24, 176, 0, l, 16);
     }
 
 

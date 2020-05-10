@@ -9,8 +9,8 @@ public class DisplayInteractionContext {
     public PlayerEntity player;
     public boolean isUsingGui;
 
-    public float intersectX, intersectY;
-    public float offsetX, offsetY;
+    public double displayX, displayY;
+    public double componentX, componentY;
 
     public DisplayInteractionContext(GSI gsi, PlayerEntity player, boolean isUsingGui){
         this.gsi = gsi;
@@ -18,14 +18,14 @@ public class DisplayInteractionContext {
         this.isUsingGui = isUsingGui;
     }
 
-    public void setIntersect(float intersectX, float intersectY){
-        this.intersectX = intersectX;
-        this.intersectY = intersectY;
+    public void setDisplayClick(double intersectX, double intersectY){ //click position relative to the display
+        this.displayX = intersectX;
+        this.displayY = intersectY;
     }
 
-    public void setOffset(float offsetX, float offsetY){
-        this.offsetX = intersectX - offsetX;
-        this.offsetY = intersectY - offsetY;
+    public void setComponentClick(double offsetX, double offsetY){ //click position relative to the component
+        this.componentX = displayX - offsetX;
+        this.componentY = displayY - offsetY;
     }
 
     public boolean isHover(){

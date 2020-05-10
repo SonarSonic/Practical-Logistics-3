@@ -1,10 +1,11 @@
 package sonar.logistics.client.gsi.components;
 
+import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
 
-public class ElementComponent extends AbstractStyledScaleable {
+public class ElementComponent extends AbstractStyledScaleable implements IScaleableComponent {
 
     public IRenderableElement element;
 
