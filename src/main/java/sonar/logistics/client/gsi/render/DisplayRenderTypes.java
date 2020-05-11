@@ -1,6 +1,5 @@
 package sonar.logistics.client.gsi.render;
 
-import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;

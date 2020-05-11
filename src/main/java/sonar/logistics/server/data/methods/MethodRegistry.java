@@ -6,8 +6,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.PL3;
 import sonar.logistics.server.data.api.categories.IDataCategory;
-import sonar.logistics.server.data.api.methods.*;
-import sonar.logistics.server.data.api.methods.types.*;
+import sonar.logistics.server.data.api.methods.IMethod;
+import sonar.logistics.server.data.api.methods.MethodBlock;
+import sonar.logistics.server.data.api.methods.MethodTileEntity;
+import sonar.logistics.server.data.api.methods.MethodWorld;
+import sonar.logistics.server.data.api.methods.types.IMethodBlock;
+import sonar.logistics.server.data.api.methods.types.IMethodEntity;
+import sonar.logistics.server.data.api.methods.types.IMethodTileEntity;
+import sonar.logistics.server.data.api.methods.types.IMethodWorld;
 
 import java.util.ArrayList;
 import java.util.List;

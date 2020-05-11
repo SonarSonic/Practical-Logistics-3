@@ -4,8 +4,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.network.NetworkEvent;
-import sonar.logistics.utils.network.EnumSyncType;
-import sonar.logistics.blocks.base.SyncableTile;
+import sonar.logistics.common.blocks.base.SyncableTile;
+import sonar.logistics.util.network.EnumSyncType;
 
 public class TileSyncPacket extends TileAbstractPacket {
 

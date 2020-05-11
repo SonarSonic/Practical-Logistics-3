@@ -8,7 +8,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 import sonar.logistics.PL3;
-import sonar.logistics.utils.network.EnumSyncType;
+import sonar.logistics.util.network.EnumSyncType;
 
 import java.util.HashMap;
 import java.util.HashSet;

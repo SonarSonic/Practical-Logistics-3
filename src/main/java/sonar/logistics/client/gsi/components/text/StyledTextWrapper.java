@@ -1,6 +1,5 @@
 package sonar.logistics.client.gsi.components.text;
 
-import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.components.text.api.IGlyphString;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;

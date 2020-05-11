@@ -3,7 +3,6 @@ package sonar.logistics.client.design.gui.widgets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import sonar.logistics.client.design.gui.ScreenUtils;
-import sonar.logistics.client.gsi.properties.ColourProperty;
 
 import java.util.function.Function;
 

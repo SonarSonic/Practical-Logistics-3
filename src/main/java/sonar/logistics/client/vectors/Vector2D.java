@@ -1,6 +1,6 @@
 package sonar.logistics.client.vectors;
 
-import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
+import sonar.logistics.common.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 public class Vector2D {
 
@@ -68,10 +68,10 @@ public class Vector2D {
     /////
 
     public static Vector2D getSizingFromRatio(Vector2D sizing, Vector2D ratio){
-        double actualElementScale = Math.min(sizing.x / ratio.x, sizing.y / ratio.y);
-        double actualElementWidth = (ratio.x * actualElementScale);
-        double actualElementHeight = (ratio.y * actualElementScale);
-        return new Vector2D( actualElementWidth, actualElementHeight);
+        double scalar = Math.min(sizing.x / ratio.x, sizing.y / ratio.y);
+        double width = (ratio.x * scalar);
+        double height = (ratio.y * scalar);
+        return new Vector2D(width, height);
     }
 
     public static Vector2D align(Vector2D scale, Vector2D max, ElementAlignment xAlign, ElementAlignment yAlign) {

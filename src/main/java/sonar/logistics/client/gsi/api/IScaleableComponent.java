@@ -1,6 +1,5 @@
 package sonar.logistics.client.gsi.api;
 
-import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 
@@ -15,7 +14,7 @@ public interface IScaleableComponent extends IScaleable, IRenderable {
      }
 
     default boolean canInteract(DisplayInteractionContext context) {
-        return getAlignment().getBounds().contains(context.displayHit);
+        return getBounds().maxBounds().contains(context.displayHit);
     }
 
     default boolean onClicked(DisplayClickContext context){

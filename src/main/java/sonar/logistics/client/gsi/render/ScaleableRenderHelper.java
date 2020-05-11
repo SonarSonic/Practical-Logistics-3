@@ -8,12 +8,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
 
 public class ScaleableRenderHelper {
 

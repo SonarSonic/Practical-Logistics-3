@@ -11,13 +11,13 @@ import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sonar.logistics.blocks.ores.SapphireOreGen;
-import sonar.logistics.multiparts.PL3Multiparts;
+import sonar.logistics.common.blocks.ores.SapphireOreGen;
+import sonar.logistics.common.multiparts.PL3Multiparts;
 import sonar.logistics.networking.PL3PacketHandler;
+import sonar.logistics.networking.proxy.ClientProxy;
+import sonar.logistics.networking.proxy.IProxy;
+import sonar.logistics.networking.proxy.ServerProxy;
 import sonar.logistics.server.caches.network.PL3NetworkManager;
-import sonar.logistics.setup.ClientProxy;
-import sonar.logistics.setup.IProxy;
-import sonar.logistics.setup.ServerProxy;
 
 @Mod(PL3.MODID)
 public class PL3 {

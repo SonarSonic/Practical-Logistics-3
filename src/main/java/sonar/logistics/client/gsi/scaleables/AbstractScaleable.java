@@ -6,22 +6,22 @@ import sonar.logistics.client.vectors.Quad2D;
 
 public abstract class AbstractScaleable implements IScaleable {
 
-    public ScaleableBounds alignment = new ScaleableBounds();
+    public ScaleableBounds bounds = new ScaleableBounds();
 
     public AbstractScaleable() {}
 
-    public void setAlignment(ScaleableBounds alignment){
-        this.alignment = alignment;
+    public void setBounds(ScaleableBounds bounds){
+        this.bounds = bounds;
     }
 
     @Override
     public void build(Quad2D bounds) {
-        this.alignment.build(bounds);
+        this.bounds.build(bounds);
     }
 
     @Override
-    public ScaleableBounds getAlignment() {
-        return alignment;
+    public ScaleableBounds getBounds() {
+        return bounds;
     }
 
 }

@@ -46,10 +46,10 @@ public class GridContainer extends AbstractContainer {
     public void build(Quad2D bounds) {
         super.build(bounds);
         if(setCellSize) {
-            this.rows = (int)Math.floor(alignment.getRenderBounds().getHeight()/ cellSize.getY());
-            this.columns = (int)Math.floor(alignment.getRenderBounds().getWidth()/ cellSize.getX());
+            this.rows = (int)Math.floor(this.bounds.renderBounds().getHeight()/ cellSize.getY());
+            this.columns = (int)Math.floor(this.bounds.renderBounds().getWidth()/ cellSize.getX());
         }else {
-            this.cellSize = this.alignment.getRenderBounds().getSizing().mul(1D / columns, 1D / rows);
+            this.cellSize = this.bounds.renderBounds().getSizing().mul(1D / columns, 1D / rows);
         }
 
         /////set the sizing for each component.
@@ -58,7 +58,7 @@ public class GridContainer extends AbstractContainer {
                 int pos = (r*columns) + c;
                 IScaleableComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
                 if(component != null){
-                    Vector2D componentAlignment = alignment.getRenderBounds().getAlignment().add(c * cellSize.getX(), r * cellSize.getY());
+                    Vector2D componentAlignment = this.bounds.renderBounds().getAlignment().add(c * cellSize.getX(), r * cellSize.getY());
                     component.build(new Quad2D(componentAlignment, cellSize));
                 }
             }

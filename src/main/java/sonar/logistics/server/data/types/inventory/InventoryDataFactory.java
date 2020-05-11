@@ -5,7 +5,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import sonar.logistics.server.data.api.IDataFactory;
 import sonar.logistics.server.data.types.changes.ChangeableNumber;
 

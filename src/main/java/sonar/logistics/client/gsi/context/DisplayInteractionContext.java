@@ -5,8 +5,6 @@ import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
 
-import java.awt.geom.Point2D;
-
 public class DisplayInteractionContext {
 
     public GSI gsi;

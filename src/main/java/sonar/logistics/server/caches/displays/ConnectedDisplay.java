@@ -2,12 +2,11 @@ package sonar.logistics.server.caches.displays;
 
 import com.google.common.collect.Lists;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import sonar.logistics.PL3;
-import sonar.logistics.multiparts.displays.LargeDisplayScreenTile;
+import sonar.logistics.common.multiparts.displays.LargeDisplayScreenTile;
 import sonar.logistics.server.cables.EnumCableTypes;
 import sonar.logistics.server.cables.ICableCache;
-import sonar.logistics.utils.ListHelper;
+import sonar.logistics.util.ListHelper;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

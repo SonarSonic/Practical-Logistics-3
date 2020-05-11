@@ -7,11 +7,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import sonar.logistics.server.caches.displays.ConnectedDisplayManager;
-import sonar.logistics.server.caches.network.PL3NetworkManager;
-import sonar.logistics.utils.ListHelper;
-import sonar.logistics.utils.network.EnumSyncType;
-import sonar.logistics.utils.network.ISyncable;
+import sonar.logistics.util.ListHelper;
+import sonar.logistics.util.network.EnumSyncType;
+import sonar.logistics.util.network.ISyncable;
 
 import javax.annotation.Nullable;
 import java.util.*;

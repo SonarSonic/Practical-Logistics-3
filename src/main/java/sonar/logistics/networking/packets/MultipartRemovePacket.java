@@ -3,9 +3,9 @@ package sonar.logistics.networking.packets;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
-import sonar.logistics.blocks.host.MultipartHostTile;
-import sonar.logistics.multiparts.utils.EnumMultipartSlot;
-import sonar.logistics.multiparts.base.MultipartEntry;
+import sonar.logistics.common.blocks.host.MultipartHostTile;
+import sonar.logistics.common.multiparts.base.MultipartEntry;
+import sonar.logistics.common.multiparts.utils.EnumMultipartSlot;
 
 public class MultipartRemovePacket extends MultipartAbstractPacket {
 

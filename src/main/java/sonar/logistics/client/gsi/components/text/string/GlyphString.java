@@ -3,12 +3,12 @@ package sonar.logistics.client.gsi.components.text.string;
 import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.components.text.api.IGlyphString;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
-import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
-import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.ElementGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.StyleGlyph;
+import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
+import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
 import java.util.ArrayList;
 import java.util.List;

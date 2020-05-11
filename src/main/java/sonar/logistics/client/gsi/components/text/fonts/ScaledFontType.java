@@ -1,11 +1,9 @@
 package sonar.logistics.client.gsi.components.text.fonts;
 
-import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.fonts.Font;
 import net.minecraft.client.gui.fonts.TexturedGlyph;
-import net.minecraft.client.gui.fonts.providers.TrueTypeGlyphProvider;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.PL3;

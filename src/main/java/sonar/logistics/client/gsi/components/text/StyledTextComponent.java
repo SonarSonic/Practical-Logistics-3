@@ -3,7 +3,7 @@ package sonar.logistics.client.gsi.components.text;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import sonar.logistics.client.gsi.api.*;
+import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.api.IGlyphString;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
@@ -37,7 +37,7 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
     @Override
     public void build(Quad2D bounds) {
         super.build(bounds);
-        this.textWrapper.wrap(fontType, glyphStrings, parentStyling, this.alignment.getRenderBounds().getSizing());
+        this.textWrapper.wrap(fontType, glyphStrings, parentStyling, this.bounds.renderBounds().getSizing());
         this.pageCount = textWrapper.cachedGlyphPages.size();
     }
 
@@ -47,7 +47,7 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
         if(textWrapper.cachedGlyphPages.size() > page){
             context.matrix.push();
 
-            context.matrix.translate(alignment.getRenderBounds().getX(), alignment.getRenderBounds().getY(), -0.01F);
+            context.matrix.translate(bounds.renderBounds().getX(), bounds.renderBounds().getY(), -0.01F);
             StyledTextRenderer.renderCachedGlyphLines(context, fontType, textWrapper.cachedGlyphPages.get(page), this);
 
             context.matrix.pop();

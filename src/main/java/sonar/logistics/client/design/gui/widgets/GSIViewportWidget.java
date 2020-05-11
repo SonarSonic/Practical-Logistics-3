@@ -6,10 +6,10 @@ import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IRenderable;
 import org.lwjgl.opengl.GL11;
+import sonar.logistics.client.design.api.IFlexibleGuiEventListener;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.design.gui.interactions.ViewportAbstractInteraction;
-import sonar.logistics.client.design.api.IFlexibleGuiEventListener;
 import sonar.logistics.client.design.windows.EnumRescaleType;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
@@ -23,7 +23,7 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     public GSI gsi;
 
     public IScaleableComponent selectedComponent;
-    public double x, y, width, height;
+    public Quad2D bounds;
 
     public double centreX, centreY;
     public double scaling;
@@ -32,22 +32,19 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     public GSIViewportWidget(GSI gsi, double x, double y, double width, double height){
         GSIDesignSettings.clearViewportInteraction();
         this.gsi = gsi;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.bounds = new Quad2D(x, y, width, height);
         this.defaultCentre();
         this.defaultScaling();
     }
 
     //the default multiplier for rendering the GSI.
     public void defaultScaling(){
-        this.scaling = Math.min(160, Math.min(width / getGSIRenderWidth(), height / getGSIRenderHeight()));
+        this.scaling = Math.min(160, Math.min(bounds.width / getGSIRenderWidth(), bounds.height / getGSIRenderHeight()));
     }
 
     public void defaultCentre(){
-        this.centreX = width / 2;
-        this.centreY = height / 2;
+        this.centreX = bounds.width / 2;
+        this.centreY = bounds.height / 2;
     }
 
     //// DISPLAY RELATIVE VALUES \\\\
@@ -86,12 +83,12 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     //the x offset of the central render point, can be outside of the scissored range
     public double getCentreOffsetX(){
-        return x + centreX;
+        return bounds.x + centreX;
     }
 
     //the y offset of the central render point, can be outside of the scissored range
     public double getCentreOffsetY(){
-        return y + centreY;
+        return bounds.y + centreY;
     }
 
     //the total x render offset relative to the gui, not the display
@@ -111,17 +108,17 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     //the components window relative to the gui
     public Quad2D getScaledBoundsForComponent(IScaleableComponent component){
-        return component.getAlignment().getBounds().copy().factor(scaling).translate(getRenderOffsetX(), getRenderOffsetY());
+        return component.getBounds().maxBounds().copy().factor(scaling).translate(getRenderOffsetX(), getRenderOffsetY());
     }
 
     //converts the gui relative window sizing to display relative sizing
-    public void setAlignmentFromWindow(IScaleableComponent component, Quad2D window){
+    public void setBoundsFromScaledBounds(IScaleableComponent component, Quad2D scaledBounds){
         Quad2D bounds = getBoundsForDisplay();
-        double x = (window.x - bounds.x) / bounds.width;
-        double y = (window.y - bounds.y) / bounds.height;
-        double width = window.width / bounds.width;
-        double height = window.height / bounds.height;
-        component.getAlignment().setAlignmentPercentages(new Quad2D(x, y, width, height));
+        double x = (scaledBounds.x - bounds.x) / bounds.width;
+        double y = (scaledBounds.y - bounds.y) / bounds.height;
+        double width = scaledBounds.width / bounds.width;
+        double height = scaledBounds.height / bounds.height;
+        component.getBounds().setBoundPercentages(new Quad2D(x, y, width, height));
         gsi.queueRebuild();
     }
 
@@ -132,7 +129,7 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         MainWindow mainWindow = Minecraft.getInstance().getMainWindow();
         double scale = mainWindow.getGuiScaleFactor();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor((int) (x * scale), (int) (mainWindow.getHeight() - ((y + height) * scale)), (int) (width * scale), (int) (height * scale));
+        GL11.glScissor((int) (bounds.x * scale), (int) (mainWindow.getHeight() - ((bounds.y + bounds.height) * scale)), (int) (bounds.width * scale), (int) (bounds.height * scale));
 
         ///align render - scissored
         RenderSystem.pushMatrix();
@@ -159,7 +156,7 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         RenderSystem.enableDepthTest();
         RenderSystem.translated(0, 0, 10);
         DecimalFormat df = new DecimalFormat("#.##");
-        Minecraft.getInstance().fontRenderer.drawString("X: " + df.format(centreX - width / 2) + ", Y: " + df.format(centreY - height / 2) + ", Zoom: " + df.format(scaling/16), (int)x + 2, (int) (y + height - 11), ScreenUtils.white.rgba);
+        Minecraft.getInstance().fontRenderer.drawString("X: " + df.format(centreX - bounds.width / 2) + ", Y: " + df.format(centreY - bounds.height / 2) + ", Zoom: " + df.format(scaling/16), (int)bounds.getX() + 2, (int) (bounds.getMaxY() - 11), ScreenUtils.white.rgba);
         RenderSystem.translated(0, 0, -10);
         RenderSystem.disableDepthTest();
 
@@ -171,7 +168,7 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     }
 
     public boolean isMouseOverViewport(double mouseX, double mouseY) {
-        return (mouseX >= x && mouseY >= y && mouseX < (x + width) && mouseY < (y + height));
+        return bounds.contains(mouseX, mouseY);
     }
 
     @Override

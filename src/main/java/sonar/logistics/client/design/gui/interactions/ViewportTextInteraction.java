@@ -86,7 +86,7 @@ public class ViewportTextInteraction extends ViewportAbstractInteraction impleme
         }
         DisplayInteractionContext context = new DisplayInteractionContext(viewport.gsi, Minecraft.getInstance().player, true);
         context.setDisplayClick((mouseX - viewport.getRenderOffsetX()) / viewport.scaling, (mouseY - viewport.getRenderOffsetY()) / viewport.scaling);
-        context.offsetComponentHit(textComponent.getAlignment().getRenderBounds().getX(), textComponent.getAlignment().getRenderBounds().getY());
+        context.offsetComponentHit(textComponent.getBounds().renderBounds().getX(), textComponent.getBounds().renderBounds().getY());
         StyledTextWrapper.CachedGlyphLine interactedLine = textComponent.getInteractedLine(context);
         return textComponent.getInteractedGlyph(context, interactedLine);
     }
@@ -104,7 +104,7 @@ public class ViewportTextInteraction extends ViewportAbstractInteraction impleme
                 if(selectedComponent instanceof StyledTextComponent){
                     textComponent = (StyledTextComponent) selectedComponent;
                     textComponent.specialGlyphRenderer = this;
-                    context.offsetComponentHit(textComponent.getAlignment().getRenderBounds().getX(), textComponent.getAlignment().getRenderBounds().getY());
+                    context.offsetComponentHit(textComponent.getBounds().renderBounds().getX(), textComponent.getBounds().renderBounds().getY());
                     StyledTextWrapper.CachedGlyphLine interactedLine = textComponent.getInteractedLine(context);
                     Tuple<IGlyphType, GlyphStyle> interactedGlyph = textComponent.getInteractedGlyph(context, interactedLine);
                     if(interactedLine != null){
@@ -160,8 +160,8 @@ public class ViewportTextInteraction extends ViewportAbstractInteraction impleme
     public Tuple<CursorPoint, CursorPoint> getSelectionFromDrag(DraggedSelection draggedSelection){
 
         List<StyledTextWrapper.CachedGlyphLine> page = getCurrentPage();
-        double offsetX = textComponent.getAlignment().getRenderBounds().getX();
-        double offsetY = textComponent.getAlignment().getRenderBounds().getY();
+        double offsetX = textComponent.getBounds().renderBounds().getX();
+        double offsetY = textComponent.getBounds().renderBounds().getY();
 
         IGlyphType start = null;
         IGlyphType end = null;

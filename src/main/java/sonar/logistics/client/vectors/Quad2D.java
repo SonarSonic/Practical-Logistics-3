@@ -1,6 +1,6 @@
 package sonar.logistics.client.vectors;
 
-import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
+import sonar.logistics.common.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 public class Quad2D {
 
@@ -122,8 +122,16 @@ public class Quad2D {
         return v.x >= getX() && v.x <= getMaxX() && v.y >= getY() && v.y <= getMaxY();
     }
 
+    public boolean contains(double xV, double xY){
+        return xV >= getX() && xV <= getMaxX() && xY >= getY() && xY <= getMaxY();
+    }
+
     public boolean inside(Vector2D v){
         return v.x > getX() && v.x < getMaxX() && v.y > getY() && v.y < getMaxY();
+    }
+
+    public boolean inside(double xV, double xY){
+        return xV > getX() && xV < getMaxX() && xY > getY() && xY < getMaxY();
     }
 
     /////

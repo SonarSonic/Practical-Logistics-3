@@ -5,7 +5,7 @@ import sonar.logistics.client.vectors.Quad2D;
 
 public interface IScaleable {
 
-    ScaleableBounds getAlignment();
+    ScaleableBounds getBounds();
 
     void build(Quad2D bounds);
 

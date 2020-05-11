@@ -1,7 +1,7 @@
 package sonar.logistics.server.caches.network;
 
-import sonar.logistics.multiparts.networking.IDataSourceNode;
-import sonar.logistics.multiparts.networking.INetworkedTile;
+import sonar.logistics.common.multiparts.networking.IDataSourceNode;
+import sonar.logistics.common.multiparts.networking.INetworkedTile;
 
 import java.util.ArrayList;
 import java.util.HashMap;

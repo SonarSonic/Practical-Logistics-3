@@ -1,12 +1,12 @@
 package sonar.logistics.client.gsi.components;
 
+import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
-import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
+import sonar.logistics.common.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 import java.util.List;
 
@@ -68,10 +68,10 @@ public class GridComponent extends AbstractStyledScaleable implements IScaleable
         super.build(bounds);
 
         if(setCellSize) {
-            this.rows = (int)Math.floor(alignment.getRenderBounds().getHeight()/ cellSize.getY());
-            this.columns = (int)Math.floor(alignment.getRenderBounds().getWidth()/ cellSize.getX());
+            this.rows = (int)Math.floor(this.bounds.renderBounds().getHeight()/ cellSize.getY());
+            this.columns = (int)Math.floor(this.bounds.renderBounds().getWidth()/ cellSize.getX());
         }else {
-            this.cellSize = this.alignment.getRenderBounds().getSizing().mul(1D / columns, 1D / rows);
+            this.cellSize = this.bounds.renderBounds().getSizing().mul(1D / columns, 1D / rows);
         }
 
         double uniformScale = Math.min(cellSize.x, cellSize.y);

@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.api;
 
-import sonar.logistics.utils.network.ISyncable;
+import sonar.logistics.util.network.ISyncable;
 
 import java.util.List;
 

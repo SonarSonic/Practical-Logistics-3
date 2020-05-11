@@ -2,7 +2,7 @@ package sonar.logistics.server.data.holders;
 
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.data.api.IDataWatcher;
-import sonar.logistics.utils.MathUtils;
+import sonar.logistics.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;

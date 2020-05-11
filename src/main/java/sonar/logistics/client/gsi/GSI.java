@@ -11,9 +11,9 @@ import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.vectors.DisplayVectorHelper;
 import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.multiparts.displays.DisplayVectorHelper;
-import sonar.logistics.multiparts.displays.api.IDisplay;
+import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class GSI {
     public boolean onHover(DisplayInteractionContext context){
         IScaleableComponent component = getInteractedComponent(context);
         if(component != null){
-            context.offsetComponentHit(component.getAlignment().getRenderBounds());
+            context.offsetComponentHit(component.getBounds().renderBounds());
             return component.onHovered(context);
         }
         return false;
@@ -49,7 +49,7 @@ public class GSI {
 
         IScaleableComponent component = getInteractedComponent(context);
         if(component != null){
-            context.offsetComponentHit(component.getAlignment().getRenderBounds());
+            context.offsetComponentHit(component.getBounds().renderBounds());
             return component.onClicked(context);
         }
         return false;
@@ -80,7 +80,7 @@ public class GSI {
         components.clear();
 
         StyledTextComponent lines = new StyledTextComponent();
-        lines.alignment.setAlignmentPercentages(new Quad2D(0, 0, 1, 1));
+        lines.bounds.setBoundPercentages(new Quad2D(0, 0, 1, 1));
 
         GlyphString element = new GlyphString();
 

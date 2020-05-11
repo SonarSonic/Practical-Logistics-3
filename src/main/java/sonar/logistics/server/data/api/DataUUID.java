@@ -3,13 +3,10 @@ package sonar.logistics.server.data.api;
 import com.google.common.base.Objects;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.Constants;
-import sonar.logistics.utils.network.EnumSyncType;
-import sonar.logistics.utils.network.ISyncable;
+import sonar.logistics.util.network.EnumSyncType;
+import sonar.logistics.util.network.ISyncable;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
 
 /** used to identify data and find the source it originated from */
 @Nonnull

@@ -1,12 +1,15 @@
 package sonar.logistics.client.gsi.components.text;
 
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.gui.fonts.*;
+import net.minecraft.client.gui.fonts.EmptyGlyph;
+import net.minecraft.client.gui.fonts.Font;
+import net.minecraft.client.gui.fonts.IGlyph;
+import net.minecraft.client.gui.fonts.TexturedGlyph;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
-import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
-import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
-import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
+import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
+import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
+import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 

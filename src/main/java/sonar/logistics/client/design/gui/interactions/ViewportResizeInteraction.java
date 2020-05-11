@@ -3,8 +3,8 @@ package sonar.logistics.client.design.gui.interactions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
-import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.design.gui.ScreenUtils;
+import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.design.windows.EnumRescaleType;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.vectors.Quad2D;
@@ -60,7 +60,7 @@ public class ViewportResizeInteraction extends ViewportAbstractInteraction {
     public void onDragFinished(double mouseX, double mouseY, int button) {
         super.onDragFinished(mouseX, mouseY, button);
         if(viewport.currentRescaleType != null && viewport.selectedComponent != null) {
-            viewport.setAlignmentFromWindow(viewport.selectedComponent, viewport.currentRescaleType.rescaleWindow(viewport.getScaledBoundsForComponent(viewport.selectedComponent), viewport.getBoundsForDisplay(), viewport.getSnappedDragX(dragX), viewport.getSnappedDragY(dragY), Screen.hasShiftDown()));
+            viewport.setBoundsFromScaledBounds(viewport.selectedComponent, viewport.currentRescaleType.rescaleWindow(viewport.getScaledBoundsForComponent(viewport.selectedComponent), viewport.getBoundsForDisplay(), viewport.getSnappedDragX(dragX), viewport.getSnappedDragY(dragY), Screen.hasShiftDown()));
             viewport.currentRescaleType = null;
         }
     }

@@ -1,9 +1,6 @@
 package sonar.logistics.client.design.gui.interactions.hotkeys;
 
-import net.java.games.input.Keyboard;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.util.text.TextFormatting;
 import sonar.logistics.client.design.gui.interactions.ViewportTextInteraction;
 
 public enum HotKeyFunctions {

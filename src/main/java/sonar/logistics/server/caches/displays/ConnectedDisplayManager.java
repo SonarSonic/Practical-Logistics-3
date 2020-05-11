@@ -1,18 +1,18 @@
 package sonar.logistics.server.caches.displays;
 
-import com.google.common.graph.Network;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import sonar.logistics.PL3;
-import sonar.logistics.blocks.host.MultipartHostHelper;
-import sonar.logistics.blocks.host.MultipartHostTile;
-import sonar.logistics.blocks.host.NetworkedHostTile;
-import sonar.logistics.multiparts.base.MultipartEntry;
-import sonar.logistics.multiparts.displays.LargeDisplayScreenTile;
-import sonar.logistics.multiparts.utils.EnumMultipartSlot;
-import sonar.logistics.server.cables.*;
+import sonar.logistics.common.blocks.host.MultipartHostHelper;
+import sonar.logistics.common.blocks.host.MultipartHostTile;
+import sonar.logistics.common.blocks.host.NetworkedHostTile;
+import sonar.logistics.common.multiparts.base.MultipartEntry;
+import sonar.logistics.common.multiparts.displays.LargeDisplayScreenTile;
+import sonar.logistics.common.multiparts.utils.EnumMultipartSlot;
+import sonar.logistics.server.cables.EnumCableTypes;
+import sonar.logistics.server.cables.ICableHelper;
 import sonar.logistics.server.caches.AbstractCableCacheListener;
 
 import javax.annotation.Nullable;

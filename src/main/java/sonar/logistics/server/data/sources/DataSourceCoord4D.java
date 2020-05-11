@@ -1,15 +1,11 @@
 package sonar.logistics.server.data.sources;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import sonar.logistics.server.data.api.IEnvironment;
 

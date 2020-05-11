@@ -1,8 +1,8 @@
 package sonar.logistics.client.gsi.components;
 
+import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
 
 public class ElementComponent extends AbstractStyledScaleable implements IScaleableComponent {
@@ -23,7 +23,7 @@ public class ElementComponent extends AbstractStyledScaleable implements IScalea
     public void render(ScaleableRenderContext context) {
         super.render(context);
         context.matrix.push();
-        element.render(context, alignment.getRenderBounds());
+        element.render(context, bounds.renderBounds());
         context.matrix.pop();
     }
 

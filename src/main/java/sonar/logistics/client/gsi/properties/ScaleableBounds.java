@@ -10,7 +10,7 @@ public class ScaleableBounds {
     private Quad2D size;
     private Quad2D renderSize;
 
-    public void setAlignmentPercentages(Quad2D percentages){
+    public void setBoundPercentages(Quad2D percentages){
         this.percentages = percentages;
     }
 
@@ -24,11 +24,11 @@ public class ScaleableBounds {
         this.renderSize = properties.getRenderSizing(size);
     }
 
-    public Quad2D getBounds(){
+    public Quad2D maxBounds(){
         return size;
     }
 
-    public Quad2D getRenderBounds(){
+    public Quad2D renderBounds(){
         return renderSize;
     }
 
