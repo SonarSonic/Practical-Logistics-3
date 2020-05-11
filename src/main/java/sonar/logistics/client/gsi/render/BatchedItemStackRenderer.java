@@ -1,21 +1,17 @@
 package sonar.logistics.client.gsi.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import sonar.logistics.blocks.PL3Blocks;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.multiparts.displays.DisplayVectorHelper;
+import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +79,8 @@ public class BatchedItemStackRenderer {
     }
 
 
-    public void addBatchedItemStack(ItemStack toRender, Vec3d alignment, Vec3d scaling){
-        BatchedItemStack batchedItemStack = new BatchedItemStack(toRender, alignment, scaling);
+    public void addBatchedItemStack(ItemStack toRender, Quad2D bounds){
+        BatchedItemStack batchedItemStack = new BatchedItemStack(toRender, bounds);
         if(batchedItemStack.isGui3D){
             batched3DItemStacks.add(batchedItemStack);
         }else{
@@ -94,19 +90,19 @@ public class BatchedItemStackRenderer {
 
     public static class BatchedItemStack{
 
-        public static Vec3d unscaledSize = new Vec3d(1,1,1);
+        public static Vector2D ITEM_RATIO = new Vector2D(1,1);
 
         public ItemStack toRender;
         public IBakedModel model;
-        public Vec3d alignment;
-        public Vec3d scaling;
+        public Vector2D alignment;
+        public Vector2D scaling;
         public boolean isGui3D;
 
-        public BatchedItemStack(ItemStack toRender, Vec3d alignment, Vec3d maxSizing){
+        public BatchedItemStack(ItemStack toRender, Quad2D bounds){
             this.toRender = toRender;
             this.model = itemRenderer.getItemModelWithOverrides(toRender, null, null);
-            this.scaling = DisplayVectorHelper.scaleFromUnscaledSize(unscaledSize, maxSizing, 1);
-            this.alignment = alignment.add((maxSizing.getX()/2 - scaling.getX()/2) + scaling.x/2, (maxSizing.getY()/2 - scaling.getY()/2) + scaling.y/2, 0);
+            this.scaling = Vector2D.getSizingFromRatio(bounds.getSizing(), ITEM_RATIO);
+            this.alignment = Vector2D.align(scaling, bounds.getSizing(), ElementAlignment.CENTERED, ElementAlignment.CENTERED);
             this.isGui3D = model.isGui3d();
         }
 

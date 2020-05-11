@@ -2,6 +2,7 @@ package sonar.logistics.multiparts.displays;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
+import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.server.caches.displays.ConnectedDisplay;
 import sonar.logistics.server.caches.displays.ConnectedDisplayManager;
@@ -14,7 +15,7 @@ public class LargeDisplayScreenTile extends DisplayScreenTile {
     public int connectedDisplayID = -1;
     public ConnectedDisplay connectedDisplay;
 
-    public LargeDisplayScreenTile(MultipartEntry entry, Vec3d scaling) {
+    public LargeDisplayScreenTile(MultipartEntry entry, Quad2D scaling) {
         super(entry, scaling);
     }
 

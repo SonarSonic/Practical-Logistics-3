@@ -4,6 +4,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.multiparts.displays.DisplayVectorHelper;
 
 public interface IDisplay {
@@ -15,8 +16,8 @@ public interface IDisplay {
     BlockPos getPos();
 
     /**returns the screens scaling vector in the form WIDTH / HEIGHT / DEPTH
-     * this must be implemented on every screen*/
-    Vec3d getGSISizing();
+     * this must be implemented on every screen */
+    Quad2D getGSIBounds();
 
     /**returns the screens rotational vector in the form PITCH / YAW / ROLL
      * by default this is calculated using the screens {@link #getFacing()}*/
@@ -39,8 +40,7 @@ public interface IDisplay {
 
     /**gets the transform required to start the rendering at the top left of the screen*/
     default Vec3d getRenderOffset(){
-        Vec3d size = getGSISizing();
-        return new Vec3d(-size.x/2, -size.y/2, 0);
+        return new Vec3d(-getGSIBounds().getWidth()/2, -getGSIBounds().getHeight()/2, 0);
     }
 
     default void onGSIInvalidate(){}

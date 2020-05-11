@@ -1,14 +1,12 @@
 package sonar.logistics.client.gsi.properties;
 
-import net.minecraft.util.math.Vec3d;
-import sonar.logistics.multiparts.displays.DisplayVectorHelper;
+import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 public class ScaleableStyling {
 
-    public ElementAlignment xAlign = ElementAlignment.CENTERED;
-    public ElementAlignment yAlign = ElementAlignment.CENTERED;
-    public ElementAlignment zAlign = ElementAlignment.CENTERED;
+    public ElementAlignment alignX = ElementAlignment.CENTERED;
+    public ElementAlignment alignY = ElementAlignment.CENTERED;
 
     public ColourProperty textColour = new ColourProperty(255, 255, 255, 255);
     public ColourProperty bgdColour = new ColourProperty(0, 0, 0, 0);;
@@ -20,25 +18,21 @@ public class ScaleableStyling {
     public BorderProperty borderSize = new BorderProperty(0.0625F/4, false);
     public BorderProperty borderPadding = new BorderProperty(0.0625F/4, false);
 
-    public Vec3d getRenderSizing(ScaleableAlignment alignment){
-        double width = alignment.getSizing().getX();
-        double height = alignment.getSizing().getY();
+    public Quad2D getRenderSizing(Quad2D bounds){
 
-        width-= marginWidth.getRenderSize((float)alignment.getSizing().getX())*2;
-        height -= marginHeight.getRenderSize((float)alignment.getSizing().getY())*2;
+        Quad2D renderSize = bounds.copy();
+
+        renderSize.width -= marginWidth.getRenderSize((float)bounds.getWidth())*2;
+        renderSize.height -= marginHeight.getRenderSize((float)bounds.getHeight())*2;
 
         if(borderSize.value != 0) {
-            width -= borderSize.getRenderSize((float)alignment.getSizing().getX())*2;
-            height -= borderSize.getRenderSize((float)alignment.getSizing().getY())*2;
+            renderSize.width -= borderSize.getRenderSize((float)bounds.getWidth())*2;
+            renderSize.height -= borderSize.getRenderSize((float)bounds.getHeight())*2;
 
-            width -= borderPadding.getRenderSize((float)alignment.getSizing().getX())*2;
-            height -= borderPadding.getRenderSize((float)alignment.getSizing().getY())*2;
+            renderSize.width -= borderPadding.getRenderSize((float)bounds.getWidth())*2;
+            renderSize.height -= borderPadding.getRenderSize((float)bounds.getHeight())*2;
         }
-        return new Vec3d(width, height,0);
-    }
-
-    public Vec3d getRenderAlignment(ScaleableAlignment alignment){
-        return DisplayVectorHelper.alignArrayWithin(alignment.getRenderSizing(), alignment.getSizing(), xAlign, yAlign, zAlign);
+        return renderSize.align(bounds, alignX, alignY);
     }
 
 }

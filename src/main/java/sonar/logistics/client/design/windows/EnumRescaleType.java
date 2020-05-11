@@ -1,6 +1,6 @@
 package sonar.logistics.client.design.windows;
 
-import sonar.logistics.client.design.api.Window;
+import sonar.logistics.client.vectors.Quad2D;
 
 import javax.annotation.Nullable;
 
@@ -30,7 +30,7 @@ public enum EnumRescaleType {
         return yPos == 1.0F ? 0.0F : yPos == 0.0F ? 1.0F : 0.5F;
     }
 
-    public Window moveWindow(Window window, Window bounds, double dragX, double dragY, boolean isShifting){
+    public Quad2D moveWindow(Quad2D window, Quad2D bounds, double dragX, double dragY, boolean isShifting){
         if(isShifting){
             if(Math.abs(dragX) >= Math.abs(dragY)){ // snap to axis with biggest drag
                 dragY = 0;
@@ -52,11 +52,11 @@ public enum EnumRescaleType {
             newY = bounds.y + bounds.height - window.height;
         }
 
-        return new Window(newX, newY, window.width, window.height);
+        return new Quad2D(newX, newY, window.width, window.height);
     }
 
 
-    public Window rescaleWindow(Window window, Window bounds, double dragX, double dragY, boolean isShifting){
+    public Quad2D rescaleWindow(Quad2D window, Quad2D bounds, double dragX, double dragY, boolean isShifting){
         if(this == MOVE){ // moving this method is for neatness but may also be useful later
             return moveWindow(window, bounds, dragX, dragY, isShifting);
         }
@@ -107,23 +107,23 @@ public enum EnumRescaleType {
             newH = -newH;
         }
 
-        return new Window(newX, newY, newW, newH);
+        return new Quad2D(newX, newY, newW, newH);
     }
 
-    public double[] getClickBox(Window window, float boxSize){
+    public double[] getClickBox(Quad2D window, float boxSize){
         if(this == MOVE){
             return new double[]{window.x, window.y, window.x + window.width, window.y + window.height};
         }
         return new double[]{window.x + xPos * window.width - boxSize/2F, window.y + yPos * window.height - boxSize/2F, window.x + xPos * window.width + boxSize/2F, window.y + yPos * window.height + boxSize/2F};
     }
 
-    public boolean isMouseOver(Window window, double mouseX, double mouseY, float boxSize){
+    public boolean isMouseOver(Quad2D window, double mouseX, double mouseY, float boxSize){
         double[] boxPos = getClickBox(window, boxSize);
         return mouseX >= boxPos[0] && mouseY >= boxPos[1] && mouseX < boxPos[2] && mouseY < boxPos[3];
     }
 
     @Nullable
-    public static EnumRescaleType getRescaleTypeFromMouse(Window window, double mouseX, double mouseY, float boxSize){
+    public static EnumRescaleType getRescaleTypeFromMouse(Quad2D window, double mouseX, double mouseY, float boxSize){
         for(EnumRescaleType box : values()){
             if(box.isMouseOver(window, mouseX, mouseY, boxSize)){
                 return box;

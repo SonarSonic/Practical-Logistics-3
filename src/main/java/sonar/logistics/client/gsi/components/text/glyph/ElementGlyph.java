@@ -6,6 +6,7 @@ import sonar.logistics.client.gsi.components.text.StyledTextRenderer;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
+import sonar.logistics.client.vectors.Quad2D;
 
 public class ElementGlyph implements IGlyphType {
 
@@ -30,7 +31,7 @@ public class ElementGlyph implements IGlyphType {
         float size = getRenderWidth(context.getScaledFont(), context.parentStyling);
         if(element.canRender(context.renderContext)){
             context.renderContext.matrix.push();
-            element.render(context.renderContext, new Vec3d(context.offsetX, context.offsetY, 0), new Vec3d(size, size, 0));
+            element.render(context.renderContext, new Quad2D(context.offsetX, context.offsetY, size, size));
             context.renderContext.matrix.pop();
         }
         return size;

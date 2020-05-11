@@ -1,11 +1,11 @@
 package sonar.logistics.client.gsi.scaleables;
 
-import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.api.IRenderable;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.gsi.properties.ScaleableAlignment;
+import sonar.logistics.client.gsi.properties.ScaleableBounds;
 import sonar.logistics.client.gsi.properties.ScaleableStyling;
 import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
+import sonar.logistics.client.vectors.Quad2D;
 
 public abstract class AbstractStyledScaleable extends AbstractScaleable implements IRenderable {
 
@@ -18,8 +18,8 @@ public abstract class AbstractStyledScaleable extends AbstractScaleable implemen
     }
 
     @Override
-    public void build(Vec3d alignment, Vec3d maxSizing) {
-        this.alignment.build(alignment, maxSizing, styling);
+    public void build(Quad2D bounds) {
+        this.alignment.build(bounds, styling);
     }
 
     @Override
@@ -27,20 +27,20 @@ public abstract class AbstractStyledScaleable extends AbstractScaleable implemen
         renderBorders(context, alignment, styling);
     }
 
-    public static void renderBorders(ScaleableRenderContext context, ScaleableAlignment alignment, ScaleableStyling styling){
-        float marginWidth = styling.marginWidth.getRenderSize((float)alignment.getSizing().getX());
-        float marginHeight = styling.marginHeight.getRenderSize((float)alignment.getSizing().getY());
+    public static void renderBorders(ScaleableRenderContext context, ScaleableBounds alignment, ScaleableStyling styling){
+        double marginWidth = styling.marginWidth.getRenderSize(alignment.getBounds().getWidth());
+        double marginHeight = styling.marginHeight.getRenderSize(alignment.getBounds().getHeight());
 
-        float endX = (float)alignment.getSizing().getX() - marginWidth;
-        float endY = (float)alignment.getSizing().getY() - marginHeight;
+        double endX = alignment.getBounds().getWidth() - marginWidth;
+        double endY = alignment.getBounds().getHeight() - marginHeight;
 
-        float borderWidth = styling.borderSize.getRenderSize((float)alignment.getSizing().getX());
-        float borderHeight = styling.borderSize.getRenderSize((float)alignment.getSizing().getY());
+        double borderWidth = styling.borderSize.getRenderSize(alignment.getBounds().getWidth());
+        double borderHeight = styling.borderSize.getRenderSize(alignment.getBounds().getHeight());
 
-        ScaleableRenderHelper.renderColouredRect(context, alignment.getAlignment(), marginWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
-        ScaleableRenderHelper.renderColouredRect(context, alignment.getAlignment(), endX-borderWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
+        ScaleableRenderHelper.renderColouredRect(context, alignment.getBounds(), marginWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
+        ScaleableRenderHelper.renderColouredRect(context, alignment.getBounds(), endX-borderWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
 
-        ScaleableRenderHelper.renderColouredRect(context, alignment.getAlignment(), marginWidth, marginHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
-        ScaleableRenderHelper.renderColouredRect(context, alignment.getAlignment(), marginWidth, endY - borderHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
+        ScaleableRenderHelper.renderColouredRect(context, alignment.getBounds(), marginWidth, marginHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
+        ScaleableRenderHelper.renderColouredRect(context, alignment.getBounds(), marginWidth, endY - borderHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
     }
 }

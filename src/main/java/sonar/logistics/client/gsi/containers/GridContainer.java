@@ -1,15 +1,16 @@
 package sonar.logistics.client.gsi.containers;
 
-import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 
 public class GridContainer extends AbstractContainer {
 
     public int columns, rows;
     public boolean setCellSize;
 
-    public Vec3d cellSizing;
+    public Vector2D cellSize;
 
     public GridContainer() {
         super();
@@ -20,8 +21,8 @@ public class GridContainer extends AbstractContainer {
         this.rows = rows;
     }
 
-    public void setCellSize(Vec3d cellSizing){
-        this.cellSizing = cellSizing;
+    public void setCellSize(Vector2D cellSize){
+        this.cellSize = cellSize;
         this.setCellSize = true;
     }
 
@@ -42,13 +43,13 @@ public class GridContainer extends AbstractContainer {
     }
 
     @Override
-    public void build(Vec3d alignment, Vec3d maxSizing) {
-        super.build(alignment, maxSizing);
+    public void build(Quad2D bounds) {
+        super.build(bounds);
         if(setCellSize) {
-            this.rows = (int)Math.floor(this.alignment.getRenderSizing().getY()/cellSizing.getY());
-            this.columns = (int)Math.floor(this.alignment.getRenderSizing().getX()/cellSizing.getX());
+            this.rows = (int)Math.floor(alignment.getRenderBounds().getHeight()/ cellSize.getY());
+            this.columns = (int)Math.floor(alignment.getRenderBounds().getWidth()/ cellSize.getX());
         }else {
-            this.cellSizing = this.alignment.getRenderSizing().mul(1D / columns, 1D / rows, 0);
+            this.cellSize = this.alignment.getRenderBounds().getSizing().mul(1D / columns, 1D / rows);
         }
 
         /////set the sizing for each component.
@@ -57,8 +58,8 @@ public class GridContainer extends AbstractContainer {
                 int pos = (r*columns) + c;
                 IScaleableComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
                 if(component != null){
-                    Vec3d componentAlignment = alignment.add(new Vec3d((c * cellSizing.getX()), (r * cellSizing.getY()), 0));
-                    component.build(componentAlignment.add(this.alignment.getRenderAlignment()), cellSizing);
+                    Vector2D componentAlignment = alignment.getRenderBounds().getAlignment().add(c * cellSize.getX(), r * cellSize.getY());
+                    component.build(new Quad2D(componentAlignment, cellSize));
                 }
             }
         }

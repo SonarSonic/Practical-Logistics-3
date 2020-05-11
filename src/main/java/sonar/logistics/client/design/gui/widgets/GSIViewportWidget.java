@@ -5,9 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IRenderable;
-import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
-import sonar.logistics.client.design.api.Window;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.design.gui.interactions.ViewportAbstractInteraction;
@@ -16,6 +14,7 @@ import sonar.logistics.client.design.windows.EnumRescaleType;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.vectors.Quad2D;
 
 import java.text.DecimalFormat;
 
@@ -65,12 +64,12 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     //the total render width of the gsi, including borders
     public double getGSIRenderWidth(){
-        return gsi.display.getGSISizing().getX() + getGSIBorderWidth()*2;
+        return gsi.display.getGSIBounds().getWidth() + getGSIBorderWidth()*2;
     }
 
     //the total render height of the gsi, including borders
     public double getGSIRenderHeight(){
-        return gsi.display.getGSISizing().getY() + getGSIBorderHeight()*2;
+        return gsi.display.getGSIBounds().getHeight() + getGSIBorderHeight()*2;
     }
 
     //the drag x value relative to the display, snapped to the nearest pixel(s) according to the current grid size
@@ -106,27 +105,23 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     }
 
     //the bounds of the display relative to the gui
-    public Window getBoundsForDisplay(){
-        return new Window(getRenderOffsetX(), getRenderOffsetY(), gsi.display.getGSISizing().getX() * scaling, gsi.display.getGSISizing().getY() * scaling);
+    public Quad2D getBoundsForDisplay(){
+        return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.display.getGSIBounds().getWidth() * scaling, gsi.display.getGSIBounds().getHeight() * scaling);
     }
 
     //the components window relative to the gui
-    public Window getWindowForComponent(IScaleableComponent component){
-        double wX = component.getAlignment().getAlignment().getX() * scaling;
-        double wY = component.getAlignment().getAlignment().getY() * scaling;
-        double wW = component.getAlignment().getSizing().getX() * scaling;
-        double wH = component.getAlignment().getSizing().getY() * scaling;
-        return new Window(wX + getRenderOffsetX(), wY + getRenderOffsetY(), wW, wH);
+    public Quad2D getScaledBoundsForComponent(IScaleableComponent component){
+        return component.getAlignment().getBounds().copy().factor(scaling).translate(getRenderOffsetX(), getRenderOffsetY());
     }
 
     //converts the gui relative window sizing to display relative sizing
-    public void setAlignmentFromWindow(IScaleableComponent component, Window window){
-        Window bounds = getBoundsForDisplay();
-        double x = (window.x - bounds.x)/bounds.width;
-        double y = (window.y - bounds.y)/bounds.height;
+    public void setAlignmentFromWindow(IScaleableComponent component, Quad2D window){
+        Quad2D bounds = getBoundsForDisplay();
+        double x = (window.x - bounds.x) / bounds.width;
+        double y = (window.y - bounds.y) / bounds.height;
         double width = window.width / bounds.width;
         double height = window.height / bounds.height;
-        component.getAlignment().setAlignmentPercentages(new Vec3d(x, y, 0), new Vec3d(width, height, 100));
+        component.getAlignment().setAlignmentPercentages(new Quad2D(x, y, width, height));
         gsi.queueRebuild();
     }
 
@@ -146,9 +141,9 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         RenderSystem.translated(-(getGSIRenderWidth()/2) + getGSIBorderWidth(), - (getGSIRenderHeight()/2) + getGSIBorderHeight(), 0);
 
         //screen background - scissored
-        ScreenUtils.fillDouble(-getGSIBorderWidth(), -getGSIBorderHeight(), gsi.display.getGSISizing().getX() + getGSIBorderWidth(), gsi.display.getGSISizing().getY() + getGSIBorderHeight(), ScreenUtils.display_black_border.rgba);
-        ScreenUtils.fillDouble(-getGSIBorderWidth()/2, -getGSIBorderHeight()/2, gsi.display.getGSISizing().getX() + getGSIBorderWidth()/2, gsi.display.getGSISizing().getY() + getGSIBorderHeight()/2, ScreenUtils.display_blue_border.rgba);
-        ScreenUtils.fillDouble(0, 0, gsi.display.getGSISizing().getX(), gsi.display.getGSISizing().getY(), ScreenUtils.display_grey_bgd.rgba);
+        ScreenUtils.fillDouble(-getGSIBorderWidth(), -getGSIBorderHeight(), gsi.display.getGSIBounds().getWidth() + getGSIBorderWidth(), gsi.display.getGSIBounds().getHeight() + getGSIBorderHeight(), ScreenUtils.display_black_border.rgba);
+        ScreenUtils.fillDouble(-getGSIBorderWidth()/2, -getGSIBorderHeight()/2, gsi.display.getGSIBounds().getWidth() + getGSIBorderWidth()/2, gsi.display.getGSIBounds().getHeight() + getGSIBorderHeight()/2, ScreenUtils.display_blue_border.rgba);
+        ScreenUtils.fillDouble(0, 0, gsi.display.getGSIBounds().getWidth(), gsi.display.getGSIBounds().getHeight(), ScreenUtils.display_grey_bgd.rgba);
 
         //gsi rendering - scissored
         ScaleableRenderContext context = new ScaleableRenderContext(gsi, partialTicks, new MatrixStack());

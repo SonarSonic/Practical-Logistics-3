@@ -8,9 +8,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
+import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 import sonar.logistics.multiparts.displays.api.IDisplay;
 import sonar.logistics.client.gsi.api.BlockInteractionType;
-import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -142,28 +143,6 @@ public class DisplayVectorHelper {
         }
         return new Vec3d(maxX, maxY, maxZ);
     }
-
-    public static Vec3d alignArrayWithin(Vec3d scale, Vec3d max, ElementAlignment xAlign, ElementAlignment yAlign, ElementAlignment zAlign) {
-        double x = alignValue(scale.x, max.x, xAlign);
-        double y = alignValue(scale.y, max.y,  yAlign);
-        double z = alignValue(scale.z, max.z,  zAlign);
-        return new Vec3d(x, y, z);
-    }
-
-    public static double alignValue(double scale, double max,  ElementAlignment align) {
-        switch (align) {
-            case CENTERED:
-                return (max / 2) - (scale / 2);
-            case LEFT:
-                break;
-            case RIGHT:
-                return max - scale;
-        }
-        return 0;
-    }
-
-
-
 
 
     /*
@@ -353,13 +332,13 @@ public class DisplayVectorHelper {
      * @param vertical the screens vertical vector
      * @return the exact click position, taking into account the origin*/
     @Nullable
-    public static double[] getClickedPosition(Vec3d sizing, Vec3d origin, Vec3d intersect, Vec3d horizontal, Vec3d vertical){
+    public static Vector2D getClickedPosition(Quad2D sizing, Vec3d origin, Vec3d intersect, Vec3d horizontal, Vec3d vertical){
         Vec3d pos = intersect.subtract(origin);
         double intersect_hoz = pos.dotProduct(horizontal);
         double intersect_ver = pos.dotProduct(vertical);
 
-        if(-sizing.x/2D < intersect_hoz && intersect_hoz < sizing.x/2D && -sizing.y/2D < intersect_ver && intersect_ver < sizing.y/2D){
-            return new double[]{sizing.x - (pos.dotProduct(horizontal)+sizing.x/2D), sizing.y - (pos.dotProduct(vertical)+sizing.y/2D)};
+        if(-sizing.getWidth()/2D < intersect_hoz && intersect_hoz < sizing.getWidth()/2D && -sizing.getHeight()/2D < intersect_ver && intersect_ver < sizing.getHeight()/2D){
+            return new Vector2D(sizing.getWidth() - (pos.dotProduct(horizontal)+sizing.getWidth()/2D), sizing.getHeight() - (pos.dotProduct(vertical)+sizing.getHeight()/2D));
         }
         return null;
     }
@@ -374,7 +353,7 @@ public class DisplayVectorHelper {
      * @param maxDist the maximum block reach of the player
      * @return the exact click position, taking into account the origin*/
     @Nullable
-    public static double[] getEntityLook(Entity from, IDisplay to, double maxDist){
+    public static Vector2D getEntityLook(Entity from, IDisplay to, double maxDist){
         if(from == null || to == null){
             return null;
         }
@@ -388,7 +367,7 @@ public class DisplayVectorHelper {
                intersect = getIntersection(lookOrigin, playerV, distance);
                Vec3d[] vectors = getScreenVectors(to.getScreenRotation(), screenV);
                horizontal = vectors[0]; vertical = vectors[1];
-               return getClickedPosition(to.getGSISizing(), origin, intersect, horizontal, vertical);
+               return getClickedPosition(to.getGSIBounds(), origin, intersect, horizontal, vertical);
             }
         }
         return null;
@@ -401,10 +380,10 @@ public class DisplayVectorHelper {
 
     @Nullable
     public static DisplayClickContext createClickContext(BlockInteractionType type, PlayerEntity player, IDisplay display, int maxDist){
-        double[] clickPosition = getEntityLook(player, display, maxDist);
+        Vector2D clickPosition = getEntityLook(player, display, maxDist);
         if(clickPosition != null) {
             DisplayClickContext clickContext = new DisplayClickContext(type, display.getGSI(), player, false);
-            clickContext.setDisplayClick((float)clickPosition[0], (float)clickPosition[1]);
+            clickContext.setDisplayClick(clickPosition);
             return clickContext;
         }
         return null;
@@ -417,10 +396,10 @@ public class DisplayVectorHelper {
 
     @Nullable
     public static DisplayInteractionContext createHoverContext(PlayerEntity player, IDisplay display, int maxDist){
-        double[] hoverPosition = getEntityLook(player, display, maxDist);
+        Vector2D hoverPosition = getEntityLook(player, display, maxDist);
         if(hoverPosition != null) {
             DisplayInteractionContext hoverContext = new DisplayInteractionContext(display.getGSI(), player, false);
-            hoverContext.setDisplayClick((float)hoverPosition[0], (float)hoverPosition[1]);
+            hoverContext.setDisplayClick(hoverPosition);
             return hoverContext;
         }
         return null;

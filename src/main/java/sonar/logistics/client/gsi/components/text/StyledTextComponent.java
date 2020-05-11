@@ -1,7 +1,6 @@
 package sonar.logistics.client.gsi.components.text;
 
 import net.minecraft.util.Tuple;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import sonar.logistics.client.gsi.api.*;
@@ -15,6 +14,7 @@ import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
+import sonar.logistics.client.vectors.Quad2D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +35,9 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
     public StyledTextComponent() {}
 
     @Override
-    public void build(Vec3d alignment, Vec3d maxSizing) {
-        super.build(alignment, maxSizing);
-        this.textWrapper.wrap(fontType, glyphStrings, parentStyling, this.alignment.getRenderSizing());
+    public void build(Quad2D bounds) {
+        super.build(bounds);
+        this.textWrapper.wrap(fontType, glyphStrings, parentStyling, this.alignment.getRenderBounds().getSizing());
         this.pageCount = textWrapper.cachedGlyphPages.size();
     }
 
@@ -47,7 +47,7 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
         if(textWrapper.cachedGlyphPages.size() > page){
             context.matrix.push();
 
-            context.matrix.translate(alignment.getRenderAlignment().getX(), alignment.getRenderAlignment().getY(), -0.01F);
+            context.matrix.translate(alignment.getRenderBounds().getX(), alignment.getRenderBounds().getY(), -0.01F);
             StyledTextRenderer.renderCachedGlyphLines(context, fontType, textWrapper.cachedGlyphPages.get(page), this);
 
             context.matrix.pop();
@@ -110,7 +110,7 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
                 float startY = line.offsetY;
                 float endY = line.offsetY + line.lineHeight;
 
-                if (startX < context.componentX && endX > context.componentX && startY < context.componentY && endY > context.componentY) {
+                if (startX < context.componentHit.x && endX > context.componentHit.x && startY < context.componentHit.y && endY > context.componentHit.y) {
                     return line;
                 }
             }
@@ -139,7 +139,7 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
             float startY = line.offsetY;
             float endY = line.offsetY + renderHeight;
             totalWidth+=renderWidth;
-            if(startX < context.componentX && endX > context.componentX && startY < context.componentY && endY > context.componentY){
+            if(startX < context.componentHit.x && endX > context.componentHit.x && startY < context.componentHit.y && endY > context.componentHit.y){
                 return new Tuple<>(glyph, style);
             }
         }

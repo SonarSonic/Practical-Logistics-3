@@ -1,11 +1,11 @@
 package sonar.logistics.client.gsi.components;
 
-import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
-import sonar.logistics.multiparts.displays.DisplayVectorHelper;
+import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 import sonar.logistics.multiparts.displays.old.info.elements.base.ElementAlignment;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class GridComponent extends AbstractStyledScaleable implements IScaleable
     public boolean setCellSize;
 
     public boolean forceUniform;
-    public Vec3d uniformScaling, cellSizing, uniformAlignment;
+    public Vector2D uniformScaling, cellSize, uniformAlignment;
     public ElementAlignment xAlign = ElementAlignment.CENTERED, yAlign = ElementAlignment.CENTERED;
 
     public GridComponent() {
@@ -34,8 +34,8 @@ public class GridComponent extends AbstractStyledScaleable implements IScaleable
         this.rows = rows;
     }
 
-    public void setCellSize(Vec3d cellSizing){
-        this.cellSizing = cellSizing;
+    public void setCellSize(Vector2D cellSizing){
+        this.cellSize = cellSizing;
         this.setCellSize = true;
     }
 
@@ -53,9 +53,9 @@ public class GridComponent extends AbstractStyledScaleable implements IScaleable
                 if(element != null && element.canRender(context)){
                     context.matrix.push();
                     if(forceUniform || element.isUniformScaling(context)) {
-                        element.render(context, new Vec3d((c * cellSizing.getX()) + uniformAlignment.getX(), (r * cellSizing.getY()) + uniformAlignment.getY(), 0), uniformScaling);
+                        element.render(context, new Quad2D((c * cellSize.getX()) + uniformAlignment.getX(), (r * cellSize.getY()) + uniformAlignment.getY(), uniformScaling.getX(), uniformScaling.getY()));
                     }else{
-                        element.render(context, new Vec3d((c * cellSizing.getX()), (r * cellSizing.getY()), 0), cellSizing);
+                        element.render(context, new Quad2D(c * cellSize.getX(), r * cellSize.getY(), cellSize.getX(), cellSize.getY()));
                     }
                     context.matrix.pop();
                 }
@@ -64,18 +64,18 @@ public class GridComponent extends AbstractStyledScaleable implements IScaleable
     }
 
     @Override
-    public void build(Vec3d alignment, Vec3d maxSizing) {
-        super.build(alignment, maxSizing);
+    public void build(Quad2D bounds) {
+        super.build(bounds);
 
         if(setCellSize) {
-            this.rows = (int)Math.floor(this.alignment.getRenderSizing().getY()/cellSizing.getY());
-            this.columns = (int)Math.floor(this.alignment.getRenderSizing().getX()/cellSizing.getX());
+            this.rows = (int)Math.floor(alignment.getRenderBounds().getHeight()/ cellSize.getY());
+            this.columns = (int)Math.floor(alignment.getRenderBounds().getWidth()/ cellSize.getX());
         }else {
-            this.cellSizing = this.alignment.getRenderSizing().mul(1D / columns, 1D / rows, 0);
+            this.cellSize = this.alignment.getRenderBounds().getSizing().mul(1D / columns, 1D / rows);
         }
 
-        double uniformScale = Math.min(cellSizing.x, cellSizing.y);
-        this.uniformScaling = new Vec3d(uniformScale, uniformScale, 0);
-        this.uniformAlignment = DisplayVectorHelper.alignArrayWithin(uniformScaling, cellSizing, xAlign, yAlign, ElementAlignment.LEFT);
+        double uniformScale = Math.min(cellSize.x, cellSize.y);
+        this.uniformScaling = new Vector2D(uniformScale, uniformScale);
+        this.uniformAlignment = Vector2D.align(uniformScaling, cellSize, xAlign, yAlign);
     }
 }

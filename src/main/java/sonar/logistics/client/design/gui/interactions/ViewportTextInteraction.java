@@ -1,7 +1,6 @@
 package sonar.logistics.client.design.gui.interactions;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.fonts.IGlyph;
 import net.minecraft.util.Tuple;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.ScreenUtils;
@@ -18,7 +17,6 @@ import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +86,7 @@ public class ViewportTextInteraction extends ViewportAbstractInteraction impleme
         }
         DisplayInteractionContext context = new DisplayInteractionContext(viewport.gsi, Minecraft.getInstance().player, true);
         context.setDisplayClick((mouseX - viewport.getRenderOffsetX()) / viewport.scaling, (mouseY - viewport.getRenderOffsetY()) / viewport.scaling);
-        context.setComponentClick(textComponent.getAlignment().getRenderAlignment().getX(), textComponent.getAlignment().getRenderAlignment().getY());
+        context.offsetComponentHit(textComponent.getAlignment().getRenderBounds().getX(), textComponent.getAlignment().getRenderBounds().getY());
         StyledTextWrapper.CachedGlyphLine interactedLine = textComponent.getInteractedLine(context);
         return textComponent.getInteractedGlyph(context, interactedLine);
     }
@@ -106,7 +104,7 @@ public class ViewportTextInteraction extends ViewportAbstractInteraction impleme
                 if(selectedComponent instanceof StyledTextComponent){
                     textComponent = (StyledTextComponent) selectedComponent;
                     textComponent.specialGlyphRenderer = this;
-                    context.setComponentClick(textComponent.getAlignment().getRenderAlignment().getX(), textComponent.getAlignment().getRenderAlignment().getY());
+                    context.offsetComponentHit(textComponent.getAlignment().getRenderBounds().getX(), textComponent.getAlignment().getRenderBounds().getY());
                     StyledTextWrapper.CachedGlyphLine interactedLine = textComponent.getInteractedLine(context);
                     Tuple<IGlyphType, GlyphStyle> interactedGlyph = textComponent.getInteractedGlyph(context, interactedLine);
                     if(interactedLine != null){
@@ -162,8 +160,8 @@ public class ViewportTextInteraction extends ViewportAbstractInteraction impleme
     public Tuple<CursorPoint, CursorPoint> getSelectionFromDrag(DraggedSelection draggedSelection){
 
         List<StyledTextWrapper.CachedGlyphLine> page = getCurrentPage();
-        double offsetX = textComponent.getAlignment().getRenderAlignment().getX();
-        double offsetY = textComponent.getAlignment().getRenderAlignment().getY();
+        double offsetX = textComponent.getAlignment().getRenderBounds().getX();
+        double offsetY = textComponent.getAlignment().getRenderBounds().getY();
 
         IGlyphType start = null;
         IGlyphType end = null;

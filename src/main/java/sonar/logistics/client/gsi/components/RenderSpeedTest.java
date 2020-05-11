@@ -13,6 +13,6 @@ public class RenderSpeedTest extends AbstractStyledScaleable implements IScaleab
     public void render(ScaleableRenderContext context) {
         super.render(context);
         ItemStack stack = new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK);
-        context.itemStackRenderer.addBatchedItemStack(stack, alignment.getRenderAlignment(), alignment.getRenderSizing());
+        context.itemStackRenderer.addBatchedItemStack(stack, alignment.getRenderBounds());
     }
 }

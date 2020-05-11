@@ -1,7 +1,7 @@
 package sonar.logistics.client.gsi.containers;
 
-import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.vectors.Quad2D;
 
 /**the position of other components doesn't affect the position of others, they can float over each other*/
 public class FloatingContainer extends AbstractContainer {
@@ -13,9 +13,9 @@ public class FloatingContainer extends AbstractContainer {
     }
 
     @Override
-    public void build(Vec3d alignment, Vec3d maxSizing) {
-        super.build(alignment, maxSizing);
-        subComponents.forEach(c -> c.build(alignment, maxSizing));
+    public void build(Quad2D bounds) {
+        super.build(bounds);
+        subComponents.forEach(c -> c.build(bounds));
     }
 
     @Override

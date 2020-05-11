@@ -3,8 +3,8 @@ package sonar.logistics.multiparts.displays;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.multiparts.base.MultipartTile;
 import sonar.logistics.multiparts.displays.api.IDisplay;
@@ -13,12 +13,12 @@ import sonar.logistics.utils.network.EnumSyncType;
 
 public class DisplayScreenTile extends MultipartTile implements IDisplay {
 
-    public final Vec3d scaling;
+    public final Quad2D bounds;
     public GSI gsi = new GSI(this);
 
-    public DisplayScreenTile(MultipartEntry entry, Vec3d scaling) {
+    public DisplayScreenTile(MultipartEntry entry, Quad2D bounds) {
         super(entry);
-        this.scaling = scaling;
+        this.bounds = bounds;
     }
 
     public void tick() {
@@ -49,7 +49,7 @@ public class DisplayScreenTile extends MultipartTile implements IDisplay {
     }
 
     @Override
-    public Vec3d getGSISizing() {
-        return scaling;
+    public Quad2D getGSIBounds() {
+        return bounds;
     }
 }

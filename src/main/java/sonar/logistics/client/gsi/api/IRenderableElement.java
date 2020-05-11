@@ -2,6 +2,7 @@ package sonar.logistics.client.gsi.api;
 
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.vectors.Quad2D;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +16,7 @@ public interface IRenderableElement {
         return true;
     }
 
-    void render(ScaleableRenderContext context, Vec3d alignment, Vec3d scaling);
+    void render(ScaleableRenderContext context, Quad2D bounds);
 
     @Nullable
     default Vec3d getUnscaledSize(){

@@ -4,21 +4,21 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import sonar.logistics.client.design.api.Window;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.design.windows.EnumRescaleType;
+import sonar.logistics.client.vectors.Quad2D;
 
 @OnlyIn(Dist.CLIENT)
 public class ScaleableWidget implements IGuiEventListener, IRenderable {
 
-    public Window window;
+    public Quad2D window;
 
     public boolean active = true;
     public boolean visible = true;
     private boolean focused;
 
     public ScaleableWidget(double xIn, double yIn, double widthIn, double heightIn) {
-        this.window = new Window(xIn, yIn, widthIn, heightIn);
+        this.window = new Quad2D(xIn, yIn, widthIn, heightIn);
     }
 
     public boolean changeFocus(boolean focused) {
@@ -115,12 +115,12 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
             }
         }
         if(currentRescaleType != null){
-            Window rescaledWindow = currentRescaleType.rescaleWindow(window, bounds, snapToGrid(dragX, snapToPixels), snapToGrid(dragY, snapToPixels), isShifting);
+            Quad2D rescaledWindow = currentRescaleType.rescaleWindow(window, bounds, snapToGrid(dragX, snapToPixels), snapToGrid(dragY, snapToPixels), isShifting);
             ScreenUtils.fillDouble(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.transparent_green_button.rgba);
         }
     }
 
-    Window bounds = new Window(100, 100, 200, 200);
+    Quad2D bounds = new Quad2D(100, 100, 200, 200);
 
     double snapToPixels = 1;
     double snapToGrid1 = snapToPixels*4;

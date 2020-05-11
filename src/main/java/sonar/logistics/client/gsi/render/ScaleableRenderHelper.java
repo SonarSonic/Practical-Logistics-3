@@ -12,12 +12,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 
 public class ScaleableRenderHelper {
 
     public static final int FULL_LIGHT = 15728880;
-    public static final Vec3d DEFAULT_ALIGNMENT_PERCENTAGE =  new Vec3d(0, 0, 0);
-    public static final Vec3d DEFAULT_SIZING_PERCENTAGE =  new Vec3d(1, 1, 1);
 
     //// Z OFFSETS \\\\
     public static final float TEXTURE_OFFSET = -0.001F;
@@ -32,12 +32,12 @@ public class ScaleableRenderHelper {
 
     ///// COLOURED RECTS \\\\\
 
-    public static void renderColouredRect(ScaleableRenderContext context, Vec3d alignment, float x, float y, float width, float height, ColourProperty colourProperty){
-        renderColouredRect(context, alignment, x, y, width, height, colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
+    public static void renderColouredRect(ScaleableRenderContext context, Quad2D bounds, double x, double y, double width, double height, ColourProperty colourProperty){
+        renderColouredRect(context, bounds, x, y, width, height, colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
     }
 
-    public static void renderColouredRect(ScaleableRenderContext context, Vec3d alignment, float x, float y, float width, float height, int red, int green, int blue, int alpha){
-        renderColouredRect(context, (float) (alignment.getX() + x), (float) (alignment.getY() + y), (float) (alignment.getX() + x + width), (float) (alignment.getY() + y + height), red, green, blue, alpha);
+    public static void renderColouredRect(ScaleableRenderContext context, Quad2D bounds, double x, double y, double width, double height, int red, int green, int blue, int alpha){
+        renderColouredRect(context, (float) (bounds.getX() + x), (float) (bounds.getY() + y), (float) (bounds.getX() + x + width), (float) (bounds.getY() + y + height), red, green, blue, alpha);
     }
 
     public static void renderColouredRect(ScaleableRenderContext context, float startX, float startY, float endX, float endY, int r, int g, int b, int a){

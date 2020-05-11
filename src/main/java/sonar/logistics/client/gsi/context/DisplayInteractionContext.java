@@ -2,6 +2,10 @@ package sonar.logistics.client.gsi.context;
 
 import net.minecraft.entity.player.PlayerEntity;
 import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
+
+import java.awt.geom.Point2D;
 
 public class DisplayInteractionContext {
 
@@ -9,8 +13,8 @@ public class DisplayInteractionContext {
     public PlayerEntity player;
     public boolean isUsingGui;
 
-    public double displayX, displayY;
-    public double componentX, componentY;
+    public Vector2D displayHit;
+    public Vector2D componentHit;
 
     public DisplayInteractionContext(GSI gsi, PlayerEntity player, boolean isUsingGui){
         this.gsi = gsi;
@@ -18,14 +22,20 @@ public class DisplayInteractionContext {
         this.isUsingGui = isUsingGui;
     }
 
-    public void setDisplayClick(double intersectX, double intersectY){ //click position relative to the display
-        this.displayX = intersectX;
-        this.displayY = intersectY;
+    public void setDisplayClick(double x, double y){
+        setDisplayClick(new Vector2D(x, y));
     }
 
-    public void setComponentClick(double offsetX, double offsetY){ //click position relative to the component
-        this.componentX = displayX - offsetX;
-        this.componentY = displayY - offsetY;
+    public void setDisplayClick(Vector2D displayHit){ //click position relative to the display
+        this.displayHit = displayHit;
+    }
+
+    public void offsetComponentHit(double offsetX, double offsetY){ //click position relative to the component
+        this.componentHit = displayHit.copy().sub(offsetX, offsetY);
+    }
+
+    public void offsetComponentHit(Quad2D bounds){ //click position relative to the component
+        this.componentHit = displayHit.copy().sub(bounds.getX(), bounds.getY());
     }
 
     public boolean isHover(){

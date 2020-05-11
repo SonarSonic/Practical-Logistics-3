@@ -1,12 +1,12 @@
 package sonar.logistics.client.gsi.api;
 
-import net.minecraft.util.math.Vec3d;
-import sonar.logistics.client.gsi.properties.ScaleableAlignment;
+import sonar.logistics.client.gsi.properties.ScaleableBounds;
+import sonar.logistics.client.vectors.Quad2D;
 
 public interface IScaleable {
 
-    ScaleableAlignment getAlignment();
+    ScaleableBounds getAlignment();
 
-    void build(Vec3d alignment, Vec3d maxSizing);
+    void build(Quad2D bounds);
 
 }

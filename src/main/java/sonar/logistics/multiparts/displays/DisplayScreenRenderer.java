@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
+import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.multiparts.base.IMultipartRenderer;
 import sonar.logistics.multiparts.base.MultipartEntry;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
@@ -25,7 +26,7 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
         matrix.translate((double)tile.getPos().getX() - d0, (double)tile.getPos().getY() - d1, (double)tile.getPos().getZ() - d2);
 
-        Vec3d sizing = tile.getGSISizing();
+        Quad2D sizing = tile.getGSIBounds();
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5);
         origin = origin.add(DisplayVectorHelper.getFaceOffset(tile.getFacing(), 0.5));
 
@@ -41,7 +42,7 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
         matrix.translate(0.5, 0.5, 0.5); ///// ALIGN TO THE CENTRE OF THE BLOCK
         matrix.rotate(rotation); ///// ROTATE THE RENDERER
         matrix.rotate(new Quaternion(90, 0, 0, true));
-        matrix.translate(-sizing.x/2, -sizing.y/2, -0.5); ///// SCREEN OFFSET
+        matrix.translate(-sizing.getWidth()/2, -sizing.getHeight()/2, -0.5); ///// SCREEN OFFSET
 
 
 

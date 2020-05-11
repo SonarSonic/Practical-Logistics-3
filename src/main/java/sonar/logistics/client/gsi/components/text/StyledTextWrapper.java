@@ -8,6 +8,7 @@ import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.StyleGlyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
+import sonar.logistics.client.vectors.Vector2D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,9 +99,9 @@ public class StyledTextWrapper {
     public ScaledFontType fontType;
     public LineStyle currentLineStyling;
     public GlyphStyle currentGlyphStyling;
-    public Vec3d currentSizing;
+    public Vector2D currentSizing;
 
-    public void wrap(ScaledFontType font, List<IGlyphString> glyphElements, GlyphStyle parentStyling, Vec3d maxSizing) {
+    public void wrap(ScaledFontType font, List<IGlyphString> glyphElements, GlyphStyle parentStyling, Vector2D maxSizing) {
         fontType = font;
         currentGlyphStyling = parentStyling;
         currentSizing = maxSizing;

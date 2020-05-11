@@ -15,9 +15,7 @@ public interface IScaleableComponent extends IScaleable, IRenderable {
      }
 
     default boolean canInteract(DisplayInteractionContext context) {
-        Vec3d start = getAlignment().getAlignment();
-        Vec3d end = start.add(getAlignment().getSizing());
-        return start.getX() < context.displayX && end.getX() > context.displayX && start.getY() < context.displayY && end.getY() > context.displayY;
+        return getAlignment().getBounds().contains(context.displayHit);
     }
 
     default boolean onClicked(DisplayClickContext context){

@@ -5,9 +5,9 @@ import net.minecraft.client.gui.screen.Screen;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.design.gui.ScreenUtils;
-import sonar.logistics.client.design.api.Window;
 import sonar.logistics.client.design.windows.EnumRescaleType;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
+import sonar.logistics.client.vectors.Quad2D;
 
 public class ViewportResizeInteraction extends ViewportAbstractInteraction {
 
@@ -25,7 +25,7 @@ public class ViewportResizeInteraction extends ViewportAbstractInteraction {
         super.renderScissored(mouseX, mouseY, partialTicks);
 
         if(viewport.selectedComponent != null) {
-            Window window = viewport.getWindowForComponent(viewport.selectedComponent);
+            Quad2D window = viewport.getScaledBoundsForComponent(viewport.selectedComponent);
             for (EnumRescaleType type : EnumRescaleType.values()) { //render selection box
                 if (type.xPos != -1) {
                     double[] clickBox = type.getClickBox(window, 3.0F);
@@ -33,7 +33,7 @@ public class ViewportResizeInteraction extends ViewportAbstractInteraction {
                 }
             }
             if(viewport.currentRescaleType != null) { //render resize box
-                Window rescaledWindow = viewport.currentRescaleType.rescaleWindow(window, viewport.getBoundsForDisplay(), viewport.getSnappedDragX(dragX), viewport.getSnappedDragY(dragY), Screen.hasShiftDown());
+                Quad2D rescaledWindow = viewport.currentRescaleType.rescaleWindow(window, viewport.getBoundsForDisplay(), viewport.getSnappedDragX(dragX), viewport.getSnappedDragY(dragY), Screen.hasShiftDown());
                 ScreenUtils.fillDouble(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.transparent_green_button.rgba);
             }
         }
@@ -52,7 +52,7 @@ public class ViewportResizeInteraction extends ViewportAbstractInteraction {
     public void onDragStarted(double mouseX, double mouseY, int button) {
         super.onDragStarted(mouseX, mouseY, button);
         if(viewport.selectedComponent  != null) {
-            viewport.currentRescaleType = EnumRescaleType.getRescaleTypeFromMouse(viewport.getWindowForComponent(viewport.selectedComponent), mouseX, mouseY, 4.0F);
+            viewport.currentRescaleType = EnumRescaleType.getRescaleTypeFromMouse(viewport.getScaledBoundsForComponent(viewport.selectedComponent), mouseX, mouseY, 4.0F);
         }
     }
 
@@ -60,7 +60,7 @@ public class ViewportResizeInteraction extends ViewportAbstractInteraction {
     public void onDragFinished(double mouseX, double mouseY, int button) {
         super.onDragFinished(mouseX, mouseY, button);
         if(viewport.currentRescaleType != null && viewport.selectedComponent != null) {
-            viewport.setAlignmentFromWindow(viewport.selectedComponent, viewport.currentRescaleType.rescaleWindow(viewport.getWindowForComponent(viewport.selectedComponent), viewport.getBoundsForDisplay(), viewport.getSnappedDragX(dragX), viewport.getSnappedDragY(dragY), Screen.hasShiftDown()));
+            viewport.setAlignmentFromWindow(viewport.selectedComponent, viewport.currentRescaleType.rescaleWindow(viewport.getScaledBoundsForComponent(viewport.selectedComponent), viewport.getBoundsForDisplay(), viewport.getSnappedDragX(dragX), viewport.getSnappedDragY(dragY), Screen.hasShiftDown()));
             viewport.currentRescaleType = null;
         }
     }

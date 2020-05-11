@@ -23,7 +23,7 @@ public class ElementComponent extends AbstractStyledScaleable implements IScalea
     public void render(ScaleableRenderContext context) {
         super.render(context);
         context.matrix.push();
-        element.render(context, alignment.getRenderAlignment(), alignment.getRenderSizing());
+        element.render(context, alignment.getRenderBounds());
         context.matrix.pop();
     }
 
