@@ -53,6 +53,14 @@ public class Quad2D {
         return y + height;
     }
 
+    public double getCentreX(){
+        return x + width / 2;
+    }
+
+    public double getCentreY(){
+        return y + height / 2;
+    }
+
     /////
 
     public Vector2D getAlignment(){
@@ -79,6 +87,26 @@ public class Quad2D {
 
     public Vector2D getBottomRight(){
         return new Vector2D(x + width, y + height);
+    }
+
+    /////
+
+    public Quad2D setAlignment(double x, double y){
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+
+    public Quad2D setSizing(double width, double height){
+        this.width = width;
+        this.height = height;
+        return this;
+    }
+
+    public Quad2D setMax(double maxX, double maxY){
+        this.width = maxX-x;
+        this.height = maxY-y;
+        return this;
     }
 
     /////
@@ -118,20 +146,88 @@ public class Quad2D {
 
     /////
 
-    public boolean contains(Vector2D v){
-        return v.x >= getX() && v.x <= getMaxX() && v.y >= getY() && v.y <= getMaxY();
+    public boolean isValid(){
+        return width != 0 && height != 0;
     }
 
-    public boolean contains(double xV, double xY){
-        return xV >= getX() && xV <= getMaxX() && xY >= getY() && xY <= getMaxY();
+    public Quad2D flipNegatives(){
+        double value = 0;
+        if(width < 0){ // flip negative width
+            x += width;
+            width = -width;
+        }
+
+        if(height < 0){ // flip negative height
+            y += height;
+            height = -height;
+        }
+        return this;
+    }
+
+
+    /////
+
+
+    public boolean contains(Vector2D v){
+        return containsX(v.x) && containsY(v.y);
+    }
+
+    public boolean contains(double xV, double yV){
+        return containsX(xV) && containsY(yV);
+    }
+
+    public boolean containsX(double xV){
+        return width != 0 && xV >= getX() && xV <= getMaxX();
+    }
+
+    public boolean containsY(double yV){
+        return height != 0 && yV >= getY() && yV <= getMaxY();
+    }
+
+    public static boolean contains(double xV, double yV, double wV, double hV, Vector2D v){
+        return contains(xV, yV, wV, hV, v.x, v.y);
+    }
+
+    public static boolean contains(double xV, double yV, double wV, double hV, double hitX, double hitY){
+        return hitX >= xV && hitX <= xV + wV && hitY >= yV && hitY <= yV + hV;
     }
 
     public boolean inside(Vector2D v){
         return v.x > getX() && v.x < getMaxX() && v.y > getY() && v.y < getMaxY();
     }
 
-    public boolean inside(double xV, double xY){
-        return xV > getX() && xV < getMaxX() && xY > getY() && xY < getMaxY();
+    public boolean inside(double xV, double yV){
+        return xV > getX() && xV < getMaxX() && yV > getY() && yV < getMaxY();
+    }
+
+    public boolean canFit(Quad2D quad){
+        return quad.width <= width && quad.height <= height;
+    }
+
+    public boolean canFit(double w, double h){
+        return w <= width && h <= height;
+    }
+
+    public boolean intersects(Quad2D quad2D){
+        return intersects(quad2D.x, quad2D.y, quad2D.width, quad2D.height);
+    }
+
+    public boolean intersects(double xV, double yV, double wV, double hV){
+        if (wV <= 0 || hV <= 0 || width <= 0 || height <= 0) {
+            return false;
+        }
+        double tw = width;
+        double th = height;
+        double tx = x;
+        double ty = y;
+        wV += xV;
+        hV += yV;
+        tw += tx;
+        th += ty;
+        return ((wV < xV || wV > tx) &&
+                (hV < yV || hV > ty) &&
+                (tw < tx || tw > xV) &&
+                (th < ty || th > yV));
     }
 
     /////
@@ -147,8 +243,8 @@ public class Quad2D {
 
     /**aligns the quad within the given alignments, the adjusts the quad it is called on.*/
     public Quad2D align(Quad2D bounds, ElementAlignment alignX, ElementAlignment alignY){
-        x = alignX.align(width, bounds.getWidth());
-        y = alignY.align(height, bounds.getHeight());
+        x = alignX.align(width, bounds.getWidth()) + bounds.getX();
+        y = alignY.align(height, bounds.getHeight()) + bounds.getY();
         return this;
     }
 

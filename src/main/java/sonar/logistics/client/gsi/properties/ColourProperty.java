@@ -51,4 +51,16 @@ public class ColourProperty {
         return (rgba >> 24) & 0xff;
     }
 
+    @Override
+    public int hashCode() {
+        return rgba;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ColourProperty){
+            return ((ColourProperty) obj).rgba == rgba;
+        }
+        return super.equals(obj);
+    }
 }

@@ -1,9 +1,9 @@
 package sonar.logistics.client.design.gui.interactions.hotkeys;
 
-import sonar.logistics.client.design.gui.interactions.ViewportTextInteraction;
+import sonar.logistics.client.design.gui.interactions.DefaultTextInteraction;
 
 public interface ITextFunction {
 
-    void trigger(ViewportTextInteraction textInteraction);
+    void trigger(DefaultTextInteraction textInteraction);
 
 }

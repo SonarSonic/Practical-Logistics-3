@@ -1,18 +1,17 @@
 package sonar.logistics.client.gsi.components.text.api;
 
-import sonar.logistics.client.gsi.components.text.StyledTextRenderer;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 
 public interface IGlyphType {
 
-    //int DEFAULT_ELEMENT_HEIGHT = 8; //ignores any underlining
-
     float getRenderWidth(ScaledFontType fontType, GlyphStyle parentStyling);
 
     float getRenderHeight(ScaledFontType fontType, GlyphStyle parentStyling);
 
-    float render(StyledTextRenderer.GlyphRenderContext context);
+    void render(GlyphRenderContext context, GlyphRenderInfo glyphInfo);
 
     default float upscale(ScaledFontType fontType, GlyphStyle parentStyling){
         return fontType.getFontScaling() / parentStyling.fontHeight;
@@ -24,6 +23,15 @@ public interface IGlyphType {
 
     default boolean isSpace(){
         return false;
+    }
+
+    default boolean isWordBreaker(){
+        return isSpace();
+    }
+
+    /**this doesn't prevent render being called instead this should be false if the end-user can't see the glyph, when moving the cursor for example, invisible glyphs like style / line breaks will be ignored*/
+    default boolean isVisible(){
+        return true;
     }
 
 }

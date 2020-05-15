@@ -1,16 +1,18 @@
 package sonar.logistics.client.gsi.components.text.glyph;
 
-import sonar.logistics.client.gsi.components.text.StyledTextRenderer;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 
-public class StyleGlyph implements IGlyphType {
+@Deprecated
+public class StylingGlyph implements IGlyphType {
 
-    GlyphStyle styling;
+    public GlyphStyle style;
 
-    public StyleGlyph(GlyphStyle styling){
-        this.styling = styling;
+    public StylingGlyph(GlyphStyle style) {
+        this.style = style;
     }
 
     @Override
@@ -24,12 +26,9 @@ public class StyleGlyph implements IGlyphType {
     }
 
     @Override
-    public float render(StyledTextRenderer.GlyphRenderContext context) {
-        context.changeStyling(styling);
-        return 0;
-    }
+    public void render(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {}
 
-    public GlyphStyle alterStyle(GlyphStyle parentStyling) {
-        return styling.copy();
+    public void alterStyle(GlyphStyle parentStyling){
+        //TODO
     }
 }

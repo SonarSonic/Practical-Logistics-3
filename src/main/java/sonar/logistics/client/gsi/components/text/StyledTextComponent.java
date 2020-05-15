@@ -1,80 +1,59 @@
 package sonar.logistics.client.gsi.components.text;
 
-import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
-import sonar.logistics.client.gsi.components.text.api.IGlyphString;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
-import sonar.logistics.client.gsi.components.text.glyph.StyleGlyph;
-import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
+import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
 import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.Nullable;
+import java.util.function.Function;
 
 public class StyledTextComponent extends AbstractStyledScaleable implements IScaleableComponent, IGlyphRenderer {
 
     @OnlyIn(Dist.CLIENT)
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
 
-    public List<IGlyphString> glyphStrings = new ArrayList<>();
+    public StyledTextString glyphString = new StyledTextString();
     public StyledTextWrapper textWrapper = new StyledTextWrapper();
-    public GlyphStyle parentStyling = new GlyphStyle();
     public IGlyphRenderer specialGlyphRenderer = null;
 
     public int page;
-    public int pageCount;
 
     public StyledTextComponent() {}
 
     @Override
     public void build(Quad2D bounds) {
         super.build(bounds);
-        this.textWrapper.wrap(fontType, glyphStrings, parentStyling, this.bounds.renderBounds().getSizing());
-        this.pageCount = textWrapper.cachedGlyphPages.size();
+        this.textWrapper.build(glyphString, fontType, this.bounds.renderBounds());
     }
 
     @Override
     public void render(ScaleableRenderContext context) {
         super.render(context);
-        if(textWrapper.cachedGlyphPages.size() > page){
-            context.matrix.push();
+        context.matrix.push();
 
-            context.matrix.translate(bounds.renderBounds().getX(), bounds.renderBounds().getY(), -0.01F);
-            StyledTextRenderer.renderCachedGlyphLines(context, fontType, textWrapper.cachedGlyphPages.get(page), this);
+        context.matrix.translate(0, 0, -0.01F);
+        StyledTextRenderer.renderStyledTextLines(context, fontType, bounds.renderBounds(), textWrapper.styledTextPages.getCurrentPage(page), this);
 
-            context.matrix.pop();
-        }
+        context.matrix.pop();
     }
 
     @Override
-    public float renderGlyph(IGlyphType glyph, StyledTextRenderer.GlyphRenderContext context) {
+    public void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
         if(specialGlyphRenderer != null){
-            return specialGlyphRenderer.renderGlyph(glyph, context);
+            specialGlyphRenderer.renderGlyph(context, glyphInfo);
+            return;
         }
-
-        /*
-        if(glyph == hoveredGlyph){ //TODO REMOVE THIS IS JUST FOR TESTING
-            context.parentStyling.underlined = !context.parentStyling.underlined;
-            float offsetX = glyph.render(context);
-            context.parentStyling.underlined = !context.parentStyling.underlined;
-            return offsetX;
-        }
-        if(glyph == clickedGlyph){ //TODO REMOVE THIS IS JUST FOR TESTING
-            context.parentStyling.strikethrough = !context.parentStyling.strikethrough;
-            float offsetX = glyph.render(context);
-            context.parentStyling.strikethrough = !context.parentStyling.strikethrough;
-            return offsetX;
-        }
-        */
-        return glyph.render(context);
+        glyphInfo.glyph.render(context, glyphInfo);
     }
 
     IGlyphType hoveredGlyph = null;
@@ -82,9 +61,9 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
 
     @Override
     public boolean onHovered(DisplayInteractionContext context) {
-        Tuple<IGlyphType, GlyphStyle> interactedGlyph = getInteractedGlyph(context, getInteractedLine(context));
-        if(interactedGlyph != null){
-            hoveredGlyph = interactedGlyph.getA();
+        GlyphRenderInfo glyphHit = getGlyphHit(context.displayHit, g -> g.quad.contains(context.displayHit) && StyledTextPages.FILTER_VISIBLE.apply(g));
+        if(glyphHit != null){
+            clickedGlyph = glyphHit.glyph;
             return true;
         }
         return false;
@@ -92,57 +71,40 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
 
     @Override
     public boolean onClicked(DisplayClickContext context) {
-        Tuple<IGlyphType, GlyphStyle> interactedGlyph = getInteractedGlyph(context, getInteractedLine(context));
-        if(interactedGlyph != null){
-            clickedGlyph = interactedGlyph.getA();
+        GlyphRenderInfo glyphHit = getGlyphHit(context.displayHit, g -> g.quad.contains(context.displayHit) && StyledTextPages.FILTER_VISIBLE.apply(g));
+        if(glyphHit != null){
+            clickedGlyph = glyphHit.glyph;
             return true;
         }
         return false;
     }
 
-    public StyledTextWrapper.CachedGlyphLine getInteractedLine(DisplayInteractionContext context){
-        if(textWrapper.cachedGlyphPages.size() > page) {
-            List<StyledTextWrapper.CachedGlyphLine> lines = textWrapper.cachedGlyphPages.get(page);
-
-            for (StyledTextWrapper.CachedGlyphLine line : lines) {
-                float startX = line.offsetX;
-                float endX = line.offsetX + line.lineWidth;
-                float startY = line.offsetY;
-                float endY = line.offsetY + line.lineHeight;
-
-                if (startX < context.componentHit.x && endX > context.componentHit.x && startY < context.componentHit.y && endY > context.componentHit.y) {
-                    return line;
-                }
+    public StyledTextLine getInteractedLine(Vector2D textHit){
+        for (StyledTextLine line : textWrapper.styledTextPages.getCurrentPage(page)) {
+            if (line.renderSize.contains(textHit)) {
+                return line;
             }
         }
         return null;
     }
 
-    public Tuple<IGlyphType, GlyphStyle> getInteractedGlyph(DisplayInteractionContext context, StyledTextWrapper.CachedGlyphLine line){
-        if(line == null){
-            return null;
+    @Nullable
+    public GlyphRenderInfo getGlyphHit(Vector2D textHit, Function<GlyphRenderInfo, Boolean> filter){
+        StyledTextLine line = getInteractedLine(textHit);
+        if(line != null){
+            return getGlyphHit(line, filter);
         }
-        GlyphStyle style = line.parentStyling;
-        float totalWidth = 0;
+        return null;
+    }
 
-        for(IGlyphType glyph : line.glyphs){
-            if(glyph instanceof StyleGlyph){
-                style = ((StyleGlyph) glyph).alterStyle(style.copy());
-                continue;
-            }
-
-            float renderWidth = glyph.isSpace() && line.justifySpaceSize != 0 ? line.justifySpaceSize : glyph.getRenderWidth(fontType, style) * line.lineScaling;
-            float renderHeight = glyph.isSpace() ? line.lineHeight : glyph.getRenderHeight(fontType, style) * line.lineScaling;
-
-            float startX = totalWidth;
-            float endX = totalWidth + renderWidth;
-            float startY = line.offsetY;
-            float endY = line.offsetY + renderHeight;
-            totalWidth+=renderWidth;
-            if(startX < context.componentHit.x && endX > context.componentHit.x && startY < context.componentHit.y && endY > context.componentHit.y){
-                return new Tuple<>(glyph, style);
+    @Nullable
+    public GlyphRenderInfo getGlyphHit(StyledTextLine line, Function<GlyphRenderInfo, Boolean> filter){
+        for(GlyphRenderInfo glyphInfo : line.glyphInfo){
+            if(filter.apply(glyphInfo)){
+                return glyphInfo;
             }
         }
         return null;
     }
+
 }

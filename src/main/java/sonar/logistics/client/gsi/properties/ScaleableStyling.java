@@ -20,7 +20,7 @@ public class ScaleableStyling {
 
     public Quad2D getRenderSizing(Quad2D bounds){
 
-        Quad2D renderSize = bounds.copy();
+        Quad2D renderSize = new Quad2D(0, 0, bounds.getWidth(), bounds.getHeight());
 
         renderSize.width -= marginWidth.getRenderSize((float)bounds.getWidth())*2;
         renderSize.height -= marginHeight.getRenderSize((float)bounds.getHeight())*2;

@@ -7,18 +7,27 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IRenderable;
 import org.lwjgl.opengl.GL11;
 import sonar.logistics.client.design.api.IFlexibleGuiEventListener;
+import sonar.logistics.client.design.api.IInteractWidget;
+import sonar.logistics.client.design.gui.EnumGlyphStyling;
+import sonar.logistics.client.design.gui.EnumLineStyling;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.ScreenUtils;
-import sonar.logistics.client.design.gui.interactions.ViewportAbstractInteraction;
+import sonar.logistics.client.design.gui.interactions.AbstractViewportInteraction;
+import sonar.logistics.client.design.gui.interactions.DefaultResizeInteraction;
+import sonar.logistics.client.design.gui.interactions.DefaultDragInteraction;
+import sonar.logistics.client.design.gui.interactions.DefaultTextInteraction;
 import sonar.logistics.client.design.windows.EnumRescaleType;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
+import sonar.logistics.client.gsi.components.text.StyledTextComponent;
+import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 
 import java.text.DecimalFormat;
 
-public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener {
+public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener, IInteractWidget {
 
     public GSI gsi;
 
@@ -29,8 +38,12 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     public double scaling;
     public EnumRescaleType currentRescaleType = null;
 
+    public DefaultResizeInteraction resizeInteraction = new DefaultResizeInteraction(this);
+    public DefaultTextInteraction textInteraction = new DefaultTextInteraction(this);
+    public DefaultDragInteraction dragInteraction = new DefaultDragInteraction(this);
+    public AbstractViewportInteraction currentInteraction = dragInteraction;
+
     public GSIViewportWidget(GSI gsi, double x, double y, double width, double height){
-        GSIDesignSettings.clearViewportInteraction();
         this.gsi = gsi;
         this.bounds = new Quad2D(x, y, width, height);
         this.defaultCentre();
@@ -122,6 +135,11 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         gsi.queueRebuild();
     }
 
+    //gets the hit display hit vector, note this could be negative / off the display
+    public Vector2D getHitVecFromMouse(double mouseX, double mouseY){
+        return new Vector2D((mouseX - getRenderOffsetX()) / scaling, (mouseY - getRenderOffsetY()) / scaling);
+    }
+
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
 
@@ -150,7 +168,8 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         RenderSystem.popMatrix();
 
         //interaction rendering - scissored
-        getEventListener().renderScissored(mouseX, mouseY, partialTicks);
+        resizeInteraction.renderScissored(mouseX, mouseY, partialTicks);
+        textInteraction.renderScissored(mouseX, mouseY, partialTicks);
 
         //render coordinates + zoom scaling
         RenderSystem.enableDepthTest();
@@ -164,15 +183,67 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
         //interaction rendering - non scissored
-        getEventListener().render(mouseX, mouseY, partialTicks);
+        resizeInteraction.render(mouseX, mouseY, partialTicks);
+        textInteraction.render(mouseX, mouseY, partialTicks);
     }
 
-    public boolean isMouseOverViewport(double mouseX, double mouseY) {
+    @Override
+    public Quad2D getQuad() {
+        return bounds;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+
+        if(!isMouseOver(mouseX, mouseY)){
+            return false;
+        }
+
+        /* TODO FIX RESIZING MAKE IT CHECK IT THE ELEMENT CAN BE CLICKED FIRST.
+        if(selectedComponent != null && resizeInteraction.getRescaleTypeFromMouse(mouseX, mouseY) != null){
+            currentInteraction = resizeInteraction;
+            return resizeInteraction.mouseClicked(mouseX, mouseY, button);
+        }
+        */
+
+        //update the selected component
+        DisplayInteractionContext context = new DisplayInteractionContext(gsi, Minecraft.getInstance().player, true);
+        context.setDisplayClick((mouseX - getRenderOffsetX()) / scaling, (mouseY - getRenderOffsetY()) / scaling);
+        IScaleableComponent clickedComponent = gsi.getInteractedComponent(context);
+
+
+        selectedComponent = clickedComponent;
+
+        if(selectedComponent != null && selectedComponent instanceof StyledTextComponent){
+            currentInteraction = textInteraction;
+            ((StyledTextComponent) selectedComponent).specialGlyphRenderer = textInteraction;
+            return textInteraction.mouseClicked(mouseX, mouseY, button);
+        }
+
+        ///note resize is not clicked again
+        currentInteraction = dragInteraction;
+        return dragInteraction.mouseClicked(mouseX, mouseY, button);
+    }
+
+    ///// NESTED INTERACTIONS
+
+    public void onGlyphStyleChanged(EnumGlyphStyling settings){
+        currentInteraction.onGlyphStyleChanged(settings);
+    }
+
+    public void onLineStyleChanged(EnumLineStyling settings){
+        currentInteraction.onLineStyleChanged(settings);
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
         return bounds.contains(mouseX, mouseY);
     }
 
     @Override
-    public ViewportAbstractInteraction getEventListener() {
-        return GSIDesignSettings.getViewportInteraction(this);
+    public AbstractViewportInteraction getEventListener() {
+        return currentInteraction;
     }
+
+
 }

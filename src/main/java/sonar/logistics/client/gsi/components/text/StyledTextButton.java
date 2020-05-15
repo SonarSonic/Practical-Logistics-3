@@ -1,6 +1,7 @@
 package sonar.logistics.client.gsi.components.text;
 
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
@@ -20,7 +21,7 @@ public class StyledTextButton extends StyledTextComponent {
     }
 
     @Override
-    public float renderGlyph(IGlyphType glyph, StyledTextRenderer.GlyphRenderContext context) {
+    public void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
         if(isHovered || wasClicked){
             /*
             byte[] last = context.parentStyling.textColour;
@@ -32,7 +33,7 @@ public class StyledTextButton extends StyledTextComponent {
              */
         }
 
-        return glyph.render(context);
+        glyphInfo.glyph.render(context, glyphInfo);
     }
 
     @Override

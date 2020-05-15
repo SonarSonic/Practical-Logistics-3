@@ -1,281 +1,279 @@
 package sonar.logistics.client.gsi.components.text;
 
-import sonar.logistics.client.gsi.components.text.api.IGlyphString;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
-import sonar.logistics.client.gsi.components.text.glyph.StyleGlyph;
+import sonar.logistics.client.gsi.components.text.glyph.AttributeGlyph;
+import sonar.logistics.client.gsi.components.text.render.GlyphMetric;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
+import sonar.logistics.client.gsi.components.text.render.StyledTextLine;
+import sonar.logistics.client.gsi.components.text.render.StyledTextPages;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.client.vectors.Quad2D;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**used for wrapping styled strings within a specified bounds, it also will break strings into seperate pages*/
+//TODO SPACES BREAK NEW LINES WHEN IT SHOULD ALREADY FIT!!!!
 public class StyledTextWrapper {
 
-    public List<List<CachedGlyphLine>> cachedGlyphPages = new ArrayList<>();
+    /// building variables
+    private ScaledFontType fontType;
+    private Quad2D bounds;
+    private StyledTextString text;
+    private int index;
 
-    public StyledTextWrapper(){}
+    private LineStyle currentLineStyle;
+    private GlyphStyle currentGlyphStyle;
+    private boolean currentPageBreak;
 
-    //// WRAPPING \\\\
+    ///outputs
+    public StyledTextPages styledTextPages;
 
-    private void startWrapping(){
-        cachedGlyphPages.clear();
-        currentPage = null;
-        currentLine = null;
-        isBuildingPage = false;
-        isBuildingLine = false;
-    }
+    // builds wrapping pages
+    public void build(StyledTextString text, ScaledFontType fontType, Quad2D bounds){
+        styledTextPages = new StyledTextPages(text);
 
-    private void finishWrapping(){}
+        this.fontType = fontType;
+        this.bounds = bounds;
+        this.text = text;
 
-    //// PAGE BUILDING \\\\
-
-    float pageYOffset = 0;
-    List<CachedGlyphLine> currentPage;
-    boolean isBuildingPage = false;
-
-    private void startPage(){
-        if(!isBuildingPage) {
-            currentPage = new ArrayList<>();
-            pageYOffset = 0;
-            isBuildingPage = true;
-        }
-    }
-
-    private void finishPage(){
-        if(isBuildingPage) {
-            if (!currentPage.isEmpty()) {
-                cachedGlyphPages.add(currentPage);
-            }
-            isBuildingPage = false;
-        }
-    }
-
-    //// LINE BUILDING \\\\
-
-    CachedGlyphLine lastLine;
-    CachedGlyphLine currentLine;
-    boolean isBuildingLine = false;
-
-    private void startLine(){
-        if(!isBuildingLine) {
-            currentLine = new CachedGlyphLine(currentLineStyling.copy(), currentGlyphStyling.copy());
-            isBuildingLine = true;
-        }
-    }
-
-    private void finishLine(boolean lineBreak){
-        if(isBuildingLine) {
-            lastLine = currentLine;
-            if (!currentLine.glyphs.isEmpty()) {
-                currentLine.finish(this, lineBreak);
-
-                if(pageYOffset + currentLine.lineHeight > currentSizing.getY()){
-                    ///the line is too big for the current page
-                    finishPage();
-                    startPage();
-                }
-
-                currentPage.add(currentLine);
-                currentLine.offsetY = pageYOffset;
-                pageYOffset += lastLine.lineHeight;
-
-            }
-            isBuildingLine = false;
-            if(lastLine.remainder != null){
-                startLine();
-                lastLine.remainder.forEach(this::addGlyph); // the line we checked is now the last line...
-            }
-        }
-    }
-
-    //// WORD BUILDING \\\\
+        this.currentLineStyle = new LineStyle();
+        this.currentGlyphStyle = new GlyphStyle();
 
 
-
-    public ScaledFontType fontType;
-    public LineStyle currentLineStyling;
-    public GlyphStyle currentGlyphStyling;
-    public Vector2D currentSizing;
-
-    public void wrap(ScaledFontType font, List<IGlyphString> glyphElements, GlyphStyle parentStyling, Vector2D maxSizing) {
-        fontType = font;
-        currentGlyphStyling = parentStyling;
-        currentSizing = maxSizing;
-        startWrapping();
+        //build the raw lines from line breaks
         startPage();
+        startRawLine();
+        for(index = 0; index < text.glyphs.size(); index ++){
+            IGlyphType glyph = text.glyphs.get(index);
 
-        glyphElements.forEach(strings -> strings.getGlyphs().forEach(this::addGlyph));
+            if(glyph instanceof LineBreakGlyph){
+                finishRawLine();
 
+                currentLineStyle = ((LineBreakGlyph) glyph).styling;
+                currentPageBreak = ((LineBreakGlyph) glyph).page;
+
+                startRawLine();
+            }
+
+            if(glyph instanceof AttributeGlyph){
+                currentGlyphStyle = ((AttributeGlyph) glyph).alterStyle(currentGlyphStyle.copy());
+            }
+
+            addGlyphToRawLine(glyph);
+        }
+        finishRawLine();
         finishPage();
-        finishWrapping();
     }
 
-    public void addGlyph(IGlyphType glyph) {
 
-        ///// SPECIAL TYPES \\\\\
+    ///// building pages
 
-        if(glyph instanceof LineBreakGlyph){
-            currentLineStyling = ((LineBreakGlyph) glyph).styling;
-            if(((LineBreakGlyph) glyph).page){
-                finishLine(false);
+    List<StyledTextLine> page;
+    double pageYAdvance;
+
+    public void startPage(){
+        page = new ArrayList<>();
+        pageYAdvance = 0;
+    }
+
+    public void finishPage(){
+        if(!page.isEmpty()) {
+            styledTextPages.pages.add(page);
+            styledTextPages.lines.addAll(page);
+        }
+    }
+
+
+    ///// building raw lines
+
+    List<StyledTextLine> styledLines;
+
+    public void startRawLine(){
+        styledLines = new ArrayList<>();
+        startStyledLine();
+        startGlyphMetric();
+    }
+
+    public void finishRawLine(){
+        finishGlyphMetric();
+        finishStyledLine();
+        addStyledLinesToPage(styledLines);
+    }
+
+
+    ///// building glyph metrics - these are typically words, but can be others too.
+
+    GlyphMetric metric;
+    public void startGlyphMetric(){
+        metric = new GlyphMetric();
+    }
+
+    public void finishGlyphMetric(){
+        addGlyphMetricToStyledLine(metric);
+    }
+
+
+    ///// building styled lines
+
+    StyledTextLine line;
+    public void startStyledLine(){
+        line = new StyledTextLine(currentLineStyle);
+    }
+
+    public void finishStyledLine(){
+        addStyledLineToRawLine(line);
+    }
+
+
+    ///// raw metric building
+
+    public void addGlyphToRawLine(IGlyphType glyph){
+        float renderWidth = glyph.getRenderWidth(fontType, currentGlyphStyle);
+        float renderHeight = glyph.getRenderHeight(fontType, currentGlyphStyle);
+        GlyphRenderInfo renderInfo = new GlyphRenderInfo(index, glyph, currentGlyphStyle, renderWidth, renderHeight);
+
+        addGlyphInfoToGlyphMetric(renderInfo);
+
+        //if the glyph is a line breaker we will break after it...n.b. spaces will be included on the line before the break...
+        if(currentLineStyle.breakPreference.shouldBreakAfterGlyph(glyph)){
+            finishGlyphMetric();
+            startGlyphMetric();
+        }
+
+        styledTextPages.glyphs.add(renderInfo);
+    }
+
+    public void addGlyphInfoToGlyphMetric(GlyphRenderInfo glyphInfo){
+        metric.addGlyphInfo(glyphInfo);
+    }
+
+    ///// styled metric building
+
+    //add the finished glyph metric to the styled line, called by finishRawWord()
+    public void addGlyphMetricToStyledLine(GlyphMetric metric){
+
+        if(checkAdvance(metric.renderSize.width, line.renderSize.width)){
+            ///first check the metric can fit on the current line, if it can no further action is needed
+            line.addMetric(metric);
+        } else if(bounds.canFit(metric.renderSize)){
+            //if the metric can fit within the bounds without being split we will place it on the next line
+            finishStyledLine();
+            startStyledLine();
+            line.addMetric(metric);
+        } else {
+            //if the metric doesn't fit on any line we will add each glyph individually
+            metric.glyphInfo.forEach(this::addGlyphInfoToStyledLine);
+        }
+    }
+
+    //add a single glyph to the styled line
+    public void addGlyphInfoToStyledLine(GlyphRenderInfo glyphInfo){
+
+        //check the glyph is not big for the scaling! - TODO add error message?
+        if(!currentLineStyle.wrappingType.canRescale() && !bounds.canFit(glyphInfo.quad.width, glyphInfo.quad.height)) {
+            return;
+        }
+
+        //if the glyph can fit on the current line we add it
+        if(checkAdvance(glyphInfo.quad.width, line.renderSize.width)){
+            line.addGlyphInfo(glyphInfo);
+            return;
+        }
+
+        //if wrapping is disabled we will add too the end of the line
+        if(currentLineStyle.wrappingType.canWrap()){
+            finishStyledLine();
+            startStyledLine();
+            line.addGlyphInfo(glyphInfo);
+        }else{
+            line.isOffPage = true;
+            line.addGlyphInfo(glyphInfo);
+        }
+    }
+
+
+    //// styled page building
+
+    public void addStyledLineToRawLine(StyledTextLine line){
+        if(!line.glyphInfo.isEmpty()) {
+            styledLines.add(line);
+        }
+    }
+
+    public void addStyledLinesToPage(List<StyledTextLine> styledLines){
+
+        //if the line causes a page break do it here
+        if(currentPageBreak){
+            finishPage();
+            startPage();
+        }
+
+        ///add styled lines to page
+        for(StyledTextLine line : styledLines){
+            if(!(line.renderSize.height + pageYAdvance <= bounds.height)){
                 finishPage();
-
                 startPage();
-                startLine();
-            }else{
-                finishLine(true);
-                startLine();
             }
-            return;
-        }
-        if(currentLine.isOffPage){
-            ////the line has filled the max width and wrapping is off
-            return;
-        }
-        if(glyph instanceof StyleGlyph){
-            ////glyphs style will be added, this allows rendering to perform as expected.
-            currentGlyphStyling = ((StyleGlyph)glyph).alterStyle(currentGlyphStyling.copy());
-            currentLine.addGlyph(this, glyph, 0, 0);
-            return;
+            line.renderSize.x = bounds.getX();
+            line.renderSize.y = bounds.getY() + pageYAdvance;
+            pageYAdvance += line.renderSize.height;
+            page.add(line);
         }
 
-        ///// STANDARD GLYPHS \\\\\
-
-        float renderWidth = glyph.getRenderWidth(fontType, currentGlyphStyling);
-        float renderHeight = glyph.getRenderHeight(fontType, currentGlyphStyling);
-
-        if(currentLine.lineStyling.wrappingType.canRescale()){
-            ////glyph will be rescaled to fit the line
-            currentLine.addGlyph(this, glyph, renderWidth, renderHeight);
-            return;
-        }
-
-        if(renderWidth > currentSizing.getX() && renderHeight > currentSizing.getY()){
-            ////glyph is too big for the page size
-            return;
-        }
-        if(currentLine.lineWidth + renderWidth > currentSizing.getX()){
-            ////glyph is too big for the current line
-            if(!currentLine.lineStyling.wrappingType.canWrap()) {
-                currentLine.isOffPage = true;
-                return;
-            }
-
-            finishLine(false);
-            startLine();
-        }
-        currentLine.addGlyph(this, glyph, renderWidth, renderHeight);
+        ///alignment
+        alignStyledLines(styledLines);
     }
 
-    public static class CachedGlyphLine{
 
-        public float offsetY;
-        public float offsetX;
-        public float lineScaling, lineWidth, lineHeight;
+    //// styled line alignment
 
-        public int lastSpaceIndex = -1;
-        public int justifySpaceCount = 0;
-        public float justifyTotalWidth = 0;
-        public float justifySpaceSize = 0;
+    public void alignStyledLines(List<StyledTextLine> styledLines){
 
-        public LineStyle lineStyling;
-        public GlyphStyle parentStyling;
-        public List<IGlyphType> glyphs;
-        public boolean isOffPage;
-
-        protected List<IGlyphType> remainder;
-
-        public CachedGlyphLine(LineStyle lineStyling, GlyphStyle parentStyling){
-            this.lineStyling = lineStyling;
-            this.parentStyling = parentStyling;
-            this.glyphs = new ArrayList<>();
-            this.lineScaling = 1;
-        }
-
-        public void addGlyph(StyledTextWrapper wrapper, IGlyphType glyph, float renderWidth, float renderHeight){
-
-            if(glyph.isSpace()){
-                justifyTotalWidth +=renderWidth;
-                justifySpaceCount ++;
-                lastSpaceIndex = glyphs.size();
-            }
-
-            glyphs.add(glyph);
-            lineWidth += renderWidth;
-            lineHeight = Math.max(lineHeight, renderHeight);
-        }
-
-        public void rebuildLine(StyledTextWrapper wrapper, List<IGlyphType> newGlyphs, GlyphStyle parentStyling){
-            glyphs.clear();
-            lineWidth = 0;
-            lineHeight = 0;
-            lastSpaceIndex = -1;
-            justifySpaceCount = 0;
-            justifyTotalWidth = 0;
-            justifySpaceSize = 0;
-
-            GlyphStyle currentStyling = parentStyling.copy();
-            for(IGlyphType glyph : newGlyphs) {
-                if (glyph instanceof StyleGlyph) {
-                    currentStyling = ((StyleGlyph) glyph).alterStyle(currentStyling);
-                }
-                addGlyph(wrapper, glyph, glyph.getRenderWidth(wrapper.fontType, currentStyling), glyph.getRenderHeight(wrapper.fontType, currentStyling));
-            }
-        }
-
-        public void finish(StyledTextWrapper wrapper, boolean lineBreak){
-            if(!lineBreak && lineStyling.breakPreference.shouldBreakAtSpace()){
-
-                //// finds the last space, removes it then adds to the next line. also has the effect of removing stray spaces from the end of broken lines
-                if(lastSpaceIndex != -1){
-                    remainder = new ArrayList<>();
-                    List<IGlyphType> newGlyphs = new ArrayList<>();
-                    GlyphStyle currentStyling = parentStyling;
-                    for(int i = 0; i < glyphs.size(); i++){
-                        IGlyphType glyph = glyphs.get(i);
-                        if(glyph instanceof StyleGlyph){
-                            currentStyling = ((StyleGlyph) glyph).alterStyle(currentStyling);
-                        }
-                        if(i > lastSpaceIndex) {
-                            remainder.add(glyph);
-                        }else if(i != lastSpaceIndex){
-                            newGlyphs.add(glyph);
-                        }
-                    }
-                    rebuildLine(wrapper, newGlyphs, parentStyling);
-                }
-            }
-
-            if(lineStyling.wrappingType.canRescale()){
-                if(lineStyling.wrappingType == LineStyle.WrappingType.SCALED_FIT && lineWidth <= wrapper.currentSizing.getX()) {
+        ////update the final width / height
+        int lineIndex = 0;
+        for(StyledTextLine line : styledLines){
+            if(line.lineStyle.wrappingType.canRescale()){
+                if(line.lineStyle.wrappingType == LineStyle.WrappingType.SCALED_FIT && line.renderSize.width <= bounds.width) {
                     return; //don't rescale if line can already fit
                 }
-                lineScaling = (float)wrapper.currentSizing.getX() / lineWidth;
-                lineWidth = (float)wrapper.currentSizing.getX();
-                lineHeight = lineHeight * lineScaling;
+                line.lineScaling = (float)(bounds.width / line.renderSize.width);
+                line.renderSize.width = (float)bounds.width;
+                line.renderSize.height = line.renderSize.height * line.lineScaling;
+                //TODO FIX LINE SCALING FOR GLYPH RENDER SIZE!
             }
-            lineHeight += lineStyling.lineSpacing;
+            line.renderSize.height += line.lineStyle.lineSpacing;
+            lineIndex ++;
 
-            switch (lineStyling.alignType){
-                case ALIGN_TEXT_LEFT:
-                    break;
-                case CENTER:
-                    offsetX += wrapper.currentSizing.getX()/2 - lineWidth/2;
-                    break;
-                case ALIGN_TEXT_RIGHT:
-                    offsetX = (float)wrapper.currentSizing.getX()-lineWidth;
-                    break;
-                case JUSTIFY:
-                    if(!lineBreak) {
-                        float size = (float) (wrapper.currentSizing.getX() - (lineWidth - justifyTotalWidth));
-                        justifySpaceSize = size / justifySpaceCount;
-                        lineWidth = (float)wrapper.currentSizing.getX(); //justified lines should always take up the max width
-                    }
-                    break;
+            ////align
+            boolean isLast = lineIndex == styledLines.size();
+            currentLineStyle.alignType.align(line, bounds.width, isLast);
+
+            double offsetX = 0;
+            for(GlyphRenderInfo glyphInfo : line.glyphInfo){
+                glyphInfo.quad.x = line.renderSize.getX() + offsetX;
+                glyphInfo.quad.y = line.renderSize.getY();
+                offsetX += glyphInfo.quad.width;
             }
         }
+
     }
+
+
+    //// HELPER METHODS
+
+    public boolean checkAdvance(double add, double lineAdvance){
+
+        //if the line can rescale the words will fit
+        if(currentLineStyle.wrappingType.canRescale()){
+            return true;
+        }
+
+        //if word can fit without rescaling add it to the line
+        return add + lineAdvance <= bounds.width;
+    }
+
 }

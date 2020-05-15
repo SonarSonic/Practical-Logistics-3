@@ -1,11 +1,11 @@
 package sonar.logistics.client.gsi.components.text.glyph;
 
 import sonar.logistics.client.gsi.api.IRenderableElement;
-import sonar.logistics.client.gsi.components.text.StyledTextRenderer;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
-import sonar.logistics.client.vectors.Quad2D;
 
 public class ElementGlyph implements IGlyphType {
 
@@ -26,14 +26,12 @@ public class ElementGlyph implements IGlyphType {
     }
 
     @Override
-    public float render(StyledTextRenderer.GlyphRenderContext context) {
-        float size = getRenderWidth(context.getScaledFont(), context.parentStyling);
+    public void render(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
         if(element.canRender(context.renderContext)){
             context.renderContext.matrix.push();
-            element.render(context.renderContext, new Quad2D(context.offsetX, context.offsetY, size, size));
+            element.render(context.renderContext, glyphInfo.quad);
             context.renderContext.matrix.pop();
         }
-        return size;
     }
 
     @Override

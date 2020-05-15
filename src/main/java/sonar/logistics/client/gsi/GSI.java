@@ -1,18 +1,21 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
 import sonar.logistics.client.design.gui.GSIDesignScreen;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
-import sonar.logistics.client.gsi.components.text.string.GlyphString;
+import sonar.logistics.client.gsi.components.text.StyledTextString;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.context.DisplayClickContext;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.elements.ItemStackElement;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 import sonar.logistics.client.vectors.DisplayVectorHelper;
 import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.common.blocks.PL3Blocks;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
@@ -82,37 +85,34 @@ public class GSI {
         StyledTextComponent lines = new StyledTextComponent();
         lines.bounds.setBoundPercentages(new Quad2D(0, 0, 1, 1));
 
-        GlyphString element = new GlyphString();
-
+        StyledTextString element = new StyledTextString();
 
         LineStyle lineStyle = new LineStyle();
-        lineStyle.wrappingType = LineStyle.WrappingType.SCALED_FILL;
-
+        lineStyle.wrappingType = LineStyle.WrappingType.WRAP_ON;
         lineStyle.alignType = LineStyle.AlignType.CENTER;
 
+        lineStyle.breakPreference = LineStyle.BreakPreference.SPACES;
 
         GlyphStyle style = new GlyphStyle();
-        style.textColour = new ColourProperty(255, 255, 255);
-        //style.underlined = true;
-
+        style.textColour = new ColourProperty(120, 220, 220);
+        style.fontHeight = 0.0625F;
+        style.underlined = true;
         element.addLineBreak(lineStyle);
         element.addStyling(style);
-        element.addString("Simple Title");
-
+        element.addString("Simple test text, for typing on, this is now going to be much longer and more complicated!");
 
         lineStyle = new LineStyle();
-        lineStyle.wrappingType = LineStyle.WrappingType.WRAP_ON;
-        lineStyle.alignType = LineStyle.AlignType.JUSTIFY;
-
-        lineStyle.breakPreference = LineStyle.BreakPreference.SPACES;
+        lineStyle.alignType = LineStyle.AlignType.ALIGN_TEXT_RIGHT;
         element.addLineBreak(lineStyle);
-
         style = new GlyphStyle();
-        style.textColour = new ColourProperty(200, 200, 200);
-        style.fontHeight = 0.0625F;
+        style.textColour = new ColourProperty(220, 220, 120);
+        style.fontHeight = 0.0625F/2;
+        style.strikethrough = true;
         element.addStyling(style);
-        element.addString("Simple text, to allow me to see space breaks. Hopefully it's justifying nicely, let's see");
-        lines.glyphStrings.add(element);
+        element.addString("Here we have a seperate text with a different colour");
+        element.addElement(new ItemStackElement(new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK), 200));
+
+        lines.glyphString = element;
 
         addComponent(lines);
 

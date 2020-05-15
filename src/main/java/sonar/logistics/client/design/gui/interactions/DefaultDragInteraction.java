@@ -1,18 +1,12 @@
 package sonar.logistics.client.design.gui.interactions;
 
-import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.design.gui.widgets.ScaleableWidget;
 
-public class ViewportZoomInteraction extends ViewportAbstractInteraction {
+public class DefaultDragInteraction extends AbstractViewportInteraction {
 
-    public ViewportZoomInteraction(GSIViewportWidget viewport){
+    public DefaultDragInteraction(GSIViewportWidget viewport){
         super(viewport);
-    }
-
-    @Override
-    public GSIDesignSettings.ViewportInteractSetting getViewportSetting() {
-        return GSIDesignSettings.ViewportInteractSetting.ZOOM_VIEWPORT;
     }
 
     @Override

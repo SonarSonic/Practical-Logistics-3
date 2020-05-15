@@ -2,22 +2,16 @@ package sonar.logistics.client.design.gui.interactions;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.design.windows.EnumRescaleType;
 import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.vectors.Quad2D;
 
-public class ViewportResizeInteraction extends ViewportAbstractInteraction {
+public class DefaultResizeInteraction extends AbstractViewportInteraction {
 
-    public ViewportResizeInteraction(GSIViewportWidget viewport) {
+    public DefaultResizeInteraction(GSIViewportWidget viewport) {
         super(viewport);
-    }
-
-    @Override
-    public GSIDesignSettings.ViewportInteractSetting getViewportSetting() {
-        return GSIDesignSettings.ViewportInteractSetting.RESIZE_COMPONENTS;
     }
 
     @Override
@@ -65,9 +59,14 @@ public class ViewportResizeInteraction extends ViewportAbstractInteraction {
         }
     }
 
+    public EnumRescaleType getRescaleTypeFromMouse(double mouseX, double mouseY){
+        return EnumRescaleType.getRescaleTypeFromMouse(viewport.getScaledBoundsForComponent(viewport.selectedComponent), mouseX, mouseY, 4.0F);
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         boolean dragged = super.mouseClicked(mouseX, mouseY, button);
+        /*
         if(viewport.isMouseOverViewport(mouseX, mouseY)) {
             if (button == 0) {
                 if (viewport.selectedComponent == null || viewport.currentRescaleType == null) {
@@ -78,6 +77,8 @@ public class ViewportResizeInteraction extends ViewportAbstractInteraction {
                 }
             }
         }
+
+         */
         return dragged;
 
     }

@@ -1,6 +1,7 @@
 package sonar.logistics.client.gsi.components.text.glyph;
 
-import sonar.logistics.client.gsi.components.text.StyledTextRenderer;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
@@ -23,11 +24,15 @@ public class LineBreakGlyph implements IGlyphType {
 
     @Override
     public float getRenderHeight(ScaledFontType fontType, GlyphStyle parentStyling) {
-        return 0;
+        ///the line break glyph needs default height to enable empty lines.
+        return fontType.getElementScaling()  * downscale(fontType, parentStyling);
     }
 
     @Override
-    public float render(StyledTextRenderer.GlyphRenderContext context) {
-        return 0;
+    public void render(GlyphRenderContext context, GlyphRenderInfo glyphInfo){ }
+
+    @Override
+    public boolean isVisible(){
+        return false;
     }
 }

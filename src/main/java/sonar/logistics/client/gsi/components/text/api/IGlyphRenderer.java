@@ -1,9 +1,10 @@
 package sonar.logistics.client.gsi.components.text.api;
 
-import sonar.logistics.client.gsi.components.text.StyledTextRenderer;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
+import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 
 public interface IGlyphRenderer {
 
-    float renderGlyph(IGlyphType glyph, StyledTextRenderer.GlyphRenderContext context);
+    void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo);
 
 }

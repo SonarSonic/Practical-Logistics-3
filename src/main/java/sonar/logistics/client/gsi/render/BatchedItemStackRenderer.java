@@ -102,7 +102,7 @@ public class BatchedItemStackRenderer {
             this.toRender = toRender;
             this.model = itemRenderer.getItemModelWithOverrides(toRender, null, null);
             this.scaling = Vector2D.getSizingFromRatio(bounds.getSizing(), ITEM_RATIO);
-            this.alignment = Vector2D.align(scaling, bounds.getSizing(), ElementAlignment.CENTERED, ElementAlignment.CENTERED);
+            this.alignment = bounds.getAlignment().add(scaling.x/2, scaling.y/2).add(Vector2D.align(scaling, bounds.getSizing(), ElementAlignment.CENTERED, ElementAlignment.CENTERED));
             this.isGui3D = model.isGui3d();
         }
 

@@ -1,5 +1,7 @@
 package sonar.logistics.client.gsi.components.text.style;
 
+import sonar.logistics.client.design.gui.EnumGlyphStyling;
+import sonar.logistics.client.gsi.components.text.glyph.AttributeGlyph;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 
 public class GlyphStyle {
@@ -9,7 +11,7 @@ public class GlyphStyle {
 	public ColourProperty textColour = new ColourProperty(255, 255, 255);
 	public ColourProperty backgroundColour = new ColourProperty(0, 0, 0);
 
-	public byte action_id = -1;
+	public int actionId = -1;
 
 	public boolean bold = false;
 	public boolean italic = false;
@@ -17,7 +19,6 @@ public class GlyphStyle {
 	public boolean strikethrough = false;
 	public boolean obfuscated = false;
 	public boolean shadow = false;
-	public boolean seeThroughType = false;
 
 	public GlyphStyle() {}
 
@@ -32,9 +33,18 @@ public class GlyphStyle {
 		style.strikethrough = strikethrough;
 		style.obfuscated = obfuscated;
 		style.shadow = shadow;
-		style.action_id = action_id;
+		style.actionId = actionId;
 		return style;
 	}
+
+	public AttributeGlyph[] getAttributes(){
+		AttributeGlyph[] attributeGlyphs = new AttributeGlyph[EnumGlyphStyling.values().length];
+		for(int i = 0 ; i < attributeGlyphs.length; i++){
+			attributeGlyphs[i] = EnumGlyphStyling.values()[i].getAttributeGlyph(this);
+		}
+		return attributeGlyphs;
+	}
+
 /*
 	public void setFontColour(byte[] textColour) {
 		this.textColour = textColour;
