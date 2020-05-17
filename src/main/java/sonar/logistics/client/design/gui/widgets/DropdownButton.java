@@ -1,18 +1,14 @@
 package sonar.logistics.client.design.gui.widgets;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.INestedGuiEventHandler;
-import net.minecraft.client.gui.IRenderable;
-import net.minecraft.client.gui.widget.Widget;
-import sonar.logistics.client.design.api.IFlexibleGuiEventListener;
 import sonar.logistics.client.design.api.IInteractWidget;
 import sonar.logistics.client.design.api.IMultipleGuiEventListener;
 import sonar.logistics.client.design.api.ISimpleWidget;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.vectors.Quad2D;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,9 +51,13 @@ public class DropdownButton extends AbstractGui implements IMultipleGuiEventList
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        ScreenUtils.fillDouble(quad.x, quad.y, quad.x + quad.width, quad.y + quad.height, open ? ScreenUtils.transparent_green_button.rgba : ScreenUtils.transparent_grey_button.rgba);
+        ScreenUtils.fillDouble(quad.x, quad.y, quad.x + quad.width, quad.y + quad.height, open ? ScreenUtils.transparent_activated_button.rgba : ScreenUtils.transparent_disabled_button.rgba);
         if(open){
+            RenderSystem.enableDepthTest();
+            RenderSystem.translated(0, 0, 10);
             dropDowns.forEach(widget -> widget.render(mouseX, mouseY, partialTicks));
+            RenderSystem.translated(0, 0, -10);
+            RenderSystem.disableDepthTest();
         }
     }
 

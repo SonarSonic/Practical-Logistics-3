@@ -35,10 +35,10 @@ public class ForgingHammerScreen extends ContainerScreen<ForgingHammerContainer>
         this.minecraft.getTextureManager().bindTexture(GUI);
         int relX = (this.width - this.xSize) / 2;
         int relY = (this.height - this.ySize) / 2;
-        ScreenUtils.blitDouble(relX, relY, 0, 0, this.xSize, this.ySize);
+        ScreenUtils.blitDouble(relX, relY, this.xSize, this.ySize, 0, 0);
 
         double l = ((double)tileEntity.progress + partialTicks) * 23 / ForgingHammerTile.processSpeed;
-        ScreenUtils.blitDouble(guiLeft + 76, guiTop + 24, 176, 0, l, 16);
+        ScreenUtils.blitDouble(guiLeft + 76, guiTop + 24, l, 16, 176, 0);
     }
 
 

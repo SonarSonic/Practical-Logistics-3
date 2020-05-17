@@ -1,5 +1,6 @@
 package sonar.logistics.client.design.gui;
 
+import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.properties.ColourProperty;
@@ -19,54 +20,57 @@ public class GSIDesignSettings {
 
     public static void setFontHeight(float fontHeight){
         glyphStyle.fontHeight = fontHeight;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.FONT_HEIGHT);
+        onGlyphAttributeChanged(GlyphStyleAttributes.FONT_HEIGHT);
     }
 
     public static void setTextColour(ColourProperty textColour){
         glyphStyle.textColour = textColour;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.TEXT_COLOUR);
+        onGlyphAttributeChanged(GlyphStyleAttributes.TEXT_COLOUR);
     }
 
     public static void setBackgroundColour(ColourProperty backgroundColour){
         glyphStyle.backgroundColour = backgroundColour;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.BACKGROUND_COLOUR);
+        onGlyphAttributeChanged(GlyphStyleAttributes.BACKGROUND_COLOUR);
     }
 
-    public static void setActionID(int actionId){
-        glyphStyle.actionId = actionId;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.ACTION_ID);
+    public static void setTriggerId(int triggerId){
+        glyphStyle.triggerId = triggerId;
+        onGlyphAttributeChanged(GlyphStyleAttributes.TRIGGER_ID);
     }
 
     public static void toggleBoldStyling(){
         glyphStyle.bold = !glyphStyle.bold;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.BOLD);
+        onGlyphAttributeChanged(GlyphStyleAttributes.BOLD);
     }
 
     public static void toggleUnderlineStyling(){
         glyphStyle.underlined = !glyphStyle.underlined;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.UNDERLINE);
+        onGlyphAttributeChanged(GlyphStyleAttributes.UNDERLINE);
     }
 
     public static void toggleItalicStyling(){
         glyphStyle.italic = !glyphStyle.italic;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.ITALIC);
+        onGlyphAttributeChanged(GlyphStyleAttributes.ITALIC);
     }
 
     public static void toggleStrikethroughStyling(){
         glyphStyle.strikethrough = !glyphStyle.strikethrough;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.STRIKETHROUGH);
+        onGlyphAttributeChanged(GlyphStyleAttributes.STRIKETHROUGH);
     }
 
     public static void toggleObfuscatedStyling(){
         glyphStyle.obfuscated = !glyphStyle.obfuscated;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.OBFUSCATED);
+        onGlyphAttributeChanged(GlyphStyleAttributes.OBFUSCATED);
     }
 
     public static void toggleShadowStyling(){
         glyphStyle.shadow = !glyphStyle.shadow;
-        screen.gsiRenderWidget.onGlyphStyleChanged(EnumGlyphStyling.SHADOW);
+        onGlyphAttributeChanged(GlyphStyleAttributes.SHADOW);
     }
 
+    public static void onGlyphAttributeChanged(GlyphStyleAttributes attribute){
+        screen.onGlyphAttributeChanged(attribute, attribute.get(glyphStyle));
+    }
 
     //// LINE STYLING
 

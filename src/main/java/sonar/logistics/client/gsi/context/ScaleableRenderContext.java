@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix3f;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.render.BatchedItemStackRenderer;
 import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
@@ -17,7 +18,6 @@ public class ScaleableRenderContext {
     public float partialTicks;
     public MatrixStack matrix;
     private IRenderTypeBuffer worldBuffer;
-    private IRenderTypeBuffer.Impl tessellatorBuffer;
     public int light;
     public int overlay;
 
@@ -33,7 +33,7 @@ public class ScaleableRenderContext {
         this.matrix = matrix;
         this.worldBuffer = null;
         this.light = ScaleableRenderHelper.FULL_LIGHT;
-        this.overlay = 0;
+        this.overlay = OverlayTexture.NO_OVERLAY;
         this.lightingMatrix = null;
         this.isGui = true;
         this.bakedLight = ScaleableRenderHelper.getBakedLight(light);
@@ -53,7 +53,7 @@ public class ScaleableRenderContext {
 
         this.bakedLight = ScaleableRenderHelper.getBakedLight(light);
     }
-
+    /*
     public IRenderTypeBuffer getWorldBuffer(){
         return worldBuffer != null ? worldBuffer : tessellatorBuffer;
     }
@@ -61,16 +61,44 @@ public class ScaleableRenderContext {
     public IRenderTypeBuffer.Impl getTessellatorBuffer(){
         return tessellatorBuffer;
     }
+    */
 
     public void preRender() {
-        tessellatorBuffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
         itemStackRenderer.preRender(this);
     }
 
     public void postRender() {
-        tessellatorBuffer.finish();
         itemStackRenderer.postRender(this); //this uses & finishes the tessellator buffer so should always be called after.
     }
+
+    ////
+
+    private IRenderTypeBuffer.Impl renderBuffer;
+
+    public IRenderTypeBuffer getRenderBuffer(boolean batched){
+        if(batched && worldBuffer != null){
+            return worldBuffer;
+        }
+        return renderBuffer;
+    }
+
+    public IRenderTypeBuffer startRenderBuffer(boolean batched){
+        if(batched && worldBuffer != null){
+            return worldBuffer;
+        }
+        return renderBuffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+    }
+
+    public void finishRenderBuffer(boolean batched){
+        if(batched && worldBuffer != null){
+            return;
+        }
+        renderBuffer.finish();
+    }
+
+    ////
+
+
 
     public void resetLightingMatrix(){
         if(lightingMatrix != null && !isGui){

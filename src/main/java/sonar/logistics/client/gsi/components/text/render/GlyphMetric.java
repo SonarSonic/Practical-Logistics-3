@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.components.text.render;
 
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
+import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.vectors.Quad2D;
 
@@ -18,7 +18,7 @@ public class GlyphMetric {
         this.renderSize = new Quad2D();
     }
 
-    public void addGlyph(int index, IGlyphType glyph, GlyphStyle style, double width, double height){
+    public void addGlyph(int index, Glyph glyph, GlyphStyle style, double width, double height){
         addGlyphInfo(new GlyphRenderInfo(index, glyph, style, width, height));
     }
 

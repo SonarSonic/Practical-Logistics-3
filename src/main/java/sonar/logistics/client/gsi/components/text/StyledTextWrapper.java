@@ -1,9 +1,8 @@
 package sonar.logistics.client.gsi.components.text;
 
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
+import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
-import sonar.logistics.client.gsi.components.text.glyph.AttributeGlyph;
 import sonar.logistics.client.gsi.components.text.render.GlyphMetric;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.render.StyledTextLine;
@@ -16,39 +15,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**used for wrapping styled strings within a specified bounds, it also will break strings into seperate pages*/
-//TODO SPACES BREAK NEW LINES WHEN IT SHOULD ALREADY FIT!!!!
 public class StyledTextWrapper {
+
+    public static StyledTextWrapper INSTANCE = new StyledTextWrapper();
+
+    private StyledTextWrapper(){}
 
     /// building variables
     private ScaledFontType fontType;
     private Quad2D bounds;
-    private StyledTextString text;
     private int index;
 
     private LineStyle currentLineStyle;
-    private GlyphStyle currentGlyphStyle;
     private boolean currentPageBreak;
 
     ///outputs
     public StyledTextPages styledTextPages;
 
     // builds wrapping pages
-    public void build(StyledTextString text, ScaledFontType fontType, Quad2D bounds){
-        styledTextPages = new StyledTextPages(text);
-
+    public void build(StyledTextPages pages, ScaledFontType fontType, Quad2D bounds){
+        pages.clearCache();
         this.fontType = fontType;
         this.bounds = bounds;
-        this.text = text;
-
+        this.index = 0;
         this.currentLineStyle = new LineStyle();
-        this.currentGlyphStyle = new GlyphStyle();
-
+        this.currentPageBreak = false;
+        this.styledTextPages = pages;
 
         //build the raw lines from line breaks
         startPage();
         startRawLine();
-        for(index = 0; index < text.glyphs.size(); index ++){
-            IGlyphType glyph = text.glyphs.get(index);
+        for(index = 0; index < styledTextPages.text.glyphs.size(); index ++){
+            Glyph glyph = styledTextPages.text.glyphs.get(index);
 
             if(glyph instanceof LineBreakGlyph){
                 finishRawLine();
@@ -57,10 +55,6 @@ public class StyledTextWrapper {
                 currentPageBreak = ((LineBreakGlyph) glyph).page;
 
                 startRawLine();
-            }
-
-            if(glyph instanceof AttributeGlyph){
-                currentGlyphStyle = ((AttributeGlyph) glyph).alterStyle(currentGlyphStyle.copy());
             }
 
             addGlyphToRawLine(glyph);
@@ -82,8 +76,8 @@ public class StyledTextWrapper {
 
     public void finishPage(){
         if(!page.isEmpty()) {
-            styledTextPages.pages.add(page);
-            styledTextPages.lines.addAll(page);
+            styledTextPages.styledPages.add(page);
+            styledTextPages.styledLines.addAll(page);
         }
     }
 
@@ -131,20 +125,20 @@ public class StyledTextWrapper {
 
     ///// raw metric building
 
-    public void addGlyphToRawLine(IGlyphType glyph){
-        float renderWidth = glyph.getRenderWidth(fontType, currentGlyphStyle);
-        float renderHeight = glyph.getRenderHeight(fontType, currentGlyphStyle);
-        GlyphRenderInfo renderInfo = new GlyphRenderInfo(index, glyph, currentGlyphStyle, renderWidth, renderHeight);
+    public void addGlyphToRawLine(Glyph glyph){
+        GlyphStyle style = glyph.getStyle();
+        float renderWidth = glyph.getRenderWidth(fontType, style);
+        float renderHeight = glyph.getRenderHeight(fontType, style);
+        GlyphRenderInfo renderInfo = new GlyphRenderInfo(index, glyph, style, renderWidth, renderHeight);
+        styledTextPages.styledGlyphs.add(renderInfo);
 
-        addGlyphInfoToGlyphMetric(renderInfo);
-
-        //if the glyph is a line breaker we will break after it...n.b. spaces will be included on the line before the break...
-        if(currentLineStyle.breakPreference.shouldBreakAfterGlyph(glyph)){
+        if(currentLineStyle.breakPreference.isWordBreaker(glyph)){
             finishGlyphMetric();
+            addGlyphInfoToStyledLine(renderInfo);
             startGlyphMetric();
+        }else {
+            addGlyphInfoToGlyphMetric(renderInfo);
         }
-
-        styledTextPages.glyphs.add(renderInfo);
     }
 
     public void addGlyphInfoToGlyphMetric(GlyphRenderInfo glyphInfo){

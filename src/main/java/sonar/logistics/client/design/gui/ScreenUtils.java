@@ -8,15 +8,17 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.PL3;
 import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.vectors.Quad2D;
 
 public class ScreenUtils {
 
     public static ColourProperty transparent_grey_bgd = new ColourProperty(5, 5, 2, 50);
     public static ColourProperty transparent_blue_bgd = new ColourProperty(8, 8, 32, 50);
 
-    public static ColourProperty transparent_grey_button = new ColourProperty(80, 80, 80, 80);
-    public static ColourProperty transparent_red_button = new ColourProperty(255, 120, 120, 120);
-    public static ColourProperty transparent_green_button = new ColourProperty(120, 255, 120, 120);
+    public static ColourProperty transparent_disabled_button = new ColourProperty(80, 80, 80, 80);
+    public static ColourProperty transparent_hovered_button = new ColourProperty(255, 255, 255, 120);
+    public static ColourProperty transparent_activated_button = new ColourProperty(120, 255, 120, 120);
+    public static ColourProperty transparent_alert_button = new ColourProperty(255, 120, 120, 120);
 
     public static ColourProperty light_grey = new ColourProperty(120, 120, 120);
     public static ColourProperty white = new ColourProperty(255, 255, 255);
@@ -40,6 +42,10 @@ public class ScreenUtils {
     GL_GEQUAL   = 0x206, - 518
     GL_ALWAYS   = 0x207; - 519
     */
+
+    public static void fillDouble(Quad2D quad, int rgba) {
+        fillDouble(quad.getX(), quad.getY(), quad.getMaxX(), quad.getMaxY(), rgba);
+    }
 
     public static void fillDouble(double x1, double y1, double x2, double y2, int rgba) {
         double value;
@@ -74,7 +80,11 @@ public class ScreenUtils {
         RenderSystem.disableBlend();
     }
 
-    public static void blitDouble(double left, double top, int uv_left, int uvTop, double width, double height) {
+    public static void blitDouble(Quad2D quad, int uv_left, int uvTop) {
+        blitDouble(quad.getX(), quad.getY(), quad.getWidth(), quad.getHeight(), uv_left, uvTop);
+    }
+
+    public static void blitDouble(double left, double top, double width, double height, int uv_left, int uvTop) {
         int texX = 256;
         int texY = 256;
         blitDouble(left, left + width, top, top + height, (uv_left + 0.0F) / (float)texX, (uv_left + (float)width) / (float)texX, (uvTop + 0.0F) / (float)texY, (uvTop + (float)height) / (float)texY);

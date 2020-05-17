@@ -2,6 +2,7 @@ package sonar.logistics.client.gsi.components;
 
 import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
 import sonar.logistics.client.vectors.Quad2D;
@@ -44,8 +45,8 @@ public class GridComponent extends AbstractStyledScaleable implements IScaleable
     }
 
     @Override
-    public void render(ScaleableRenderContext context) {
-        super.render(context);
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
+        super.render(context, interact);
         for(int r = 0; r < rows; r ++) {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r * columns) + c;

@@ -1,11 +1,9 @@
 package sonar.logistics.client.design.gui.interactions;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.design.windows.EnumRescaleType;
-import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.client.vectors.Quad2D;
 
 public class DefaultResizeInteraction extends AbstractViewportInteraction {
@@ -28,7 +26,7 @@ public class DefaultResizeInteraction extends AbstractViewportInteraction {
             }
             if(viewport.currentRescaleType != null) { //render resize box
                 Quad2D rescaledWindow = viewport.currentRescaleType.rescaleWindow(window, viewport.getBoundsForDisplay(), viewport.getSnappedDragX(dragX), viewport.getSnappedDragY(dragY), Screen.hasShiftDown());
-                ScreenUtils.fillDouble(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.transparent_green_button.rgba);
+                ScreenUtils.fillDouble(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.transparent_activated_button.rgba);
             }
         }
 

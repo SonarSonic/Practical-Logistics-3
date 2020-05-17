@@ -1,7 +1,10 @@
 package sonar.logistics.client.gsi.components.text.render;
 
 import sonar.logistics.client.gsi.components.text.StyledTextString;
+import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
+import sonar.logistics.client.vectors.Vector2D;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,34 +12,52 @@ import java.util.function.Function;
 
 public class StyledTextPages {
 
+    ///saved
+    public StyledTextString text;
 
-    public final static Function<GlyphRenderInfo, Boolean> FILTER_VISIBLE = glyphRenderInfo -> glyphRenderInfo.quad.width != 0 && glyphRenderInfo.glyph.isVisible();
-    public final static Function<GlyphRenderInfo, Boolean> FILTER_INVISIBLE = glyphRenderInfo -> !glyphRenderInfo.glyph.isVisible();
+    ///cached
+    public List<List<StyledTextLine>> styledPages;
+    public List<StyledTextLine> styledLines;
+    public List<GlyphRenderInfo> styledGlyphs;
 
-    public StyledTextString string;
+    public int page;
+    public IGlyphRenderer specialGlyphRenderer = null;
 
-    public List<List<StyledTextLine>> pages;
-    public List<StyledTextLine> lines;
-    public List<GlyphRenderInfo> glyphs;
-
-    public StyledTextPages(StyledTextString string){
-        this.string = string;
-        this.pages = new ArrayList<>();
-        this.lines = new ArrayList<>();
-        this.glyphs = new ArrayList<>();
+    public StyledTextPages(StyledTextString text){
+        this.text = text;
+        this.styledPages = new ArrayList<>();
+        this.styledLines = new ArrayList<>();
+        this.styledGlyphs = new ArrayList<>();
     }
 
-    public List<StyledTextLine> getCurrentPage(int pageNumber){
-        if(pages.size() > pageNumber) {
-            return pages.get(pageNumber);
+    public void clearCache(){
+        styledPages.clear();
+        styledLines.clear();
+        styledGlyphs.clear();
+    }
+
+    public List<StyledTextLine> getCurrentPage(){
+        if(styledPages.size() > page) {
+            return styledPages.get(page);
         }
         return new ArrayList<>();
     }
 
     ////
 
+    public int getPageNumber(int index){
+        int pageNumber = 0;
+        for(List<StyledTextLine> page : styledPages){
+            if(index >= page.get(0).getStartIndex() && index <= page.get(page.size() -1).getEndIndex()){
+                return pageNumber;
+            }
+            pageNumber++;
+        }
+        return -1;
+    }
+
     public List<StyledTextLine> getStyledPage(int index){
-        for(List<StyledTextLine> page : pages){
+        for(List<StyledTextLine> page : styledPages){
             if(index >= page.get(0).getStartIndex() && index <= page.get(page.size() -1).getEndIndex()){
                 return page;
             }
@@ -44,20 +65,11 @@ public class StyledTextPages {
         return null;
     }
 
-    /*
-    public List<StyledTextLine> getNextStyledPage(int index){
-        return pages.get(Math.min(pages.size()-1, index));
-    }
-
-    public List<StyledTextLine> getPrevStyledPage(int index){
-        return pages.get(Math.max(0, index));
-    }
-    */
-
     ////
 
+    @Nullable
     public StyledTextLine getStyledLine(int index){
-        for(StyledTextLine line : lines){
+        for(StyledTextLine line : styledLines){
             if(index >= line.getStartIndex() && index <= line.getEndIndex()){
                 return line;
             }
@@ -65,17 +77,18 @@ public class StyledTextPages {
         return null;
     }
 
+    @Nonnull
     public StyledTextLine getNextStyledLine(int index){
         StyledTextLine line = getStyledLine(index);
-        return lines.get(Math.min(lines.size()-1, lines.indexOf(line) + 1));
+        return styledLines.get(Math.min(styledLines.size()-1, styledLines.indexOf(line) + 1));
     }
 
     @Nullable
     public StyledTextLine getNextStyledLine(int index, Function<StyledTextLine, Boolean> func){
         StyledTextLine line = getStyledLine(index);
 
-        for(int i = lines.indexOf(line) + 1; i < lines.size(); i++){
-            StyledTextLine renderInfo = lines.get(i);
+        for(int i = styledLines.indexOf(line) + 1; i < styledLines.size(); i++){
+            StyledTextLine renderInfo = styledLines.get(i);
             if(func.apply(renderInfo)){
                 return renderInfo;
             }
@@ -83,17 +96,18 @@ public class StyledTextPages {
         return null;
     }
 
+    @Nonnull
     public StyledTextLine getPrevStyledLine(int index){
         StyledTextLine line = getStyledLine(index);
-        return lines.get(Math.max(0, lines.indexOf(line) - 1));
+        return styledLines.get(Math.max(0, styledLines.indexOf(line) - 1));
     }
 
     @Nullable
     public StyledTextLine getPrevStyledLine(int index, Function<StyledTextLine, Boolean> func){
         StyledTextLine line = getStyledLine(index);
 
-        for(int i = lines.indexOf(line) - 1; i >= 0; i--){
-            StyledTextLine renderInfo = lines.get(i);
+        for(int i = styledLines.indexOf(line) - 1; i >= 0; i--){
+            StyledTextLine renderInfo = styledLines.get(i);
             if(func.apply(renderInfo)){
                 return renderInfo;
             }
@@ -103,18 +117,23 @@ public class StyledTextPages {
 
     ////
 
+    @Nullable
     public GlyphRenderInfo getGlyphInfo(int index){
-        return glyphs.get(index);
+        if(styledGlyphs.isEmpty()){
+            return null;
+        }
+        return styledGlyphs.get(index);
     }
 
+    @Nonnull
     public GlyphRenderInfo getNextGlyphInfo(int index){
-        return glyphs.get(Math.min(glyphs.size()-1, index));
+        return styledGlyphs.get(Math.min(styledGlyphs.size()-1, index));
     }
 
     @Nullable
     public GlyphRenderInfo getNextGlyphInfo(int index, Function<GlyphRenderInfo, Boolean> func){
-        for(int i = index+1; i < glyphs.size(); i++){
-            GlyphRenderInfo renderInfo = glyphs.get(i);
+        for(int i = index+1; i < styledGlyphs.size(); i++){
+            GlyphRenderInfo renderInfo = styledGlyphs.get(i);
             if(func.apply(renderInfo)){
                 return renderInfo;
             }
@@ -122,14 +141,16 @@ public class StyledTextPages {
         return null;
     }
 
+
+    @Nonnull
     public GlyphRenderInfo getPrevGlyphInfo(int index){
-        return glyphs.get(Math.max(0, index));
+        return styledGlyphs.get(Math.max(0, index));
     }
 
     @Nullable
     public GlyphRenderInfo getPrevGlyphInfo(int index, Function<GlyphRenderInfo, Boolean> func){
         for(int i = index-1; i >= 0; i--){
-            GlyphRenderInfo renderInfo = glyphs.get(i);
+            GlyphRenderInfo renderInfo = styledGlyphs.get(i);
             if(func.apply(renderInfo)){
                 return renderInfo;
             }
@@ -139,10 +160,43 @@ public class StyledTextPages {
 
     public List<GlyphRenderInfo> getSelection(int startIndex, int endIndex){
         List<GlyphRenderInfo> selection = new ArrayList<>();
-        for(int i = startIndex; i < endIndex ; i++){
-            selection.add(glyphs.get(i));
+        for(int i = startIndex; i <= Math.min(endIndex, styledGlyphs.size()-1) ; i++){
+            selection.add(styledGlyphs.get(i));
         }
         return selection;
+    }
+
+    ///// interaction methods
+
+    public final static Function<GlyphRenderInfo, Boolean> FILTER_VISIBLE = glyphRenderInfo -> glyphRenderInfo.quad.width != 0 && glyphRenderInfo.glyph.isVisible();
+    public final static Function<GlyphRenderInfo, Boolean> FILTER_INVISIBLE = glyphRenderInfo -> !glyphRenderInfo.glyph.isVisible();
+
+    public StyledTextLine getInteractedLine(Vector2D textHit){
+        for (StyledTextLine line : getCurrentPage()) {
+            if (line.renderSize.contains(textHit)) {
+                return line;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public GlyphRenderInfo getGlyphHit(Vector2D textHit, Function<GlyphRenderInfo, Boolean> filter){
+        StyledTextLine line = getInteractedLine(textHit);
+        if(line != null){
+            return getGlyphHit(line, filter);
+        }
+        return null;
+    }
+
+    @Nullable
+    public GlyphRenderInfo getGlyphHit(StyledTextLine line, Function<GlyphRenderInfo, Boolean> filter){
+        for(GlyphRenderInfo glyphInfo : line.glyphInfo){
+            if(filter.apply(glyphInfo)){
+                return glyphInfo;
+            }
+        }
+        return null;
     }
 
 }

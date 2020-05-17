@@ -1,6 +1,7 @@
 package sonar.logistics.common.multiparts.displays;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Quaternion;
@@ -8,7 +9,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.vectors.DisplayVectorHelper;
+import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.common.multiparts.base.IMultipartRenderer;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
@@ -31,7 +32,7 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
         Quad2D sizing = tile.getGSIBounds();
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5);
-        origin = origin.add(DisplayVectorHelper.getFaceOffset(tile.getFacing(), 0.5));
+        origin = origin.add(VectorHelper.getFaceOffset(tile.getFacing(), 0.5));
 
 
         ///// START DISPLAY RENDERING \\\\\
@@ -52,7 +53,7 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
         ///// START GSI RENDERING \\\\\
 
         ScaleableRenderContext renderContext = new ScaleableRenderContext(tile.getGSI(), partialTicks, matrix, renderer, light, overlayLight, worldMatrix, false);
-        tile.getGSI().render(renderContext);
+        tile.getGSI().render(renderContext, tile.getGSI().getDefaultInteractionHandler(Minecraft.getInstance().player));
 
         ///// END GSI RENDERING \\\\\
 

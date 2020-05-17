@@ -1,7 +1,5 @@
 package sonar.logistics.client.gsi.components.text.style;
 
-import sonar.logistics.client.design.gui.EnumGlyphStyling;
-import sonar.logistics.client.gsi.components.text.glyph.AttributeGlyph;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 
 public class GlyphStyle {
@@ -11,7 +9,7 @@ public class GlyphStyle {
 	public ColourProperty textColour = new ColourProperty(255, 255, 255);
 	public ColourProperty backgroundColour = new ColourProperty(0, 0, 0);
 
-	public int actionId = -1;
+	public int triggerId = -1;
 
 	public boolean bold = false;
 	public boolean italic = false;
@@ -33,10 +31,24 @@ public class GlyphStyle {
 		style.strikethrough = strikethrough;
 		style.obfuscated = obfuscated;
 		style.shadow = shadow;
-		style.actionId = actionId;
+		style.triggerId = triggerId;
 		return style;
 	}
 
+	public boolean matches(GlyphStyle style){
+		return 	fontHeight == style.fontHeight &&
+				textColour.equals(style.textColour) &&
+				backgroundColour.equals(style.backgroundColour) &&
+				triggerId == style.triggerId &&
+				bold == style.bold &&
+				italic == style.italic &&
+				underlined == style.underlined &&
+				strikethrough == style.strikethrough &&
+				obfuscated == style.obfuscated &&
+				shadow == style.shadow;
+	}
+
+	/*
 	public AttributeGlyph[] getAttributes(){
 		AttributeGlyph[] attributeGlyphs = new AttributeGlyph[EnumGlyphStyling.values().length];
 		for(int i = 0 ; i < attributeGlyphs.length; i++){
@@ -44,6 +56,7 @@ public class GlyphStyle {
 		}
 		return attributeGlyphs;
 	}
+	*/
 
 /*
 	public void setFontColour(byte[] textColour) {

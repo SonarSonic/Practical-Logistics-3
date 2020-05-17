@@ -43,7 +43,7 @@ public class LargeDisplayScreenBlock extends AbstractScreenBlock implements IMul
     public ActionResultType onMultipartActivated(MultipartEntry entry, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
 
         if(!world.isRemote){
-            if(player.isShiftKeyDown()) {
+            if(player.isSneaking()) {
                 WorldCableData worldData = GlobalCableData.getWorldData(world);//TESTING
                 LocalCableData networkCableData = worldData.getCableData(pos, EnumCableTypes.getLargeDisplayType(entry.getBlockState().get(PL3Properties.ORIENTATION)));//TESTING
                 if (networkCableData == null) {

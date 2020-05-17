@@ -1,17 +1,20 @@
 package sonar.logistics.client.gsi.components.text;
 
 import sonar.logistics.client.gsi.api.IRenderableElement;
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.glyph.*;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
+import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
+import sonar.logistics.client.gsi.components.text.style.GlyphStyleHolder;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StyledTextString {
 
-    public List<IGlyphType> glyphs;
+    public List<Glyph> glyphs;
 
     public StyledTextString(){
         this.glyphs = new ArrayList<>();
@@ -52,26 +55,6 @@ public class StyledTextString {
 
     /////
 
-    public void addAttribute(AttributeGlyph attribute){
-        addAttribute(attribute, glyphs.size());
-    }
-
-    public void addAttribute(AttributeGlyph attribute, int index){
-        glyphs.add(index, attribute);
-    }
-
-    /////
-
-    public void addStyling(GlyphStyle style){
-        addStyling(style, glyphs.size());
-    }
-
-    public void addStyling(GlyphStyle style, int index){
-        glyphs.add(index, new StylingGlyph(style.copy()));
-    }
-
-    /////
-
     public void addLineBreak(LineStyle styling){
         addLineBreak(styling, glyphs.size());
     }
@@ -88,6 +71,50 @@ public class StyledTextString {
 
     public void addPageBreak(LineStyle styling, int index){
         glyphs.add(index, new LineBreakGlyph(false, styling));
+    }
+
+    /////
+
+    public boolean deleteGlyph(int index){
+        glyphs.remove(index);
+        return true;
+    }
+
+    public boolean deleteGlyphs(int startIndex, int endIndex){
+        List<Glyph> toDelete = new ArrayList<>();
+        for(int i = startIndex ; i < endIndex; i ++) {
+            Glyph glyph = glyphs.get(i);
+            toDelete.add(glyph);
+        }
+        glyphs.removeAll(toDelete);
+        return !toDelete.isEmpty();
+    }
+
+    public void clearAttributes(int startIndex, int endIndex){
+        for(int i = startIndex ; i < endIndex; i ++) {
+            Glyph glyph = glyphs.get(i);
+            glyph.styleHolder = null;
+        }
+    }
+
+    public void resetAttribute(GlyphStyleAttributes attribute, int startIndex, int endIndex){
+        applyAttribute(attribute, attribute.getDefault(), startIndex, endIndex);
+    }
+
+    public void applyAttribute(GlyphStyleAttributes attribute, Object attributeObj, int startIndex, int endIndex){
+        for(int i = startIndex ; i < endIndex; i ++){
+            Glyph glyph = glyphs.get(i);
+
+            if(glyph.styleHolder == null){
+                glyph.styleHolder = new GlyphStyleHolder();
+            }
+
+            glyph.styleHolder.setAttribute(attribute, attributeObj);
+
+            if(glyph.styleHolder.isDefault()){
+                glyph.styleHolder = null;
+            }
+        }
     }
 
 }

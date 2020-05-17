@@ -1,28 +1,24 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.player.PlayerEntity;
 import sonar.logistics.client.design.gui.GSIDesignScreen;
+import sonar.logistics.client.gsi.api.IInteractionListener;
+import sonar.logistics.client.gsi.api.INestedInteractionListener;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
-import sonar.logistics.client.gsi.components.text.StyledTextComponent;
-import sonar.logistics.client.gsi.components.text.StyledTextString;
-import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
-import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.context.DisplayClickContext;
-import sonar.logistics.client.gsi.context.DisplayInteractionContext;
+import sonar.logistics.client.gsi.components.ButtonComponent;
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.gsi.elements.ItemStackElement;
-import sonar.logistics.client.gsi.properties.ColourProperty;
-import sonar.logistics.client.vectors.DisplayVectorHelper;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.common.blocks.PL3Blocks;
+import sonar.logistics.client.vectors.VectorHelper;
+import sonar.logistics.client.vectors.Vector2D;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GSI {
+//TODO SYNC PACKETS & SAVING
+public class GSI implements INestedInteractionListener {
 
 
     public List<IScaleableComponent> components = new ArrayList<>();
@@ -33,44 +29,36 @@ public class GSI {
         this.display = display;
     }
 
-    public boolean onHover(DisplayInteractionContext context){
-        IScaleableComponent component = getInteractedComponent(context);
-        if(component != null){
-            context.offsetComponentHit(component.getBounds().renderBounds());
-            return component.onHovered(context);
+    private DisplayInteractionHandler defaultInteraction = null;
+
+    public DisplayInteractionHandler getDefaultInteractionHandler(PlayerEntity player){
+        if(defaultInteraction == null){
+            defaultInteraction = new DisplayInteractionHandler(this, Minecraft.getInstance().player, false);
         }
-        return false;
+        Vector2D clickPosition = VectorHelper.getEntityLook(player, display, 8);
+        defaultInteraction.update(clickPosition);
+        return defaultInteraction;
     }
 
-    public boolean onClicked(DisplayClickContext context){
-        if(context.type.isShifting() && context.type.isRight()){
+    @Override
+    public boolean mouseClicked(DisplayInteractionHandler handler, int button) {
+        if(!handler.isUsingGui && handler.hasShiftDown()){
             Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this, Minecraft.getInstance().player)));
             testStructure();
-            queueRebuild(); //TODO REMOVE!!! THIS IS JUST FOR TESTING
+            rebuild();
             return true;
         }
-
-        IScaleableComponent component = getInteractedComponent(context);
-        if(component != null){
-            context.offsetComponentHit(component.getBounds().renderBounds());
-            return component.onClicked(context);
-        }
-        return false;
+        return INestedInteractionListener.super.mouseClicked(handler, button);
     }
 
-    public void render(ScaleableRenderContext context){
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact){
         if(queuedRebuild){
             rebuild();
             queuedRebuild = false;
         }
 
-        DisplayInteractionContext hover = DisplayVectorHelper.createHoverContext(Minecraft.getInstance().player, display);
-        if(hover != null){
-            //onHover(hover);
-        }
-
         context.preRender();
-        components.forEach(c -> c.render(context));
+        components.forEach(c -> c.render(context, interact));
         context.postRender();
     }
 
@@ -81,7 +69,9 @@ public class GSI {
     ///TODO REMOVE ME!
     public void testStructure(){
         components.clear();
+        addComponent(new ButtonComponent(0, 176, 0));
 
+        /*
         StyledTextComponent lines = new StyledTextComponent();
         lines.bounds.setBoundPercentages(new Quad2D(0, 0, 1, 1));
 
@@ -93,28 +83,19 @@ public class GSI {
 
         lineStyle.breakPreference = LineStyle.BreakPreference.SPACES;
 
-        GlyphStyle style = new GlyphStyle();
-        style.textColour = new ColourProperty(120, 220, 220);
-        style.fontHeight = 0.0625F;
-        style.underlined = true;
         element.addLineBreak(lineStyle);
-        element.addStyling(style);
         element.addString("Simple test text, for typing on, this is now going to be much longer and more complicated!");
 
         lineStyle = new LineStyle();
         lineStyle.alignType = LineStyle.AlignType.ALIGN_TEXT_RIGHT;
         element.addLineBreak(lineStyle);
-        style = new GlyphStyle();
-        style.textColour = new ColourProperty(220, 220, 120);
-        style.fontHeight = 0.0625F/2;
-        style.strikethrough = true;
-        element.addStyling(style);
         element.addString("Here we have a seperate text with a different colour");
         element.addElement(new ItemStackElement(new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK), 200));
 
-        lines.glyphString = element;
+        lines.pages.text = element;
 
         addComponent(lines);
+        */
 
         /*
         GridContainer subGrid = new GridContainer();
@@ -182,17 +163,17 @@ public class GSI {
     }
 
     @Nullable
-    public IScaleableComponent getInteractedComponent(DisplayInteractionContext context){
-        return getInteractedComponent(components, context);
+    public IScaleableComponent getInteractedComponent(DisplayInteractionHandler handler){
+        return getInteractedComponent(components, handler);
     }
 
     @Nullable
-    public IScaleableComponent getInteractedComponent(List<IScaleableComponent> components, DisplayInteractionContext context){
+    public IScaleableComponent getInteractedComponent(List<IScaleableComponent> components, DisplayInteractionHandler handler){
         for(IScaleableComponent component : components){
-            if(component.canRayTrace() && component.canInteract(context)){
+            if(component.canRayTrace() && component.getInteraction(handler).isMouseOver(handler)){
                 List<IScaleableComponent> subComponents = component.getSubComponents();
                 if(subComponents != null){
-                    IScaleableComponent result = getInteractedComponent(subComponents, context);
+                    IScaleableComponent result = getInteractedComponent(subComponents, handler);
                     if(result != null){
                         return result;
                     }
@@ -202,4 +183,56 @@ public class GSI {
         }
         return null;
     }
+
+    //// Triggers
+
+    public boolean testTrigger; //TODO REMOVE ME!
+
+    public boolean toggle(IInteractionListener listener, int triggerId){
+        if(triggerId == 0){
+            return testTrigger = !testTrigger;
+        }
+        return false; //TODO
+    }
+
+
+    public boolean isActive(IInteractionListener listener, int triggerId){
+        if(triggerId == 0){
+            return testTrigger;
+        }
+
+        return false; //TODO
+    }
+
+    //// INestedInteractionListener
+
+    public boolean isDragging;
+    public IScaleableComponent focused;
+
+    @Override
+    public boolean isDragging() {
+        return isDragging;
+    }
+
+    @Override
+    public void setDragging(boolean dragging) {
+        this.isDragging = dragging;
+    }
+
+    @Nullable
+    @Override
+    public IScaleableComponent getFocused() {
+        return focused;
+    }
+
+    @Override
+    public void setFocused(@Nullable IScaleableComponent component) {
+        this.focused = component;
+    }
+
+    @Override
+    public List<IScaleableComponent> children() {
+        return components;
+    }
+
 }

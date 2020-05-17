@@ -1,15 +1,14 @@
 package sonar.logistics.client.gsi.components.text.style;
 
+import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.render.StyledTextLine;
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 
-import java.util.Iterator;
 import java.util.ListIterator;
 
 public class LineStyle {
 
-    public double lineSpacing = 0;
+    public double lineSpacing = 0;//TODO
     public double charSpacing = 0;///TODO
     public WrappingType wrappingType = WrappingType.WRAP_OFF;
     public AlignType alignType = AlignType.ALIGN_TEXT_LEFT;
@@ -84,7 +83,7 @@ public class LineStyle {
         SPACES, //when a glyph, extends the lines limit the it will attempt to find a space in the line and break here instead, the space will not appear on either line.
         ELEMENTS; // will break the line if the line
 
-        public boolean shouldBreakAfterGlyph(IGlyphType glyph){
+        public boolean isWordBreaker(Glyph glyph){
             return glyph.isSpace() || glyph.isWordBreaker();
         }
 

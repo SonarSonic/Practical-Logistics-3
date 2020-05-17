@@ -3,11 +3,10 @@ package sonar.logistics.client.gsi.components.text.glyph;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.render.StyledTextRenderer;
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 
-public class CharGlyph implements IGlyphType {
+public class CharGlyph extends Glyph {
 
     public char aChar;
 

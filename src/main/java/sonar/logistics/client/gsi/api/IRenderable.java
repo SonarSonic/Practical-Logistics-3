@@ -1,5 +1,6 @@
 package sonar.logistics.client.gsi.api;
 
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 
 public interface IRenderable {
@@ -8,10 +9,10 @@ public interface IRenderable {
         return true;
     }
 
-    default boolean canRender(ScaleableRenderContext context){
+    default boolean canRender(ScaleableRenderContext context, DisplayInteractionHandler interact){
         return true;
     }
 
-    void render(ScaleableRenderContext context);
+    void render(ScaleableRenderContext context, DisplayInteractionHandler interact);
 
 }

@@ -16,6 +16,7 @@ import sonar.logistics.common.multiparts.displays.old.info.elements.base.Element
 import java.util.ArrayList;
 import java.util.List;
 
+//batches itemstack rendering, there is about a 30% performance increase by not changing the GL settings for every item
 public class BatchedItemStackRenderer {
 
     public static ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
@@ -47,7 +48,6 @@ public class BatchedItemStackRenderer {
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         }
-
 
         if(isGui3D) {
             RenderHelper.setupGui3DDiffuseLighting();

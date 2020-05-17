@@ -1,13 +1,15 @@
 package sonar.logistics.client.gsi.scaleables;
 
 import sonar.logistics.client.gsi.api.IRenderable;
+import sonar.logistics.client.gsi.api.IScaleableComponent;
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.properties.ScaleableBounds;
 import sonar.logistics.client.gsi.properties.ScaleableStyling;
 import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
 import sonar.logistics.client.vectors.Quad2D;
 
-public abstract class AbstractStyledScaleable extends AbstractScaleable implements IRenderable {
+public abstract class AbstractStyledScaleable extends AbstractScaleable implements IRenderable, IScaleableComponent {
 
     public ScaleableStyling styling = new ScaleableStyling();
 
@@ -23,7 +25,7 @@ public abstract class AbstractStyledScaleable extends AbstractScaleable implemen
     }
 
     @Override
-    public void render(ScaleableRenderContext context) {
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
         renderBorders(context, bounds, styling);
     }
 

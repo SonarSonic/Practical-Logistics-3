@@ -2,6 +2,7 @@ package sonar.logistics.client.gsi.components.text.render;
 
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
+//TODO FIX JUSTIFY & LINE STYLING!
 public class StyledTextLine extends GlyphMetric {
 
     public LineStyle lineStyle;

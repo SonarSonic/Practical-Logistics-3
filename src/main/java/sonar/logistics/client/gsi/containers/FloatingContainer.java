@@ -1,5 +1,6 @@
 package sonar.logistics.client.gsi.containers;
 
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.vectors.Quad2D;
 
@@ -19,10 +20,10 @@ public class FloatingContainer extends AbstractContainer {
     }
 
     @Override
-    public void render(ScaleableRenderContext context) {
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
         subComponents.forEach(e -> {
-            if(e.canRender(context)) {
-                e.render(context);
+            if(e.canRender(context, interact)) {
+                e.render(context, interact);
             }
         });
     }

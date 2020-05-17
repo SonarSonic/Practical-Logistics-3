@@ -47,6 +47,7 @@ public class ClientProxy implements IProxy {
         ClientRegistry.bindTileEntityRenderer(PL3Blocks.FORGING_HAMMER_TILE, ForgingHammerRenderer::new);
         ClientRegistry.bindTileEntityRenderer(PL3Blocks.MULTIPART_HOST_TILE, MultipartHostRenderer::new);
         RenderTypeLookup.setRenderLayer(PL3Blocks.FORGING_HAMMER_BLOCK, RenderType.getCutoutMipped());
+        RenderTypeLookup.setRenderLayer(PL3Blocks.MULTIPART_HOST_BLOCK, RenderType.getTranslucent());
     }
 
     @Override

@@ -113,7 +113,7 @@ public class DataCableBlock extends Block implements IMultipartBlock {
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
         if(!world.isRemote){
-            if(player.isShiftKeyDown()) {
+            if(player.isSneaking()) {
                 WorldCableData worldData = GlobalCableData.getWorldData(world);//TESTING
                 LocalCableData networkCableData = worldData.getCableData(pos, EnumCableTypes.NETWORK_CABLE);//TESTING
                 if (networkCableData == null) {

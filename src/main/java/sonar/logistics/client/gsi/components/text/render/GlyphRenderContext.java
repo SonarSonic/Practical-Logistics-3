@@ -15,17 +15,15 @@ public class GlyphRenderContext {
 
     public ScaleableRenderContext renderContext;
     public ScaledFontType fontType;
-    public Quad2D bounds;
 
     public StyledTextLine line;
     public float red, green, blue, alpha;
 
     public List<TexturedGlyph.Effect> effects;
 
-    public GlyphRenderContext(ScaleableRenderContext renderContext, ScaledFontType fontType, Quad2D bounds){
+    public GlyphRenderContext(ScaleableRenderContext renderContext, ScaledFontType fontType){
         this.renderContext = renderContext;
         this.fontType = fontType;
-        this.bounds = bounds;
     }
 
     public void startLine(StyledTextLine line){
@@ -40,7 +38,7 @@ public class GlyphRenderContext {
     public void flushEffects(){
         if (!effects.isEmpty()) {
             TexturedGlyph whiteGlyph = ScaledFontType.DEFAULT_MINECRAFT.getFont().getWhiteGlyph();
-            IVertexBuilder builder = renderContext.getTessellatorBuffer().getBuffer(ScaledFontType.DEFAULT_MINECRAFT.getRenderType(whiteGlyph));
+            IVertexBuilder builder = renderContext.getRenderBuffer(false).getBuffer(ScaledFontType.DEFAULT_MINECRAFT.getRenderType(whiteGlyph));
             for (TexturedGlyph.Effect effect : effects) {
                 whiteGlyph.renderEffect(effect, renderContext.getMatrix4f(), builder, renderContext.light);
             }

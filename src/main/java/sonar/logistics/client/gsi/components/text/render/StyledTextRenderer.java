@@ -5,12 +5,9 @@ import net.minecraft.client.gui.fonts.EmptyGlyph;
 import net.minecraft.client.gui.fonts.IGlyph;
 import net.minecraft.client.gui.fonts.TexturedGlyph;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
-import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
-import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
-import sonar.logistics.client.gsi.components.text.render.StyledTextLine;
+import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.vectors.Quad2D;
@@ -19,15 +16,17 @@ import java.util.List;
 
 public class StyledTextRenderer {
 
-    public IGlyphRenderer DEFAULT_RENDERER = (context, glyphInfo) -> glyphInfo.glyph.render(context, glyphInfo);
+    public static IGlyphRenderer DEFAULT_RENDERER = (context, glyphInfo) -> glyphInfo.glyph.render(context, glyphInfo);
 
     ///// CACHED RENDER METHODS \\\\\
 
-    public static void renderStyledTextLines(ScaleableRenderContext context, ScaledFontType fontType, Quad2D bounds, List<StyledTextLine> lines, IGlyphRenderer renderer) {
-        GlyphRenderContext glyphContext = new GlyphRenderContext(context, fontType, bounds);
-        for(StyledTextLine line : lines) {
-            renderCachedGlyphLine(glyphContext, line, renderer);
+    public static void renderCurrentPage(ScaleableRenderContext context, ScaledFontType fontType, StyledTextPages pages) {
+        GlyphRenderContext glyphContext = new GlyphRenderContext(context, fontType);
+        context.startRenderBuffer(false);
+        for(StyledTextLine line : pages.getCurrentPage()) {
+            renderCachedGlyphLine(glyphContext, line, pages.specialGlyphRenderer == null ? DEFAULT_RENDERER : pages.specialGlyphRenderer);
         }
+        context.finishRenderBuffer(false);
     }
 
     public static void renderCachedGlyphLine(GlyphRenderContext context, StyledTextLine line, IGlyphRenderer renderer) {
@@ -35,6 +34,7 @@ public class StyledTextRenderer {
         context.renderContext.matrix.scale(line.lineScaling, line.lineScaling, 0);
 
         context.startLine(line);
+
         for(GlyphRenderInfo glyph : line.glyphInfo){
             context.renderContext.matrix.push();
             context.renderContext.matrix.translate(glyph.quad.x, glyph.quad.y, 0);
@@ -76,7 +76,7 @@ public class StyledTextRenderer {
         if (!(texturedGlyph instanceof EmptyGlyph)) {
             float boldOffset = glyphInfo.style.bold ? glyph.getBoldOffset() : 0.0F;
             float shadowOffset = renderingShadow ? glyph.getShadowOffset() : 0.0F;
-            IVertexBuilder builder = context.renderContext.getTessellatorBuffer().getBuffer(context.getScaledFont().getRenderType(texturedGlyph));
+            IVertexBuilder builder = context.renderContext.getRenderBuffer(false).getBuffer(context.getScaledFont().getRenderType(texturedGlyph));
             texturedGlyph.render(glyphInfo.style.italic, shadowOffset, shadowOffset, context.renderContext.getMatrix4f(), builder, context.red, context.green, context.blue, context.alpha, context.renderContext.light);
             if (glyphInfo.style.bold) {
                 texturedGlyph.render(glyphInfo.style.italic, shadowOffset + boldOffset, shadowOffset, context.renderContext.getMatrix4f(), builder, context.red, context.green, context.blue, context.alpha, context.renderContext.light);
@@ -127,7 +127,7 @@ public class StyledTextRenderer {
 
     ///// SIZING \\\\\\
 
-    public static float getGlyphWidth(ScaledFontType fontType, GlyphStyle style, IGlyphType renderableGlyph){
+    public static float getGlyphWidth(ScaledFontType fontType, GlyphStyle style, Glyph renderableGlyph){
         if (renderableGlyph instanceof CharGlyph) {
             CharGlyph charGlyph = (CharGlyph) renderableGlyph;
             if(charGlyph.isSpace()){ //// SPACE
@@ -142,7 +142,7 @@ public class StyledTextRenderer {
         return 0;
     }
 
-    public static float getGlyphHeight(ScaledFontType fontType, GlyphStyle style, IGlyphType renderableGlyph){
+    public static float getGlyphHeight(ScaledFontType fontType, GlyphStyle style, Glyph renderableGlyph){
         return fontType.getFontScaling();
     }
 

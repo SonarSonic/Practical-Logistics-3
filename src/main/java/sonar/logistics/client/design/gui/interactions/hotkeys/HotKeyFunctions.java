@@ -1,12 +1,9 @@
 package sonar.logistics.client.design.gui.interactions.hotkeys;
 
-import net.java.games.input.Keyboard;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.util.text.TextFormatting;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.interactions.DefaultTextInteraction;
-import sonar.logistics.client.gsi.components.text.glyph.AttributeGlyph;
+import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 
 public enum HotKeyFunctions {
 
@@ -18,13 +15,13 @@ public enum HotKeyFunctions {
 	LEFT((key, scanCode, mod) -> key == 263 && !Screen.hasShiftDown(), interaction -> {interaction.clearSelection(); interaction.moveCursorLeft(interaction.cursor);}),//
 	RIGHT((key, scanCode, mod) -> key == 262 && !Screen.hasShiftDown(), interaction -> {interaction.clearSelection(); interaction.moveCursorRight(interaction.cursor);}),//
 
-
-	HOME_SHIFT((key, scanCode, mod) -> key == 268 && !Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorToStart(interaction.selectionEnd);}),//
-	END_SHIFT((key, scanCode, mod) -> key == 269 && !Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorToEnd(interaction.selectionEnd);}),//
-	UP_SHIFT((key, scanCode, mod) -> key == 265 && !Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorUp(interaction.selectionEnd);}),//
-	DOWN_SHIFT((key, scanCode, mod) -> key == 264 && !Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorDown(interaction.selectionEnd);}),//
-	LEFT_SHIFT((key, scanCode, mod) -> key == 263 && !Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorLeft(interaction.selectionEnd);}),//
-	RIGHT_SHIFT((key, scanCode, mod) -> key == 262 && !Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorRight(interaction.selectionEnd);}),//
+	///TODO CONFIRM THESE SHIFT MOVES WORK.
+	HOME_SHIFT((key, scanCode, mod) -> key == 268 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorToStart(interaction.selectionEnd);}),//
+	END_SHIFT((key, scanCode, mod) -> key == 269 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorToEnd(interaction.selectionEnd);}),//
+	UP_SHIFT((key, scanCode, mod) -> key == 265 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorUp(interaction.selectionEnd);}),//
+	DOWN_SHIFT((key, scanCode, mod) -> key == 264 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorDown(interaction.selectionEnd);}),//
+	LEFT_SHIFT((key, scanCode, mod) -> key == 263 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorLeft(interaction.selectionEnd);}),//
+	RIGHT_SHIFT((key, scanCode, mod) -> key == 262 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorRight(interaction.selectionEnd);}),//
 
 
 	//selection move
@@ -37,12 +34,12 @@ public enum HotKeyFunctions {
 	OBFUSCATED((key, scanCode, mod) -> key == 79 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown(), interaction -> GSIDesignSettings.toggleObfuscatedStyling()),//
 
 
-	ENTER((key, scanCode, mod) -> key == 257, DefaultTextInteraction::enter),//
+	ENTER((key, scanCode, mod) -> key == 257, i -> i.addGlyph(new LineBreakGlyph(false, GSIDesignSettings.lineStyle))),//
 	//COPY((key, scanCode, mod) -> Screen.isKeyComboCtrlC(i), (gui, string, chr, key) -> gui.copy()),//
 	//PASTE((key, scanCode, mod) -> Screen.isKeyComboCtrlV(i), (gui, string, chr, key) -> gui.paste()),//
 	//CUT((key, scanCode, mod) -> Screen.isKeyComboCtrlX(i), (gui, string, chr, key) -> gui.cut()),//
-	BACKSPACE((key, scanCode, mod) -> key == 259, DefaultTextInteraction::backspace),//
-	DEL((key, scanCode, mod) -> key == 261, DefaultTextInteraction::delete);//
+	BACKSPACE((key, scanCode, mod) -> key == 259, i -> i.deleteGlyph(true)),//
+	DEL((key, scanCode, mod) -> key == 261, i -> i.deleteGlyph(false));//
 	
 	//no line required
 	//SAVE((key, scanCode, mod) -> key == Keyboard.KEY_S && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown(), (gui, chr, key) -> gui.save()),//

@@ -7,7 +7,6 @@ import net.minecraft.client.gui.fonts.TexturedGlyph;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.PL3;
-import sonar.logistics.client.gsi.render.DisplayRenderTypes;
 
 public abstract class ScaledFontType {
 
@@ -40,7 +39,7 @@ public abstract class ScaledFontType {
     };
 
     public static ScaledFontType RALEWAY = new ScaledFontType(new ResourceLocation(PL3.MODID, "ralewayregular")) {
-        RenderType type = DisplayRenderTypes.getScaledTextType(new ResourceLocation(PL3.MODID, "ralewayregular" + "/" + 1));
+        RenderType type = RenderType.getText(new ResourceLocation(PL3.MODID, "ralewayregular" + "/" + 1));
 
         @Override
         public void initFont(Font font) {

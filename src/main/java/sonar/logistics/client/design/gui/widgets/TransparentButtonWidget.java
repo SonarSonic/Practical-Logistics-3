@@ -2,7 +2,6 @@ package sonar.logistics.client.design.gui.widgets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.widget.button.Button;
 import sonar.logistics.client.design.api.IInteractWidget;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.vectors.Quad2D;
@@ -42,8 +41,8 @@ public class TransparentButtonWidget extends AbstractGui implements IInteractWid
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         Minecraft.getInstance().getTextureManager().bindTexture(ScreenUtils.BUTTONS_ALPHA);
-        ScreenUtils.fillDouble(quad.x, quad.y, quad.x + quad.width, quad.y + quad.height, isActive.apply(this) ? ScreenUtils.transparent_green_button.rgba : ScreenUtils.transparent_grey_button.rgba);
-        ScreenUtils.blitDouble(quad.x, quad.y, uvLeft, uvTop, quad.width, quad.height);
+        ScreenUtils.fillDouble(quad.x, quad.y, quad.x + quad.width, quad.y + quad.height, isActive.apply(this) ? ScreenUtils.transparent_activated_button.rgba : ScreenUtils.transparent_disabled_button.rgba);
+        ScreenUtils.blitDouble(quad.x, quad.y, quad.width, quad.height, uvLeft, uvTop);
     }
 
     @Override

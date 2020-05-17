@@ -10,8 +10,10 @@ import net.minecraft.util.text.StringTextComponent;
 import sonar.logistics.client.design.api.ISimpleWidget;
 import sonar.logistics.client.design.gui.widgets.DropdownButton;
 import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
+import sonar.logistics.client.design.gui.widgets.PL3TextWidget;
 import sonar.logistics.client.design.gui.widgets.TransparentButtonWidget;
 import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
 import java.util.List;
@@ -29,10 +31,12 @@ public class GSIDesignScreen extends Screen {
     public int xSize = 384;
     public int ySize = 256;
 
+    public PL3TextWidget fontHeight;
+
     public GSIDesignScreen(GSI gsi, PlayerEntity player) {
         super(new StringTextComponent("GSI"));
-        GSIDesignSettings.setDesignScreen(this);
         this.gsi = gsi;
+        GSIDesignSettings.setDesignScreen(this);
     }
 
     @Override
@@ -59,12 +63,32 @@ public class GSIDesignScreen extends Screen {
         ));
         addRenderable(gsiRenderWidget = new GSIViewportWidget(gsi, this.guiLeft + 32, this.guiTop + 32, this.xSize - 64, this.ySize - 64));
 
+        fontHeight = PL3TextWidget.create("", font, guiLeft + 32 + 144, guiTop + 13, 36, 14).setOutlineColor(ScreenUtils.light_grey.rgba).setDigitsOnly();
+        fontHeight.setMaxStringLength(4);
+        fontHeight.setText(String.valueOf((int)(GSIDesignSettings.glyphStyle.fontHeight * 256F)));
+        fontHeight.setResponder(string -> GSIDesignSettings.setFontHeight(fontHeight.getLongFromText(false) / 256F));
+        addButton(fontHeight);
     }
 
     @Override
     public void tick() {
         super.tick();
         GSIDesignSettings.tickCursorCounter();
+    }
+
+    public void onCursorStyleChanged(){
+        String value = String.valueOf((int)(GSIDesignSettings.glyphStyle.fontHeight * 256F));
+        if(!fontHeight.getText().equals(value))
+            fontHeight.setText(value);
+    }
+
+    public void onGlyphAttributeChanged(GlyphStyleAttributes attribute, Object attributeObj) {
+        gsiRenderWidget.onGlyphAttributeChanged(attribute, attributeObj);
+        if(attribute == GlyphStyleAttributes.FONT_HEIGHT){
+            String value = String.valueOf((int)((float)(attributeObj) * 256F));
+            if(!fontHeight.getText().equals(value))
+                fontHeight.setText(value);
+        }
     }
 
     public void addGuiEventListener(IGuiEventListener listener){
@@ -85,6 +109,10 @@ public class GSIDesignScreen extends Screen {
         this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         for(int i = 0; i < this.renderables.size(); ++i) {
             this.renderables.get(i).render(mouseX, mouseY, partialTicks);
+        }
+
+        for(int i = 0; i < this.buttons.size(); ++i) {
+            this.buttons.get(i).render(mouseX, mouseY, partialTicks);
         }
 
         ////viewport border

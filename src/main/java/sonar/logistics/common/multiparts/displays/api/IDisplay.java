@@ -4,7 +4,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.vectors.DisplayVectorHelper;
+import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.client.vectors.Quad2D;
 
 public interface IDisplay {
@@ -22,19 +22,19 @@ public interface IDisplay {
     /**returns the screens rotational vector in the form PITCH / YAW / ROLL
      * by default this is calculated using the screens {@link #getFacing()}*/
     default Vec3d getScreenRotation(){
-        return DisplayVectorHelper.getScreenRotation(getFacing());
+        return VectorHelper.getScreenRotation(getFacing());
     }
 
     /**the screens origin ( the center of the screen / it's point of rotation )
      * by default this uses {@link #getFacing()} to offset the display*/
     default Vec3d getScreenOrigin(){
-        return getRenderOrigin().add(DisplayVectorHelper.convertVector(getPos()));
+        return getRenderOrigin().add(VectorHelper.convertVector(getPos()));
     }
 
     /**gets the render origin*/
     default Vec3d getRenderOrigin(){
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5); // place vector in the centre of the block pos
-        origin = origin.add(DisplayVectorHelper.getFaceOffset(getFacing(), 0.5)); // offset by the direction of the screen
+        origin = origin.add(VectorHelper.getFaceOffset(getFacing(), 0.5)); // offset by the direction of the screen
         return origin;
     }
 

@@ -86,4 +86,15 @@ public class Vector2D {
         return new Vector2D(x, y);
     }
 
+    ////
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Vector2D){
+            return ((Vector2D) obj).x == x && ((Vector2D) obj).y == y;
+        }
+
+        return super.equals(obj);
+    }
 }

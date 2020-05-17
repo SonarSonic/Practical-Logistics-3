@@ -8,9 +8,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
-import sonar.logistics.client.gsi.api.BlockInteractionType;
-import sonar.logistics.client.gsi.context.DisplayClickContext;
-import sonar.logistics.client.vectors.DisplayVectorHelper;
 import sonar.logistics.common.multiparts.base.IMultipartBlock;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.common.multiparts.base.MultipartTile;
@@ -29,11 +26,7 @@ public class AbstractScreenBlock extends OrientatedMultipart implements IMultipa
             MultipartTile tile = entry.getMultipartTile();
             if (tile instanceof IDisplay) {
                 IDisplay display = (IDisplay) tile;
-                BlockInteractionType interactionType = player.isShiftKeyDown() ? BlockInteractionType.SHIFT_RIGHT : BlockInteractionType.RIGHT;
-                DisplayClickContext clickContext = DisplayVectorHelper.createClickContext(interactionType, player, display);
-                if(clickContext != null) {
-                    return display.getGSI().onClicked(clickContext) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
-                }
+                return display.getGSI().mouseClicked(display.getGSI().getDefaultInteractionHandler(player), 1) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
             }
         }
         return ActionResultType.FAIL;

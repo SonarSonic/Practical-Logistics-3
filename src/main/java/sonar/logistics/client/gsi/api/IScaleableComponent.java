@@ -1,8 +1,8 @@
 package sonar.logistics.client.gsi.api;
 
-import sonar.logistics.client.gsi.context.DisplayClickContext;
-import sonar.logistics.client.gsi.context.DisplayInteractionContext;
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -13,16 +13,7 @@ public interface IScaleableComponent extends IScaleable, IRenderable {
          return null;
      }
 
-    default boolean canInteract(DisplayInteractionContext context) {
-        return getBounds().maxBounds().contains(context.displayHit);
-    }
-
-    default boolean onClicked(DisplayClickContext context){
-        return false;
-    }
-
-    default boolean onHovered(DisplayInteractionContext context){
-        return false;
-    }
+    @Nonnull
+    default IInteractionListener getInteraction(DisplayInteractionHandler context){ return DefaultInteraction.INSTANCE; }
 
 }

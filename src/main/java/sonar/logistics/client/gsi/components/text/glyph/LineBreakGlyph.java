@@ -2,12 +2,11 @@ package sonar.logistics.client.gsi.components.text.glyph;
 
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
-import sonar.logistics.client.gsi.components.text.api.IGlyphType;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
-public class LineBreakGlyph implements IGlyphType {
+public class LineBreakGlyph extends Glyph {
 
     public boolean page;
     public LineStyle styling;

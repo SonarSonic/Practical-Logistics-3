@@ -1,14 +1,10 @@
 package sonar.logistics.client.vectors;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import sonar.logistics.client.gsi.api.BlockInteractionType;
-import sonar.logistics.client.gsi.context.DisplayClickContext;
-import sonar.logistics.client.gsi.context.DisplayInteractionContext;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
@@ -19,8 +15,8 @@ import java.util.function.Function;
  * SIZING VECTOR = WIDTH = X, HEIGHT = Y, DEPTH = Z
  * TRANSLATION VECTOR = X-Translate = X, Y-Translate = Z, X-Translate = Z
  * SCALING VECTOR = X-Scale = X, Y-Scale = Z, X-Scale = Z */
-//TODO SWITCH TO MUTABLE VECTORS
-public class DisplayVectorHelper {
+//TODO SWITCH TO MUTABLE VECTORS?
+public class VectorHelper {
 
     public static final Vec3d X_VEC = new Vec3d(1, 0, 0);
     public static final Vec3d Y_VEC = new Vec3d(0, 1, 0);
@@ -114,6 +110,7 @@ public class DisplayVectorHelper {
     */
 
     /** scales the unscaled width and height to fit the given scaling */
+    @Deprecated
     public static Vec3d scaleFromUnscaledSize(Vec3d unscaled, Vec3d scaling, double percentageFill) { //FIXME returns scaling in Z, check this out.
         double actualElementScale = Math.min(scaling.x / unscaled.x, scaling.y / unscaled.y);
         double actualElementWidth = (unscaled.x * actualElementScale) * percentageFill;
@@ -122,6 +119,7 @@ public class DisplayVectorHelper {
     }
 
     /** scales the unscaled width and height to fit the given scaling, maintaining uniform scaling */
+    @Deprecated
     public static Vec3d scaleUnscaledSizeToFit(Vec3d unscaled, Vec3d scaling, double percentageFill) { //FIXME returns scaling in Z, check this out.
         double actualElementScale = Math.min(scaling.x / unscaled.x, scaling.y / unscaled.y) * percentageFill;
         return new Vec3d ( actualElementScale, actualElementScale, actualElementScale );
@@ -370,20 +368,15 @@ public class DisplayVectorHelper {
         }
         return null;
     }
-
+    /*
     @Nullable
-    public static DisplayClickContext createClickContext(BlockInteractionType type, PlayerEntity player, IDisplay display){
+    public static DisplayClickContext createClickContext(DisplayInteractionType type, PlayerEntity player, IDisplay display){
         return createClickContext(type, player, display, 8);
     }
 
     @Nullable
-    public static DisplayClickContext createClickContext(BlockInteractionType type, PlayerEntity player, IDisplay display, int maxDist){
-        Vector2D clickPosition = getEntityLook(player, display, maxDist);
-        if(clickPosition != null) {
-            DisplayClickContext clickContext = new DisplayClickContext(type, display.getGSI(), player, false);
-            clickContext.setDisplayClick(clickPosition);
-            return clickContext;
-        }
+    public static DisplayClickContext createClickContext(DisplayInteractionType type, PlayerEntity player, IDisplay display, int maxDist){
+
         return null;
     }
 

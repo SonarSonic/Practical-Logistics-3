@@ -26,8 +26,9 @@ public class DisplayRenderHelper {
         matrixStack.scale((float)vec3d.x, (float)vec3d.y, (float)vec3d.z);
     }
 
+    @Deprecated
     public static void colouredRect(ScaleableRenderContext context, float left, float top, float width, float height, int red, int green, int blue, int alpha) {
-        colouredRect(context.matrix.getLast(), context.getWorldBuffer(), context.light, context.overlay, left, top, width, height, red, green, blue, alpha);
+       // colouredRect(context.matrix.getLast(), context.getWorldBuffer(), context.light, context.overlay, left, top, width, height, red, green, blue, alpha);
     }
 
     public static void colouredRect(MatrixStack.Entry matrix, IRenderTypeBuffer renderer, int light, int overlayLight, float left, float top, float width, float height, int red, int green, int blue, int alpha) {
