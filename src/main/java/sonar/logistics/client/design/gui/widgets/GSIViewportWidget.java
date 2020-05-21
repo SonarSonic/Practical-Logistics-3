@@ -172,9 +172,9 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
         //screen background - scissored
         context.matrix.translate(-getGSIBorderWidth(),-getGSIBorderHeight(), 1); //
-        ScaleableRenderHelper.renderColouredRect(context, gsi.host.getGSIBounds(), 0, 0, getGSIRenderWidth(), getGSIRenderHeight(), ScreenUtils.display_black_border);
-        ScaleableRenderHelper.renderColouredRect(context, gsi.host.getGSIBounds(), getGSIBorderWidth()/2, getGSIBorderHeight()/2, getGSIRenderWidth() - getGSIBorderWidth(), getGSIRenderHeight() - getGSIBorderHeight(), ScreenUtils.display_blue_border);
-        ScaleableRenderHelper.renderColouredRect(context, gsi.host.getGSIBounds(), getGSIBorderWidth(), getGSIBorderHeight(), getGSIRenderWidth() - getGSIBorderWidth()*2, getGSIRenderHeight() - getGSIBorderHeight()*2, ScreenUtils.display_grey_bgd);
+        ScaleableRenderHelper.renderColouredRect(context, true, gsi.host.getGSIBounds(), 0, 0, getGSIRenderWidth(), getGSIRenderHeight(), ScreenUtils.display_black_border);
+        ScaleableRenderHelper.renderColouredRect(context, true, gsi.host.getGSIBounds(), getGSIBorderWidth()/2, getGSIBorderHeight()/2, getGSIRenderWidth() - getGSIBorderWidth(), getGSIRenderHeight() - getGSIBorderHeight(), ScreenUtils.display_blue_border);
+        ScaleableRenderHelper.renderColouredRect(context, true, gsi.host.getGSIBounds(), getGSIBorderWidth(), getGSIBorderHeight(), getGSIRenderWidth() - getGSIBorderWidth()*2, getGSIRenderHeight() - getGSIBorderHeight()*2, ScreenUtils.display_grey_bgd);
         context.matrix.translate(+getGSIBorderWidth(), +getGSIBorderHeight(), -1);
 
         gsi.render(context, handler);

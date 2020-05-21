@@ -27,23 +27,6 @@ public abstract class AbstractStyledScaleable extends AbstractScaleable implemen
 
     @Override
     public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
-        renderBorders(context, bounds, styling);
-    }
-
-    public static void renderBorders(ScaleableRenderContext context, ComponentBounds alignment, ScaleableStyling styling){
-        double marginWidth = styling.marginWidth.getRenderSize(alignment.maxBounds().getWidth());
-        double marginHeight = styling.marginHeight.getRenderSize(alignment.maxBounds().getHeight());
-
-        double endX = alignment.maxBounds().getWidth() - marginWidth;
-        double endY = alignment.maxBounds().getHeight() - marginHeight;
-
-        double borderWidth = styling.borderSize.getRenderSize(alignment.maxBounds().getWidth());
-        double borderHeight = styling.borderSize.getRenderSize(alignment.maxBounds().getHeight());
-
-        ScaleableRenderHelper.renderColouredRect(context, alignment.maxBounds(), marginWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
-        ScaleableRenderHelper.renderColouredRect(context, alignment.maxBounds(), endX-borderWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
-
-        ScaleableRenderHelper.renderColouredRect(context, alignment.maxBounds(), marginWidth, marginHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
-        ScaleableRenderHelper.renderColouredRect(context, alignment.maxBounds(), marginWidth, endY - borderHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
+        ScaleableRenderHelper.renderBorders(context, bounds, styling);
     }
 }

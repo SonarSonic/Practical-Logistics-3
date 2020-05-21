@@ -1,7 +1,7 @@
 package sonar.logistics.client.gsi.properties;
 
 import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.common.multiparts.displays.old.info.elements.base.ElementAlignment;
+import sonar.logistics.client.gsi.api.ElementAlignment;
 
 public class ScaleableStyling {
 

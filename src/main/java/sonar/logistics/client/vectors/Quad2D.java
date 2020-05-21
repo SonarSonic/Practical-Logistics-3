@@ -1,6 +1,6 @@
 package sonar.logistics.client.vectors;
 
-import sonar.logistics.common.multiparts.displays.old.info.elements.base.ElementAlignment;
+import sonar.logistics.client.gsi.api.ElementAlignment;
 
 public class Quad2D {
 

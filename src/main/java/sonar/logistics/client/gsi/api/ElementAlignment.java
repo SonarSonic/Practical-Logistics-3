@@ -1,4 +1,4 @@
-package sonar.logistics.common.multiparts.displays.old.info.elements.base;
+package sonar.logistics.client.gsi.api;
 
 public enum ElementAlignment {
 

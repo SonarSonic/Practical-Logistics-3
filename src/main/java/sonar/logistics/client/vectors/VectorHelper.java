@@ -363,7 +363,7 @@ public class VectorHelper {
         playerV = getLookVector(from.rotationPitch, from.rotationYaw);
         screenV = getLookVector(to.getScreenRotation().x, to.getScreenRotation().y);
         if(isFacingScreen(playerV, screenV)){
-            lookOrigin = from.getEyePosition(1); //TODO TEST
+            lookOrigin = from.getEyePosition(1);
             origin = to.getScreenOrigin();
             distance = getDistanceToScreen(lookOrigin, origin, playerV, screenV);
             if(Math.abs(distance) < maxDist){

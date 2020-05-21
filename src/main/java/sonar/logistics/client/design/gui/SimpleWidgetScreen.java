@@ -7,6 +7,7 @@ import net.minecraft.util.text.StringTextComponent;
 import sonar.logistics.client.design.api.IInteractWidget;
 import sonar.logistics.client.design.api.ISimpleWidget;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +43,6 @@ public class SimpleWidgetScreen extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        RenderSystem.enableAlphaTest(); //TODO RENDERING ISSUE WITH CHAT OVERLAY - NEED TO DO DISABLE ALPHA TEST / BLEND TEST. ?
-        RenderSystem.disableDepthTest();
-        RenderSystem.defaultBlendFunc();
         renderBackground();
         drawBackground(mouseX, mouseY, partialTicks);
         drawWidgets(mouseX, mouseY, partialTicks);
@@ -64,6 +62,7 @@ public class SimpleWidgetScreen extends Screen {
 
     }
 
+    @Nonnull
     @Override
     public List<? extends IGuiEventListener> children() {
         return interactWidgets;

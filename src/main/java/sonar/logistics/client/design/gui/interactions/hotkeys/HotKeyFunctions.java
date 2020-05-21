@@ -16,7 +16,6 @@ public enum HotKeyFunctions {
 	LEFT((key, scanCode, mod) -> key == 263 && !Screen.hasShiftDown(), interaction -> {interaction.clearSelection(); interaction.moveCursorLeft(interaction.cursor);}),//
 	RIGHT((key, scanCode, mod) -> key == 262 && !Screen.hasShiftDown(), interaction -> {interaction.clearSelection(); interaction.moveCursorRight(interaction.cursor);}),//
 
-	///TODO CONFIRM THESE SHIFT MOVES WORK.
 	HOME_SHIFT((key, scanCode, mod) -> key == 268 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorToStart(interaction.selectionEnd);}),//
 	END_SHIFT((key, scanCode, mod) -> key == 269 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorToEnd(interaction.selectionEnd);}),//
 	UP_SHIFT((key, scanCode, mod) -> key == 265 && Screen.hasShiftDown(), interaction -> {interaction.checkSelection(); interaction.moveCursorUp(interaction.selectionEnd);}),//

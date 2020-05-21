@@ -7,7 +7,7 @@ import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
-import sonar.logistics.common.multiparts.displays.old.info.elements.base.ElementAlignment;
+import sonar.logistics.client.gsi.api.ElementAlignment;
 
 import java.util.List;
 

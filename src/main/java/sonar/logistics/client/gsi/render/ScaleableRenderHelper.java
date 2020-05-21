@@ -13,52 +13,50 @@ import sonar.logistics.PL3;
 import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.gsi.properties.ComponentBounds;
+import sonar.logistics.client.gsi.properties.ScaleableStyling;
 import sonar.logistics.client.vectors.Quad2D;
 
 public class ScaleableRenderHelper {
 
+    public static final ResourceLocation BATCHED_RECT_TEXTURE = new ResourceLocation(PL3.MODID,"textures/gui/batched_rect_texture.png" );
+
+    public static final RenderType RECT_RENDER_TYPE = RenderType.getEntityTranslucentCull(BATCHED_RECT_TEXTURE);
+    public static final RenderType BUTTON_RENDER_TYPE = RenderType.getEntityTranslucentCull(ScreenUtils.BUTTONS_ALPHA);
+
     public static final int FULL_LIGHT = 15728880;
 
-    //// Z OFFSETS \\\\
     public static final float MIN_Z_OFFSET = -0.001F;
     public static final float ITEM_OFFSET = -0.001F;
     public static final float ITEM_Z_SCALE = 0.01F;
 
-    public static int getBakedLight(int lightmapCoord) {
-        int bl = LightTexture.getLightBlock(lightmapCoord);
-        int sl = LightTexture.getLightSky(lightmapCoord);
-        return LightTexture.packLight(bl, sl);
-    }
-
-    public static ResourceLocation BATCHED_RECT_TEXTURE = new ResourceLocation(PL3.MODID,"textures/gui/batched_rect_texture.png" );
-    public static RenderType RECT_RENDER_TYPE = RenderType.getEntityTranslucentCull(BATCHED_RECT_TEXTURE); //TODO TRANSLUCENT BUTTONS
-    public static RenderType BUTTON_RENDER_TYPE = RenderType.getEntityTranslucentCull(ScreenUtils.BUTTONS_ALPHA);
-
 
     ///// COLOURED RECTS \\\\\
 
-    public static void renderColouredRect(ScaleableRenderContext context, Quad2D bounds, int rgba){
-        renderColouredRect(context, (float)bounds.getX(), (float)bounds.getY(), (float)bounds.getMaxX(), (float)bounds.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba));
+    public static void renderColouredRect(ScaleableRenderContext context, boolean batched, Quad2D bounds, int rgba){
+        renderColouredRect(context, batched, (float)bounds.getX(), (float)bounds.getY(), (float)bounds.getMaxX(), (float)bounds.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba));
     }
 
-    public static void renderColouredRect(ScaleableRenderContext context, Quad2D bounds, double x, double y, double width, double height, ColourProperty colourProperty){
-        renderColouredRect(context, bounds, x, y, width, height, colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
+    public static void renderColouredRect(ScaleableRenderContext context, boolean batched, Quad2D bounds, double x, double y, double width, double height, ColourProperty colourProperty){
+        renderColouredRect(context, batched, bounds, x, y, width, height, colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
     }
 
-    public static void renderColouredRect(ScaleableRenderContext context, Quad2D bounds, double x, double y, double width, double height, int red, int green, int blue, int alpha){
-        renderColouredRect(context, (float) (bounds.getX() + x), (float) (bounds.getY() + y), (float) (bounds.getX() + x + width), (float) (bounds.getY() + y + height), red, green, blue, alpha);
+    public static void renderColouredRect(ScaleableRenderContext context, boolean batched, Quad2D bounds, double x, double y, double width, double height, int red, int green, int blue, int alpha){
+        renderColouredRect(context, batched, (float) (bounds.getX() + x), (float) (bounds.getY() + y), (float) (bounds.getX() + x + width), (float) (bounds.getY() + y + height), red, green, blue, alpha);
     }
 
-    public static void renderColouredRect(ScaleableRenderContext context, float startX, float startY, float endX, float endY, int r, int g, int b, int a){
-        IRenderTypeBuffer buffer = context.startRenderBuffer(true);
+    public static void renderColouredRect(ScaleableRenderContext context, boolean batched, float startX, float startY, float endX, float endY, int r, int g, int b, int a){
+        IRenderTypeBuffer buffer = context.startRenderBuffer(batched);
         IVertexBuilder builder = buffer.getBuffer(RECT_RENDER_TYPE);
         Vector3f normal = context.getNormal();
         builder.pos(context.getMatrix4f(), startX, endY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(0,1).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
         builder.pos(context.getMatrix4f(), endX, endY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(1,1).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
         builder.pos(context.getMatrix4f(), endX, startY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(1,0).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
         builder.pos(context.getMatrix4f(), startX, startY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(0,0).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
-        context.finishRenderBuffer(true);
+        context.finishRenderBuffer(batched);
     }
+
+    ///// TEXTURED RECTS \\\\\
 
     public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, boolean batched, Quad2D quad, int rgba, float minU, float maxU, float minV, float maxV) {
         renderTexturedRect(context, type, batched, quad.getX(), quad.getY(), quad.getMaxX(), quad.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba), minU, maxU, minV, maxV);
@@ -67,7 +65,6 @@ public class ScaleableRenderHelper {
     public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, boolean batched, double startX, double startY, double endX, double endY, int rgba, float minU, float maxU, float minV, float maxV){
         renderTexturedRect(context, type, batched, startX, startY, endX, endY, ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba), minU, maxU, minV, maxV);
     }
-
 
     public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, boolean batched, double startX, double startY, double endX, double endY, int r, int g, int b, int a, float minU, float maxU, float minV, float maxV){
         renderTexturedRect(context, type, batched, (float)startX, (float)startY, (float)endX, (float)endY, r, g, b, a, minU, maxU, minV, maxV);
@@ -84,23 +81,27 @@ public class ScaleableRenderHelper {
         context.finishRenderBuffer(batched);
     }
 
+    ///// STYLES \\\\\
 
+    public static void renderBorders(ScaleableRenderContext context, ComponentBounds alignment, ScaleableStyling styling){
+        double marginWidth = styling.marginWidth.getRenderSize(alignment.maxBounds().getWidth());
+        double marginHeight = styling.marginHeight.getRenderSize(alignment.maxBounds().getHeight());
 
-    ///// TEXTURED RECTS \\\\\
+        double endX = alignment.maxBounds().getWidth() - marginWidth;
+        double endY = alignment.maxBounds().getHeight() - marginHeight;
 
-    /*
-    public static void renderTexturedRect(ScaleableRenderContext context, Vec3d alignment, float x, float y, float width, float height, int r, int g, int b, int a, ResourceLocation location){
-        renderTexturedRect(context, (float) (alignment.getX() + x), (float) (alignment.getY() + y), (float) (alignment.getX() + x + width), (float) (alignment.getY() + y + height), sprite);
+        double borderWidth = styling.borderSize.getRenderSize(alignment.maxBounds().getWidth());
+        double borderHeight = styling.borderSize.getRenderSize(alignment.maxBounds().getHeight());
+
+        ScaleableRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
+        ScaleableRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), endX-borderWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
+
+        ScaleableRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
+        ScaleableRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, endY - borderHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
     }
 
-    public static void blit(int x, int y, int z, int width, int height, TextureAtlasSprite sprite) {
-        innerBlit(x, x + width, y, y + height, z, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
-    }
-    */
 
-
-
-    ///// ITEM STACKS \\\\\
+    ///// FLUID STACKS \\\\\
 
     public static void renderScaledFluidStack(ScaleableRenderContext context, FluidStack toRender, float startX, float startY, float width, float height){
         context.matrix.translate(0,0, MIN_Z_OFFSET);
@@ -155,6 +156,12 @@ public class ScaleableRenderHelper {
 
 
     ///// HELPER METHODS \\\\\\
+
+    public static int getBakedLight(int lightmapCoord) {
+        int bl = LightTexture.getLightBlock(lightmapCoord);
+        int sl = LightTexture.getLightSky(lightmapCoord);
+        return LightTexture.packLight(bl, sl);
+    }
 
     public static TextureAtlasSprite getSprite(ResourceLocation spriteLocation) {
         return Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(spriteLocation);

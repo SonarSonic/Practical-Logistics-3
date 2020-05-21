@@ -33,6 +33,6 @@ public class ColouredButtonComponent extends AbstractStyledScaleable implements 
         super.render(context, handler);
         context.matrix.translate(0,0, -0.0001F);
         int rgba = trigger.isActive(this, handler) ? activatedColour : isMouseOver(handler) ? hoveredColour : disabledColour;
-        ScaleableRenderHelper.renderColouredRect(context, bounds.renderBounds(), rgba);
+        ScaleableRenderHelper.renderColouredRect(context, true, bounds.renderBounds(), rgba);
     }
 }

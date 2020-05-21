@@ -7,8 +7,6 @@ import sonar.logistics.client.vectors.Quad2D;
 /**the position of other components doesn't affect the position of others, they can float over each other*/
 public class FloatingContainer extends AbstractContainer {
 
-    //TODO public ComponentStorage storage = new ComponentStorage(this);
-
     public FloatingContainer() {
         super();
     }
