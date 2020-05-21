@@ -1,5 +1,7 @@
 package sonar.logistics.client.vectors;
 
+import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
@@ -164,9 +166,14 @@ public class VectorHelper {
      * @param f the direction the screen is facing
      * @return the screens rotation, in the form of (pitch, yaw, roll)*/
     public static Vec3d getScreenRotation(Direction f){
-        double pitch = f.getYOffset()*90;
-        double yaw = f.getAxis().isHorizontal() ? f.getOpposite().getHorizontalAngle() : (f==Direction.UP ? Direction.NORTH.getOpposite(): Direction.NORTH).getHorizontalAngle();
-        double roll = 0;
+        double pitch = 0, yaw = 0, roll = 0;
+
+        if(f.getAxis().isHorizontal()){
+            yaw = f.getOpposite().getHorizontalAngle();
+        }else {
+            pitch = f.getYOffset()*90;
+            yaw = 180;
+        }
 
         return new Vec3d(pitch, yaw, roll);
     }

@@ -1,119 +1,97 @@
 package sonar.logistics.client.design.gui;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
-import sonar.logistics.client.design.api.ISimpleWidget;
-import sonar.logistics.client.design.gui.widgets.DropdownButton;
+import sonar.logistics.client.design.gui.interactions.DefaultDragInteraction;
+import sonar.logistics.client.design.gui.interactions.DefaultResizeInteraction;
+import sonar.logistics.client.design.gui.interactions.DefaultTextInteraction;
 import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
+import sonar.logistics.client.design.gui.widgets.GSIWidget;
 import sonar.logistics.client.design.gui.widgets.PL3TextWidget;
-import sonar.logistics.client.design.gui.widgets.TransparentButtonWidget;
 import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.gsi.components.buttons.EnumButtonIcons;
+import sonar.logistics.client.gsi.components.buttons.IconButtonComponent;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
+import sonar.logistics.client.gsi.properties.AbsoluteBounds;
+import sonar.logistics.client.gsi.triggers.Trigger;
+import sonar.logistics.client.vectors.Quad2D;
 
-import java.util.List;
+public class GSIDesignScreen extends SimpleWidgetScreen {
 
-public class GSIDesignScreen extends Screen {
+    public final GSI displayGSI;
+    public GSIWidget editControls = new GSIWidget(); //TODO CONVERT TO A STATIC GSI - WHEN DESIGN IS FINISHED.
+    public GSIViewportWidget gsiViewportWidget;
 
-    public final GSI gsi;
+    public PL3TextWidget fontHeight; //TODO CHANGE ME
 
-    public final List<ISimpleWidget> renderables = Lists.newArrayList();
-    public GSIViewportWidget gsiRenderWidget;
-
-
-    public int guiLeft;
-    public int guiTop;
-    public int xSize = 384;
-    public int ySize = 256;
-
-    public PL3TextWidget fontHeight;
-
-    public GSIDesignScreen(GSI gsi, PlayerEntity player) {
-        super(new StringTextComponent("GSI"));
-        this.gsi = gsi;
+    public GSIDesignScreen(GSI displayGSI){
+        this.displayGSI = displayGSI;
         GSIDesignSettings.setDesignScreen(this);
     }
+
 
     @Override
     protected void init() {
         super.init();
-        this.guiLeft = (this.width - this.xSize) / 2;
-        this.guiTop = (this.height - this.ySize) / 2;
-        renderables.clear();
-        addRenderable(new TransparentButtonWidget(guiLeft + 32, guiTop + 12, 176, 48, button -> GSIDesignSettings.glyphStyle.bold, button -> GSIDesignSettings.toggleBoldStyling()));
-        addRenderable(new TransparentButtonWidget(guiLeft + 32 + 16, guiTop + 12, 176, 64, button -> GSIDesignSettings.glyphStyle.italic, button -> GSIDesignSettings.toggleItalicStyling()));
-        addRenderable(new TransparentButtonWidget(guiLeft + 32 + 32, guiTop + 12, 176, 80, button -> GSIDesignSettings.glyphStyle.underlined, button -> GSIDesignSettings.toggleUnderlineStyling()));
-        addRenderable(new TransparentButtonWidget(guiLeft + 32 + 48, guiTop + 12, 176, 96, button -> GSIDesignSettings.glyphStyle.strikethrough, button -> GSIDesignSettings.toggleStrikethroughStyling()));
+        ///
+        addWidget(editControls);
 
+        ///
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_SELECT, new Trigger((b, h) -> gsiViewportWidget.currentInteraction = gsiViewportWidget.dragInteraction, (b, h) -> gsiViewportWidget.currentInteraction instanceof DefaultDragInteraction))).setBounds(new AbsoluteBounds(8, 16*2, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_MOVE, new Trigger((b, h) -> gsiViewportWidget.currentInteraction = gsiViewportWidget.resizeInteraction, (b, h) -> gsiViewportWidget.currentInteraction instanceof DefaultResizeInteraction))).setBounds(new AbsoluteBounds(8, 16*3, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_EDIT_TEXT, new Trigger((b, h) -> gsiViewportWidget.setTextInteraction(), (b, h) -> gsiViewportWidget.currentInteraction instanceof DefaultTextInteraction))).setBounds(new AbsoluteBounds(8, 16*4, 16, 16));
 
-        addRenderable(new TransparentButtonWidget(guiLeft + 32 + 80, guiTop + 12, 176, 0, button -> GSIDesignSettings.lineStyle.alignType == LineStyle.AlignType.ALIGN_TEXT_LEFT, button -> GSIDesignSettings.setAlignType(LineStyle.AlignType.ALIGN_TEXT_LEFT)));
-        addRenderable(new TransparentButtonWidget(guiLeft + 32 + 96, guiTop + 12, 176, 16, button -> GSIDesignSettings.lineStyle.alignType == LineStyle.AlignType.CENTER, button -> GSIDesignSettings.setAlignType(LineStyle.AlignType.CENTER)));
-        addRenderable(new TransparentButtonWidget(guiLeft + 32 + 112, guiTop + 12, 176, 32, button -> GSIDesignSettings.lineStyle.alignType == LineStyle.AlignType.ALIGN_TEXT_RIGHT, button -> GSIDesignSettings.setAlignType(LineStyle.AlignType.ALIGN_TEXT_RIGHT)));
+        ///
 
-        addRenderable(new DropdownButton(guiLeft + 32 + 112 + 16, guiTop + 12, 16, 16,
-                Lists.newArrayList(
-                        new TransparentButtonWidget(guiLeft + 32 + 80, guiTop + 12, 176, 0, button -> GSIDesignSettings.lineStyle.alignType == LineStyle.AlignType.ALIGN_TEXT_LEFT, button -> GSIDesignSettings.setAlignType(LineStyle.AlignType.ALIGN_TEXT_LEFT)),
-                        new TransparentButtonWidget(guiLeft + 32 + 96, guiTop + 12, 176, 16, button -> GSIDesignSettings.lineStyle.alignType == LineStyle.AlignType.CENTER, button -> GSIDesignSettings.setAlignType(LineStyle.AlignType.CENTER)),
-                        new TransparentButtonWidget(guiLeft + 32 + 112, guiTop + 12, 176, 32, button -> GSIDesignSettings.lineStyle.alignType == LineStyle.AlignType.ALIGN_TEXT_RIGHT, button -> GSIDesignSettings.setAlignType(LineStyle.AlignType.ALIGN_TEXT_RIGHT)))
-        ));
-        addRenderable(gsiRenderWidget = new GSIViewportWidget(gsi, this.guiLeft + 32, this.guiTop + 32, this.xSize - 64, this.ySize - 64));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.GRID_NORMAL, new Trigger((b, h) -> GSIDesignSettings.setOrResetSnapping(0.0625F), (b, h) -> GSIDesignSettings.snapping == 0.0625F))).setBounds(new AbsoluteBounds(8, 16*13, 16, 16));
 
-        fontHeight = PL3TextWidget.create("", font, guiLeft + 32 + 144, guiTop + 13, 36, 14).setOutlineColor(ScreenUtils.light_grey.rgba).setDigitsOnly();
+        ///
+
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_BOLD, new Trigger((b, h) -> GSIDesignSettings.toggleBoldStyling(), (b, h) -> GSIDesignSettings.glyphStyle.bold))).setBounds(new AbsoluteBounds(16*2, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_ITALIC, new Trigger((b, h) -> GSIDesignSettings.toggleItalicStyling(), (b, h) -> GSIDesignSettings.glyphStyle.italic))).setBounds(new AbsoluteBounds(16*3, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_UNDERLINE, new Trigger((b, h) -> GSIDesignSettings.toggleUnderlineStyling(), (b, h) -> GSIDesignSettings.glyphStyle.underlined))).setBounds(new AbsoluteBounds(16*4, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_STRIKETHROUGH, new Trigger((b, h) -> GSIDesignSettings.toggleStrikethroughStyling(), (b, h) -> GSIDesignSettings.glyphStyle.strikethrough))).setBounds(new AbsoluteBounds(16*5, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_OBFUSCATE, new Trigger((b, h) -> GSIDesignSettings.toggleObfuscatedStyling(), (b, h) -> GSIDesignSettings.glyphStyle.obfuscated))).setBounds(new AbsoluteBounds(16*6, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_SHADOW, new Trigger((b, h) -> GSIDesignSettings.toggleShadowStyling(), (b, h) -> GSIDesignSettings.glyphStyle.shadow))).setBounds(new AbsoluteBounds(16*7, 12, 16, 16));
+
+        ///
+
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.JUSTIFY_LEFT, new Trigger((b, h) -> GSIDesignSettings.setJustifyType(LineStyle.JustifyType.JUSTIFY_LEFT), (b, h) -> GSIDesignSettings.lineStyle.justifyType == LineStyle.JustifyType.JUSTIFY_LEFT))).setBounds(new AbsoluteBounds(16*9, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.JUSTIFY_CENTRE, new Trigger((b, h) -> GSIDesignSettings.setJustifyType(LineStyle.JustifyType.JUSTIFY_CENTRE), (b, h) -> GSIDesignSettings.lineStyle.justifyType == LineStyle.JustifyType.JUSTIFY_CENTRE))).setBounds(new AbsoluteBounds(16*10, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.JUSTIFY_RIGHT, new Trigger((b, h) -> GSIDesignSettings.setJustifyType(LineStyle.JustifyType.JUSTIFY_RIGHT), (b, h) -> GSIDesignSettings.lineStyle.justifyType == LineStyle.JustifyType.JUSTIFY_RIGHT))).setBounds(new AbsoluteBounds(16*11, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.JUSTIFY, new Trigger((b, h) -> GSIDesignSettings.setJustifyType(LineStyle.JustifyType.JUSTIFY), (b, h) -> GSIDesignSettings.lineStyle.justifyType == LineStyle.JustifyType.JUSTIFY))).setBounds(new AbsoluteBounds(16*12, 12, 16, 16));
+
+        ///
+
+        //TODO CONVERT FONTHEIGHT TO PL3 COMPONENT
+        fontHeight = PL3TextWidget.create("", font, guiLeft + 16*14, guiTop + 13, 32, 14).setOutlineColor(ScreenUtils.light_grey.rgba).setDigitsOnly();
         fontHeight.setMaxStringLength(4);
         fontHeight.setText(String.valueOf((int)(GSIDesignSettings.glyphStyle.fontHeight * 256F)));
-        fontHeight.setResponder(string -> GSIDesignSettings.setFontHeight(fontHeight.getLongFromText(false) / 256F));
-        addButton(fontHeight);
+        fontHeight.setResponder(string -> {
+            if(fontHeight.isFocused()) {
+                int height = fontHeight.getIntegerFromText(false);
+                if (!fontHeight.getText().equals(String.valueOf(height))) {
+                    GSIDesignSettings.setFontHeight(height);
+                }
+            }
+        });
+        addWidget(fontHeight);
+
+        ///
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.DECREASE_FONT_SIZE, new Trigger((b, h) -> GSIDesignSettings.decreaseFontHeight(), (b, h) -> false))).setBounds(new AbsoluteBounds(16*16, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.INCREASE_FONT_SIZE, new Trigger((b, h) -> GSIDesignSettings.increaseFontHeight(), (b, h) -> false))).setBounds(new AbsoluteBounds(16*17, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.BULLET_POINT_TOGGLE, new Trigger((b, h) -> GSIDesignSettings.toggleLineBreakStyle(), (b, h) -> GSIDesignSettings.currentLineBreakStyle == GSIDesignSettings.selectedLineBreakStyle))).setBounds(new AbsoluteBounds(16*18, 12, 16, 16));
+        editControls.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.CLEAR_FORMATTING, new Trigger((b, h) -> { if(gsiViewportWidget.currentInteraction instanceof DefaultTextInteraction) ((DefaultTextInteraction) gsiViewportWidget.currentInteraction).clearFormatting();}, (b, h) -> false))).setBounds(new AbsoluteBounds(16*19, 12, 16, 16));
+
+        ///
+
+        editControls.build(new Quad2D(guiLeft, guiTop, xSize, ySize));
+        addWidget(gsiViewportWidget = new GSIViewportWidget(displayGSI, this.guiLeft + 32, this.guiTop + 32, this.xSize - 64, this.ySize - 64));
     }
 
     @Override
-    public void tick() {
-        super.tick();
-        GSIDesignSettings.tickCursorCounter();
-    }
-
-    public void onCursorStyleChanged(){
-        String value = String.valueOf((int)(GSIDesignSettings.glyphStyle.fontHeight * 256F));
-        if(!fontHeight.getText().equals(value))
-            fontHeight.setText(value);
-    }
-
-    public void onGlyphAttributeChanged(GlyphStyleAttributes attribute, Object attributeObj) {
-        gsiRenderWidget.onGlyphAttributeChanged(attribute, attributeObj);
-        if(attribute == GlyphStyleAttributes.FONT_HEIGHT){
-            String value = String.valueOf((int)((float)(attributeObj) * 256F));
-            if(!fontHeight.getText().equals(value))
-                fontHeight.setText(value);
-        }
-    }
-
-    public void addGuiEventListener(IGuiEventListener listener){
-        this.children.add(listener);
-    }
-
-    protected void addRenderable(ISimpleWidget renderable) {
-        this.renderables.add(renderable);
-        if(renderable instanceof IGuiEventListener) {
-            addGuiEventListener((IGuiEventListener) renderable);
-        }
-    }
-
-    @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
-        RenderSystem.disableDepthTest();
-        this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-        for(int i = 0; i < this.renderables.size(); ++i) {
-            this.renderables.get(i).render(mouseX, mouseY, partialTicks);
-        }
-
-        for(int i = 0; i < this.buttons.size(); ++i) {
-            this.buttons.get(i).render(mouseX, mouseY, partialTicks);
-        }
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
+        fill(this.guiLeft, this.guiTop, this.guiLeft + this.xSize, this.guiTop + this.ySize, ScreenUtils.transparent_grey_bgd.rgba);
 
         ////viewport border
         int marginWidth = 32, marginHeight = 32;
@@ -128,24 +106,40 @@ public class GSIDesignScreen extends Screen {
 
 
         ////button dividers
-        fill(guiLeft + 32 + 64 + 8 -1, guiTop + 12, guiLeft + 32 + 64 + 8 + 1, guiTop + 12 + 16, ScreenUtils.light_grey.rgba);
+        fill(guiLeft + 16*8 + 7, guiTop + 12, guiLeft + 16*8 + 9, guiTop + 12 + 16, ScreenUtils.light_grey.rgba);
+        fill(guiLeft + 16*13 + 7, guiTop + 12, guiLeft + 16*13 + 9, guiTop + 12 + 16, ScreenUtils.light_grey.rgba);
 
-
-        this.drawGuiContainerBackgroundLayer(mouseX, mouseY);
-        RenderSystem.enableDepthTest();
     }
 
-    protected void drawGuiContainerBackgroundLayer(int mouseX, int mouseY) {
+
+
+    public void onGlyphAttributeChanged(GlyphStyleAttributes attribute, Object attributeObj) {
+        gsiViewportWidget.onGlyphAttributeChanged(attribute, attributeObj);
+        if(attribute == GlyphStyleAttributes.FONT_HEIGHT){
+            String value = String.valueOf((int)((float)(attributeObj) * 256F));
+            if(!fontHeight.getText().equals(value))
+                fontHeight.setText(value);
+        }
     }
 
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        fill(this.guiLeft, this.guiTop, this.guiLeft + this.xSize, this.guiTop + this.ySize, ScreenUtils.transparent_grey_bgd.rgba);
-        ///fill(this.guiLeft + 1, this.guiTop + 1, this.guiLeft + this.xSize - 1, this.guiTop + this.ySize - 1, ScreenUtils.blue_overlay.rgba);
+    public void onLineStyleChanged(EnumLineStyling lineStyling) {
+        gsiViewportWidget.onLineStyleChanged(lineStyling);
     }
+
+    public void onLineBreakGlyphChanged(EnumLineBreakGlyph currentLineBreakStyle) {
+        gsiViewportWidget.onLineBreakGlyphChanged(currentLineBreakStyle);
+    }
+
+    public void onCursorStyleChanged() {
+        String value = String.valueOf((int)(GSIDesignSettings.glyphStyle.fontHeight * 256F));
+        if(!fontHeight.getText().equals(value))
+            fontHeight.setText(value);
+    }
+
+
 
     @Override
     public boolean isPauseScreen() {
         return false;
     }
-
 }

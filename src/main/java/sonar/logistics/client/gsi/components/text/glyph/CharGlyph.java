@@ -20,17 +20,17 @@ public class CharGlyph extends Glyph {
 
     @Override
     public float getRenderWidth(ScaledFontType fontType, GlyphStyle parentStyling) {
-        return StyledTextRenderer.getGlyphWidth(fontType, parentStyling, this) * downscale(fontType, parentStyling);
+        return StyledTextRenderer.INSTANCE.getCharWidth(fontType, parentStyling, aChar) * downscale(fontType, parentStyling);
     }
 
     @Override
     public float getRenderHeight(ScaledFontType fontType, GlyphStyle parentStyling) {
-        return StyledTextRenderer.getGlyphHeight(fontType, parentStyling, this) * downscale(fontType, parentStyling);
+        return StyledTextRenderer.INSTANCE.getCharHeight(fontType, parentStyling, aChar) * downscale(fontType, parentStyling);
     }
 
     @Override
     public void render(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
-        StyledTextRenderer.renderCharGlyph(context, glyphInfo, this);
+        StyledTextRenderer.INSTANCE.renderCharGlyph(context, glyphInfo, this);
     }
 
     @Override

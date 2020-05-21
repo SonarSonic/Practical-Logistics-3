@@ -4,20 +4,20 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.gsi.api.IGSIHost;
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.client.vectors.Quad2D;
 
-public interface IDisplay {
+public interface IDisplay extends IGSIHost {
 
     GSI getGSI();
+
+    DisplayInteractionHandler getInteractionHandler();
 
     Direction getFacing();
 
     BlockPos getPos();
-
-    /**returns the screens scaling vector in the form WIDTH / HEIGHT / DEPTH
-     * this must be implemented on every screen */
-    Quad2D getGSIBounds();
 
     /**returns the screens rotational vector in the form PITCH / YAW / ROLL
      * by default this is calculated using the screens {@link #getFacing()}*/

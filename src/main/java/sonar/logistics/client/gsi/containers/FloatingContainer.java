@@ -20,10 +20,10 @@ public class FloatingContainer extends AbstractContainer {
     }
 
     @Override
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
         subComponents.forEach(e -> {
-            if(e.canRender(context, interact)) {
-                e.render(context, interact);
+            if(e.canRender(context, handler)) {
+                e.render(context, handler);
             }
         });
     }

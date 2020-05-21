@@ -2,6 +2,7 @@ package sonar.logistics.client.design.api;
 
 import net.minecraft.client.gui.IGuiEventListener;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**allows for flexibly changing the type of interactions which take place with the widget, mainly for neatness and avoiding repeated work*/
@@ -9,6 +10,7 @@ public interface IMultipleGuiEventListener extends IGuiEventListener {
 
     List<? extends IGuiEventListener> getEventListeners();
 
+    @Nullable
     default IGuiEventListener getEventListenerAt(double mouseX, double mouseY){
         for(IGuiEventListener e : getEventListeners()){
             if(e.isMouseOver(mouseX, mouseY)){

@@ -16,7 +16,7 @@ public class ScreenUtils {
     public static ColourProperty transparent_blue_bgd = new ColourProperty(8, 8, 32, 50);
 
     public static ColourProperty transparent_disabled_button = new ColourProperty(80, 80, 80, 80);
-    public static ColourProperty transparent_hovered_button = new ColourProperty(255, 255, 255, 120);
+    public static ColourProperty transparent_hovered_button = new ColourProperty(120, 120, 120, 120);
     public static ColourProperty transparent_activated_button = new ColourProperty(120, 255, 120, 120);
     public static ColourProperty transparent_alert_button = new ColourProperty(255, 120, 120, 120);
 
@@ -29,7 +29,7 @@ public class ScreenUtils {
     public static ColourProperty display_grey_bgd = new ColourProperty(68, 68, 68);
 
     // textures
-    public static ResourceLocation BUTTONS_ALPHA = new ResourceLocation(PL3.MODID,"textures/gui/buttons_alpha.png" );
+    public static ResourceLocation BUTTONS_ALPHA = new ResourceLocation(PL3.MODID,"textures/gui/buttons_alpha_16x16.png" );
 
     ////DEPTH VALUES \\\\
     /*
@@ -80,9 +80,19 @@ public class ScreenUtils {
         RenderSystem.disableBlend();
     }
 
+
+    public static void blitDouble(Quad2D quad, int uv_width, int uv_height, int uv_left, int uvTop, int texX, int texY) {
+        blitDouble(quad.getX(), quad.getMaxX(), quad.getY(), quad.getMaxY(), uv_left, uvTop, texX, texY, uv_width, uv_height);
+    }
+
+    public static void blitDouble(double x, double maxX, double y, double maxY, int uv_left, int uvTop, int texX, int texY, int uv_width, int uv_height) {
+        blitDouble(x, maxX, y, maxY, (uv_left + 0.0F) / (float)texX, (uv_left + (float)uv_width) / (float)texX, (uvTop + 0.0F) / (float)texY, (uvTop + (float)uv_height) / (float)texY);
+    }
+
     public static void blitDouble(Quad2D quad, int uv_left, int uvTop) {
         blitDouble(quad.getX(), quad.getY(), quad.getWidth(), quad.getHeight(), uv_left, uvTop);
     }
+
 
     public static void blitDouble(double left, double top, double width, double height, int uv_left, int uvTop) {
         int texX = 256;

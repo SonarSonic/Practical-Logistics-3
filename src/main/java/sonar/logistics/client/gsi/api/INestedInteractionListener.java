@@ -15,7 +15,7 @@ public interface INestedInteractionListener extends IInteractionListener {
     
     List<IScaleableComponent> children();
 
-    default Optional<IInteractionListener> getEventListenerForPos(DisplayInteractionHandler context) {
+    default Optional<IInteractionListener> getEventListenerForPos(DisplayInteractionHandler handler) {
         Iterator<IScaleableComponent> it = this.children().iterator();
 
         IInteractionListener listener;
@@ -24,13 +24,13 @@ public interface INestedInteractionListener extends IInteractionListener {
                 return Optional.empty();
             }
 
-            listener = it.next().getInteraction(context);
-        } while(listener == null || !listener.isMouseOver(context));
+            listener = it.next().getInteraction(handler);
+        } while(listener == null || !listener.isMouseOver(handler));
 
         return Optional.of(listener);
     }
 
-    default boolean mouseClicked(DisplayInteractionHandler context, int button) {
+    default boolean mouseClicked(DisplayInteractionHandler handler, int button) {
         Iterator<IScaleableComponent> it = this.children().iterator();
 
         IInteractionListener listener;
@@ -40,8 +40,8 @@ public interface INestedInteractionListener extends IInteractionListener {
                 return false;
             }
             component = it.next();
-            listener = component.getInteraction(context);
-        } while(!listener.mouseClicked(context, button));
+            listener = component.getInteraction(handler);
+        } while(!listener.mouseClicked(handler, button));
 
         this.setFocused(component);
         if (button == 0) {
@@ -51,37 +51,37 @@ public interface INestedInteractionListener extends IInteractionListener {
         return true;
     }
 
-    default boolean mouseReleased(DisplayInteractionHandler context, int button) {
+    default boolean mouseReleased(DisplayInteractionHandler handler, int button) {
         this.setDragging(false);
-        return this.getEventListenerForPos(context).filter((listener) -> {
-            return listener.mouseReleased(context, button);
+        return this.getEventListenerForPos(handler).filter((listener) -> {
+            return listener.mouseReleased(handler, button);
         }).isPresent();
     }
 
-    default boolean mouseDragged(DisplayInteractionHandler context, int button, double dragX, double dragY) {
-        return this.getFocused() != null && this.isDragging() && button == 0 ? this.getFocused().getInteraction(context).mouseDragged(context, button, dragX, dragY) : false;
+    default boolean mouseDragged(DisplayInteractionHandler handler, int button, double dragX, double dragY) {
+        return this.getFocused() != null && this.isDragging() && button == 0 ? this.getFocused().getInteraction(handler).mouseDragged(handler, button, dragX, dragY) : false;
     }
 
     boolean isDragging();
 
     void setDragging(boolean var1);
 
-    default boolean mouseScrolled(DisplayInteractionHandler context, double scroll) {
-        return this.getEventListenerForPos(context).filter((listener) -> {
-            return listener.mouseScrolled(context, scroll);
+    default boolean mouseScrolled(DisplayInteractionHandler handler, double scroll) {
+        return this.getEventListenerForPos(handler).filter((listener) -> {
+            return listener.mouseScrolled(handler, scroll);
         }).isPresent();
     }
 
-    default boolean keyPressed(DisplayInteractionHandler context, int keyCode, int scanCode, int modifiers) {
-        return this.getFocused() != null && this.getFocused().getInteraction(context).keyPressed(context, keyCode, scanCode, modifiers);
+    default boolean keyPressed(DisplayInteractionHandler handler, int keyCode, int scanCode, int modifiers) {
+        return this.getFocused() != null && this.getFocused().getInteraction(handler).keyPressed(handler, keyCode, scanCode, modifiers);
     }
 
-    default boolean keyReleased(DisplayInteractionHandler context, int keyCode, int scanCode, int modifiers) {
-        return this.getFocused() != null && this.getFocused().getInteraction(context).keyReleased(context, keyCode, scanCode, modifiers);
+    default boolean keyReleased(DisplayInteractionHandler handler, int keyCode, int scanCode, int modifiers) {
+        return this.getFocused() != null && this.getFocused().getInteraction(handler).keyReleased(handler, keyCode, scanCode, modifiers);
     }
 
-    default boolean charTyped(DisplayInteractionHandler context, char c, int modifiers) {
-        return this.getFocused() != null && this.getFocused().getInteraction(context).charTyped(context, c, modifiers);
+    default boolean charTyped(DisplayInteractionHandler handler, char c, int modifiers) {
+        return this.getFocused() != null && this.getFocused().getInteraction(handler).charTyped(handler, c, modifiers);
     }
 
     @Nullable
@@ -89,10 +89,10 @@ public interface INestedInteractionListener extends IInteractionListener {
 
     void setFocused(@Nullable IScaleableComponent var1);
 
-    default boolean changeFocus(DisplayInteractionHandler context, boolean change) {
+    default boolean changeFocus(DisplayInteractionHandler handler, boolean change) {
         IScaleableComponent focused = this.getFocused();
         boolean hasFocused = focused != null;
-        if (hasFocused && focused.getInteraction(context).changeFocus(context, change)) {
+        if (hasFocused && focused.getInteraction(handler).changeFocus(handler, change)) {
             return true;
         } else {
             List<IScaleableComponent> components = this.children();
@@ -118,8 +118,8 @@ public interface INestedInteractionListener extends IInteractionListener {
                     return false;
                 }
                 component = nextComponent.get();
-                listener = component.getInteraction(context);
-            } while(!listener.changeFocus(context, change));
+                listener = component.getInteraction(handler);
+            } while(!listener.changeFocus(handler, change));
 
             this.setFocused(component);
             return true;

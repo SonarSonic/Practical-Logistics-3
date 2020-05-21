@@ -28,15 +28,15 @@ public class GridContainer extends AbstractContainer {
     }
 
     @Override
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
-        super.render(context, interact);
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
+        super.render(context, handler);
         for(int r = 0; r < rows; r ++) {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r*columns) + c;
                 IScaleableComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
-                if(component != null && component.canRender(context, interact)){
+                if(component != null && component.canRender(context, handler)){
                     context.matrix.push();
-                    component.render(context, interact);
+                    component.render(context, handler);
                     context.matrix.pop();
                 }
             }

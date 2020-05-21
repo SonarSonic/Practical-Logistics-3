@@ -20,7 +20,7 @@ public class ScaleableRenderHelper {
     public static final int FULL_LIGHT = 15728880;
 
     //// Z OFFSETS \\\\
-    public static final float TEXTURE_OFFSET = -0.001F;
+    public static final float MIN_Z_OFFSET = -0.001F;
     public static final float ITEM_OFFSET = -0.001F;
     public static final float ITEM_Z_SCALE = 0.01F;
 
@@ -31,8 +31,8 @@ public class ScaleableRenderHelper {
     }
 
     public static ResourceLocation BATCHED_RECT_TEXTURE = new ResourceLocation(PL3.MODID,"textures/gui/batched_rect_texture.png" );
-    public static RenderType RECT_RENDER_TYPE = RenderType.getEntitySolid(BATCHED_RECT_TEXTURE); //TODO TRANSLUCENT BUTTONS
-    public static RenderType BUTTON_RENDER_TYPE = RenderType.getEntitySmoothCutout(ScreenUtils.BUTTONS_ALPHA);
+    public static RenderType RECT_RENDER_TYPE = RenderType.getEntityTranslucentCull(BATCHED_RECT_TEXTURE); //TODO TRANSLUCENT BUTTONS
+    public static RenderType BUTTON_RENDER_TYPE = RenderType.getEntityTranslucentCull(ScreenUtils.BUTTONS_ALPHA);
 
 
     ///// COLOURED RECTS \\\\\
@@ -52,26 +52,38 @@ public class ScaleableRenderHelper {
     public static void renderColouredRect(ScaleableRenderContext context, float startX, float startY, float endX, float endY, int r, int g, int b, int a){
         IRenderTypeBuffer buffer = context.startRenderBuffer(true);
         IVertexBuilder builder = buffer.getBuffer(RECT_RENDER_TYPE);
-        builder.pos(context.getMatrix4f(), startX, endY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(0,1).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
-        builder.pos(context.getMatrix4f(), endX, endY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(1,1).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
-        builder.pos(context.getMatrix4f(), endX, startY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(1,0).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
-        builder.pos(context.getMatrix4f(), startX, startY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(0,0).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
+        Vector3f normal = context.getNormal();
+        builder.pos(context.getMatrix4f(), startX, endY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(0,1).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
+        builder.pos(context.getMatrix4f(), endX, endY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(1,1).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
+        builder.pos(context.getMatrix4f(), endX, startY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(1,0).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
+        builder.pos(context.getMatrix4f(), startX, startY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(0,0).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
         context.finishRenderBuffer(true);
     }
 
-    public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, Quad2D quad, int rgba, float minU, float maxU, float minV, float maxV) {
-        renderTexturedRect(context, type, (float)quad.getX(), (float)quad.getY(), (float)quad.getMaxX(), (float)quad.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba), minU, maxU, minV, maxV);
+    public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, boolean batched, Quad2D quad, int rgba, float minU, float maxU, float minV, float maxV) {
+        renderTexturedRect(context, type, batched, quad.getX(), quad.getY(), quad.getMaxX(), quad.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba), minU, maxU, minV, maxV);
     }
 
-    public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, float startX, float startY, float endX, float endY, int r, int g, int b, int a, float minU, float maxU, float minV, float maxV){
-        IRenderTypeBuffer buffer = context.startRenderBuffer(true);
+    public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, boolean batched, double startX, double startY, double endX, double endY, int rgba, float minU, float maxU, float minV, float maxV){
+        renderTexturedRect(context, type, batched, startX, startY, endX, endY, ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba), minU, maxU, minV, maxV);
+    }
+
+
+    public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, boolean batched, double startX, double startY, double endX, double endY, int r, int g, int b, int a, float minU, float maxU, float minV, float maxV){
+        renderTexturedRect(context, type, batched, (float)startX, (float)startY, (float)endX, (float)endY, r, g, b, a, minU, maxU, minV, maxV);
+    }
+
+    public static void renderTexturedRect(ScaleableRenderContext context, RenderType type, boolean batched, float startX, float startY, float endX, float endY, int r, int g, int b, int a, float minU, float maxU, float minV, float maxV){
+        IRenderTypeBuffer buffer = context.startRenderBuffer(batched);
         IVertexBuilder builder = buffer.getBuffer(type);
-        builder.pos(context.getMatrix4f(), startX, endY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(minU, maxV).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
-        builder.pos(context.getMatrix4f(), endX, endY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(maxU, maxV).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
-        builder.pos(context.getMatrix4f(), endX, startY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(maxU, minV).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
-        builder.pos(context.getMatrix4f(), startX, startY, ScaleableRenderHelper.TEXTURE_OFFSET).color(r, g, b, a).tex(minU, minV).overlay(context.overlay).lightmap(context.light).normal(context.getNormal3f(), 0, 0 , 0).endVertex();
-        context.finishRenderBuffer(true);
+        Vector3f normal = context.getNormal();
+        builder.pos(context.getMatrix4f(), startX, endY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(minU, maxV).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
+        builder.pos(context.getMatrix4f(), endX, endY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(maxU, maxV).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
+        builder.pos(context.getMatrix4f(), endX, startY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(maxU, minV).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
+        builder.pos(context.getMatrix4f(), startX, startY, ScaleableRenderHelper.MIN_Z_OFFSET).color(r, g, b, a).tex(minU, minV).overlay(context.overlay).lightmap(context.light).normal(normal.getX(), normal.getY(), normal.getZ()).endVertex();
+        context.finishRenderBuffer(batched);
     }
+
 
 
     ///// TEXTURED RECTS \\\\\
@@ -91,7 +103,7 @@ public class ScaleableRenderHelper {
     ///// ITEM STACKS \\\\\
 
     public static void renderScaledFluidStack(ScaleableRenderContext context, FluidStack toRender, float startX, float startY, float width, float height){
-        context.matrix.translate(0,0, TEXTURE_OFFSET);
+        context.matrix.translate(0,0, MIN_Z_OFFSET);
 
         TextureAtlasSprite sprite = getSprite(toRender.getFluid().getAttributes().getStillTexture(toRender));
         int color = toRender.getFluid().getAttributes().getColor(toRender);

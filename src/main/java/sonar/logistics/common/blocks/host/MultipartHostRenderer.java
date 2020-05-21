@@ -2,6 +2,7 @@ package sonar.logistics.common.blocks.host;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderTypeLookup;
@@ -22,7 +23,7 @@ public class MultipartHostRenderer extends TileEntityRenderer<MultipartHostTile>
 
         ///// RENDER BASIC BLOCK STATES \\\\\
         multipartHostTile.MULTIPARTS.forEach((multipart) -> {
-            dispatcher.getBlockModelRenderer().renderModel(matrix.getLast(), renderer.getBuffer(RenderTypeLookup.getRenderType(multipart.getBlockState())), multipart.getBlockState(), dispatcher.getModelForState(multipart.getBlockState()), 1, 1, 1, light, overlayLight, EmptyModelData.INSTANCE);
+            dispatcher.getBlockModelRenderer().renderModel(matrix.getLast(), renderer.getBuffer(Atlases.getTranslucentCullBlockType()), multipart.getBlockState(), dispatcher.getModelForState(multipart.getBlockState()), 1, 1, 1, light, overlayLight, EmptyModelData.INSTANCE);
         });
 
 

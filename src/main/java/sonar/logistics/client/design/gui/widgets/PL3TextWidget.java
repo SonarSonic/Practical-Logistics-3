@@ -2,10 +2,13 @@ package sonar.logistics.client.design.gui.widgets;
 
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.FontRenderer;
+import sonar.logistics.client.design.api.IInteractWidget;
+import sonar.logistics.client.design.api.ISimpleWidget;
 import sonar.logistics.client.design.gui.ScreenUtils;
+import sonar.logistics.client.vectors.Quad2D;
 
 /**straight from Flux Networks*/
-public class PL3TextWidget extends TextFieldWidget {
+public class PL3TextWidget extends TextFieldWidget implements IInteractWidget {
 
     private String origin;
     private String extraText;
@@ -20,12 +23,14 @@ public class PL3TextWidget extends TextFieldWidget {
 
     private int outlineColor = 0xffb4b4b4;
     private static final int boxColor = ScreenUtils.transparent_disabled_button.rgba;
+    private Quad2D quad ;
 
     public PL3TextWidget(String text, FontRenderer fontRenderer, int x, int y, int par5Width, int par6Height, int width) {
         super(fontRenderer, x + width, y, par5Width - width, par6Height, "");
         this.extraText = text;
         this.textWidth = width;
         this.font = fontRenderer;
+        quad = new Quad2D(x, y, width, height);
     }
 
     public static PL3TextWidget create(String text, FontRenderer fontRenderer, int x, int y, int width, int height) {
@@ -174,4 +179,8 @@ public class PL3TextWidget extends TextFieldWidget {
         return this;
     }
 
+    @Override
+    public Quad2D getQuad() {
+        return quad;
+    }
 }

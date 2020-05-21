@@ -238,7 +238,7 @@ public class Quad2D {
 
     /**this method multiplies the given quad's width / height to obtain the translation and size*/
     public static Quad2D getQuadFromPercentage(Quad2D quad2D, Quad2D percentages){
-        return new Quad2D(quad2D.width * percentages.x, quad2D.height * percentages.y, quad2D.width * percentages.width, quad2D.height * percentages.height);
+        return new Quad2D(quad2D.getX() + (quad2D.width * percentages.x), quad2D.getY() + (quad2D.height * percentages.y), quad2D.width * percentages.width, quad2D.height * percentages.height);
     }
 
     /**aligns the quad within the given alignments, the adjusts the quad it is called on.*/

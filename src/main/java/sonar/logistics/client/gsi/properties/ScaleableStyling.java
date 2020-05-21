@@ -12,11 +12,11 @@ public class ScaleableStyling {
     public ColourProperty bgdColour = new ColourProperty(0, 0, 0, 0);;
     public ColourProperty borderColour = new ColourProperty(200, 200, 200, 255);
 
-    public BorderProperty marginWidth = new BorderProperty(0.0625F/2, false);
-    public BorderProperty marginHeight = new BorderProperty(0.0625F/2, false);
+    public BorderProperty marginWidth = new BorderProperty(0, false);
+    public BorderProperty marginHeight = new BorderProperty(0, false);
 
-    public BorderProperty borderSize = new BorderProperty(0.0625F/4, false);
-    public BorderProperty borderPadding = new BorderProperty(0.0625F/4, false);
+    public BorderProperty borderSize = new BorderProperty(0, false);
+    public BorderProperty borderPadding = new BorderProperty(0, false);
 
     public Quad2D getRenderSizing(Quad2D bounds){
 

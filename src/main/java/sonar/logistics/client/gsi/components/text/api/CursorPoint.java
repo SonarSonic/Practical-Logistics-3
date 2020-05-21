@@ -36,22 +36,4 @@ public class CursorPoint {
 
     ////
 
-    ///only for use when the index moved to is known to be visible, e.g. after removing a single glyph
-    public void moveLeft(int move){
-        if(!isLeading){
-            isLeading = true;
-            move--;
-        }
-        setIndex(index - move);
-    }
-
-    ///only for use when the index moved to is known to be visible, e.g. after adding a single glyph
-    public void moveRight(int move){
-        if(isLeading){
-            isLeading = false;
-            move--;
-        }
-        setIndex(index + move);
-    }
-
 }

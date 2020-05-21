@@ -3,6 +3,7 @@ package sonar.logistics.client.design.gui.interactions.hotkeys;
 import net.minecraft.client.gui.screen.Screen;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
 import sonar.logistics.client.design.gui.interactions.DefaultTextInteraction;
+import sonar.logistics.client.gsi.components.text.glyph.BulletPointGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 
 public enum HotKeyFunctions {
@@ -34,16 +35,16 @@ public enum HotKeyFunctions {
 	OBFUSCATED((key, scanCode, mod) -> key == 79 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown(), interaction -> GSIDesignSettings.toggleObfuscatedStyling()),//
 
 
-	ENTER((key, scanCode, mod) -> key == 257, i -> i.addGlyph(new LineBreakGlyph(false, GSIDesignSettings.lineStyle))),//
-	//COPY((key, scanCode, mod) -> Screen.isKeyComboCtrlC(i), (gui, string, chr, key) -> gui.copy()),//
-	//PASTE((key, scanCode, mod) -> Screen.isKeyComboCtrlV(i), (gui, string, chr, key) -> gui.paste()),//
-	//CUT((key, scanCode, mod) -> Screen.isKeyComboCtrlX(i), (gui, string, chr, key) -> gui.cut()),//
+	ENTER((key, scanCode, mod) -> key == 257 && !Screen.hasShiftDown(), i -> i.addGlyph(GSIDesignSettings.getLineBreakGlyph(false, GSIDesignSettings.lineStyle.copy()), GSIDesignSettings.glyphStyle)),//
+	COPY((key, scanCode, mod) -> Screen.isCopy(key), DefaultTextInteraction::copy),//
+	PASTE((key, scanCode, mod) -> Screen.isPaste(key), DefaultTextInteraction::paste),//
+	CUT((key, scanCode, mod) -> Screen.isCut(key), DefaultTextInteraction::cut),//
 	BACKSPACE((key, scanCode, mod) -> key == 259, i -> i.deleteGlyph(true)),//
-	DEL((key, scanCode, mod) -> key == 261, i -> i.deleteGlyph(false));//
+	DEL((key, scanCode, mod) -> key == 261, i -> i.deleteGlyph(false)),//
 	
 	//no line required
 	//SAVE((key, scanCode, mod) -> key == Keyboard.KEY_S && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown(), (gui, chr, key) -> gui.save()),//
-	//SELECT_ALL((key, scanCode, mod) -> GuiScreen.isKeyComboCtrlA(i), (gui, chr, key) -> GuiActions.SELECT_ALL.trigger(gui)), //
+	SELECT_ALL((key, scanCode, mod) -> Screen.isSelectAll(key), DefaultTextInteraction::selectAll); //
 	//DESELECT_ALL((key, scanCode, mod) -> c == 4, (gui, chr, key) -> GuiActions.DESELECT_ALL.trigger(gui)); //
 
 

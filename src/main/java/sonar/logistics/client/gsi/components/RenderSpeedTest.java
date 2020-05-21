@@ -10,8 +10,8 @@ import sonar.logistics.common.blocks.PL3Blocks;
 public class RenderSpeedTest extends AbstractStyledScaleable implements IScaleableComponent {
 
     @Override
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
-        super.render(context, interact);
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
+        super.render(context, handler);
         ItemStack stack = new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK);
         context.itemStackRenderer.addBatchedItemStack(stack, bounds.renderBounds());
     }

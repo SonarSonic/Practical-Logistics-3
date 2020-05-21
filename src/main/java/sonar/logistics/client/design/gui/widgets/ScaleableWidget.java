@@ -8,6 +8,7 @@ import sonar.logistics.client.design.gui.ScreenUtils;
 import sonar.logistics.client.design.windows.EnumRescaleType;
 import sonar.logistics.client.vectors.Quad2D;
 
+//TODO DELETE ME
 @OnlyIn(Dist.CLIENT)
 public class ScaleableWidget implements IGuiEventListener, IRenderable {
 

@@ -45,8 +45,8 @@ public class GridComponent extends AbstractStyledScaleable implements IScaleable
     }
 
     @Override
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
-        super.render(context, interact);
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
+        super.render(context, handler);
         for(int r = 0; r < rows; r ++) {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r * columns) + c;

@@ -33,6 +33,11 @@ public class DefaultResizeInteraction extends AbstractViewportInteraction {
     }
 
     @Override
+    public boolean canStartDrag(double mouseX, double mouseY, int button) {
+        return getRescaleTypeFromMouse(mouseX, mouseY) != null && super.canStartDrag(mouseX, mouseY, button);
+    }
+
+    @Override
     public void onDragged(double mouseX, double mouseY, int button) {
         super.onDragged(mouseX, mouseY, button);
         if(viewport.selectedComponent != null && viewport.currentRescaleType == null){
@@ -58,7 +63,7 @@ public class DefaultResizeInteraction extends AbstractViewportInteraction {
     }
 
     public EnumRescaleType getRescaleTypeFromMouse(double mouseX, double mouseY){
-        return EnumRescaleType.getRescaleTypeFromMouse(viewport.getScaledBoundsForComponent(viewport.selectedComponent), mouseX, mouseY, 4.0F);
+        return viewport.selectedComponent == null ? null : EnumRescaleType.getRescaleTypeFromMouse(viewport.getScaledBoundsForComponent(viewport.selectedComponent), mouseX, mouseY, 4.0F);
     }
 
     @Override

@@ -60,9 +60,9 @@ public class BatchedItemStackRenderer {
         for (BatchedItemStack stack : batchedItemStacks) {
             context.matrix.push();
             context.matrix.translate(stack.alignment.getX(), stack.alignment.getY(), zOffset);
-            context.matrix.scale(1, -1, context.isGui ? 1 : -1); ////
+            context.matrix.scale(1, -1, -1); ////
             context.matrix.scale((float) stack.scaling.x, (float) stack.scaling.y, zScale);
-            context.matrix.getLast().getNormal().set(Matrix3f.makeScaleMatrix(1, -1, 1)); //scale the normals
+            context.scaleNormals(1, -1, 1);
             itemRenderer.renderItem(stack.toRender, ItemCameraTransforms.TransformType.GUI, false, context.matrix, buffer, context.light, OverlayTexture.NO_OVERLAY, stack.model);
             context.matrix.pop();
         }
@@ -72,7 +72,6 @@ public class BatchedItemStackRenderer {
 
         if(context.isGui) {
             //RenderSystem.enableDepthTest();
-
             RenderSystem.disableAlphaTest();
             RenderSystem.disableRescaleNormal();
         }

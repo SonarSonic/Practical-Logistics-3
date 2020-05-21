@@ -8,12 +8,12 @@ import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
 public class LineBreakGlyph extends Glyph {
 
-    public boolean page;
-    public LineStyle styling;
+    public boolean pageBreak;
+    public LineStyle lineStyle;
 
-    public LineBreakGlyph(boolean page, LineStyle styling){
-        this.page = page;
-        this.styling = styling;
+    public LineBreakGlyph(boolean pageBreak, LineStyle lineStyle){
+        this.pageBreak = pageBreak;
+        this.lineStyle = lineStyle;
     }
 
     @Override
@@ -24,6 +24,7 @@ public class LineBreakGlyph extends Glyph {
     @Override
     public float getRenderHeight(ScaledFontType fontType, GlyphStyle parentStyling) {
         ///the line break glyph needs default height to enable empty lines.
+        //TODO FIX ME - IF THE LINE SCALING IS LESS THAT DEFAULT THE LINE BREAK GLYPH WILL MESS UP LINE POSITION, MAYBE WE NEED TO PASS OR SET STYLES ON LINE GLYPHS.
         return fontType.getElementScaling()  * downscale(fontType, parentStyling);
     }
 

@@ -4,6 +4,8 @@ import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.render.StyledTextLine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 public class LineStyle {
@@ -11,7 +13,7 @@ public class LineStyle {
     public double lineSpacing = 0;//TODO
     public double charSpacing = 0;///TODO
     public WrappingType wrappingType = WrappingType.WRAP_OFF;
-    public AlignType alignType = AlignType.ALIGN_TEXT_LEFT;
+    public JustifyType justifyType = JustifyType.JUSTIFY_LEFT;
     public BreakPreference breakPreference = BreakPreference.SPACES;
 
     public LineStyle(){}
@@ -21,7 +23,7 @@ public class LineStyle {
         copy.lineSpacing = lineSpacing;
         copy.charSpacing = charSpacing;
         copy.wrappingType = wrappingType;
-        copy.alignType = alignType;
+        copy.justifyType = justifyType;
         copy.breakPreference = breakPreference;
         return copy;
     }
@@ -41,37 +43,52 @@ public class LineStyle {
         }
     }
 
-    public enum AlignType{
-        ALIGN_TEXT_LEFT, ///aligns the line to the left
-        CENTER, //aligns the line to the centre
-        ALIGN_TEXT_RIGHT, //aligns the line to the right
+    public enum JustifyType {
+        JUSTIFY_LEFT, ///aligns the line to the left
+        JUSTIFY_CENTRE, //aligns the line to the centre
+        JUSTIFY_RIGHT, //aligns the line to the right
         JUSTIFY; ///changes the size of the spaces, to justify the text
 
-        public void align(StyledTextLine line, double boundsWidth, boolean isLastLine){
+        public void justify(StyledTextLine line, double boundsWidth, boolean isLastLine){
             ListIterator<GlyphRenderInfo> it = line.glyphInfo.listIterator(line.glyphInfo.size());
 
+            List<GlyphRenderInfo> lastSpaces = new ArrayList<>();
             double excessSpaces = 0;
             while(it.hasPrevious()){
                 GlyphRenderInfo info = it.previous();
                 if(info.glyph.isSpace()){
                     excessSpaces += info.quad.width;
+                    lastSpaces.add(info);
                     continue;
                 }
                 break;
             }
 
             switch (this){
-                case ALIGN_TEXT_LEFT:
-                    ///should already be done....
+                case JUSTIFY_LEFT:
+                    ///should already be aligned left....
                     break;
-                case CENTER:
+                case JUSTIFY_CENTRE:
                     line.renderSize.x += boundsWidth/2 - (line.renderSize.width - excessSpaces)/2;
                     break;
-                case ALIGN_TEXT_RIGHT:
+                case JUSTIFY_RIGHT:
                     line.renderSize.x += (float)boundsWidth - (line.renderSize.width - excessSpaces);
                     break;
                 case JUSTIFY:
-                    line.justifyLine(boundsWidth, isLastLine);
+                    if(isLastLine){
+                        break;
+                    }
+                    double totalSpaceSize = 0;
+                    int spaceCount = 0;
+                    for(GlyphRenderInfo info : line.glyphInfo){
+                        if(info.glyph.isSpace() && !lastSpaces.contains(info)){
+                            totalSpaceSize += info.quad.width;
+                            spaceCount++;
+                        }
+                    }
+                    float spaceSize = (float) (boundsWidth - (line.renderSize.width - totalSpaceSize)) / spaceCount;
+                    line.glyphInfo.stream().filter(info -> info.glyph.isSpace() && !lastSpaces.contains(info)).forEach(info -> info.quad.width=spaceSize);
+                    line.renderSize.width = (float)boundsWidth; //justified lines should always take up the max width
                     break;
             }
         }

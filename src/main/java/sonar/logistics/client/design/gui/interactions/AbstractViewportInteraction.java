@@ -1,6 +1,7 @@
 package sonar.logistics.client.design.gui.interactions;
 
 import net.minecraft.client.gui.IGuiEventListener;
+import sonar.logistics.client.design.gui.EnumLineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.design.gui.EnumLineStyling;
 import sonar.logistics.client.design.gui.widgets.GSIViewportWidget;
@@ -29,6 +30,8 @@ public abstract class AbstractViewportInteraction extends AbstractDraggingIntera
     public void onGlyphStyleChanged(GlyphStyleAttributes attribute, Object attributeObj){}
 
     public void onLineStyleChanged(EnumLineStyling styling){}
+
+    public void onLineBreakGlyphChanged(EnumLineBreakGlyph settings){}
 
     public void render(int mouseX, int mouseY, float partialTicks){}
 

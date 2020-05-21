@@ -9,10 +9,10 @@ public interface IRenderable {
         return true;
     }
 
-    default boolean canRender(ScaleableRenderContext context, DisplayInteractionHandler interact){
+    default boolean canRender(ScaleableRenderContext context, DisplayInteractionHandler handler){
         return true;
     }
 
-    void render(ScaleableRenderContext context, DisplayInteractionHandler interact);
+    void render(ScaleableRenderContext context, DisplayInteractionHandler handler);
 
 }

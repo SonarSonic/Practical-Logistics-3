@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
+import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.common.multiparts.base.IMultipartBlock;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.common.multiparts.base.MultipartTile;
@@ -26,7 +27,10 @@ public class AbstractScreenBlock extends OrientatedMultipart implements IMultipa
             MultipartTile tile = entry.getMultipartTile();
             if (tile instanceof IDisplay) {
                 IDisplay display = (IDisplay) tile;
-                return display.getGSI().mouseClicked(display.getGSI().getDefaultInteractionHandler(player), 1) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+                display.getInteractionHandler().updateMouseFromDisplay(player, display);
+                DisplayInteractionHandler handler = display.getInteractionHandler();
+                handler.updateMouseFromDisplay(player, display);
+                return display.getGSI().mouseClicked(handler, 1) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
             }
         }
         return ActionResultType.FAIL;

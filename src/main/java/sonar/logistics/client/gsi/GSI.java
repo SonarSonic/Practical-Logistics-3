@@ -2,50 +2,59 @@ package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import sonar.logistics.client.design.gui.GSIDesignScreen;
-import sonar.logistics.client.gsi.api.IInteractionListener;
+import sonar.logistics.client.design.gui.GSIDesignSettings;
+import sonar.logistics.client.gsi.api.IGSIHost;
 import sonar.logistics.client.gsi.api.INestedInteractionListener;
 import sonar.logistics.client.gsi.api.IScaleableComponent;
-import sonar.logistics.client.gsi.components.ButtonComponent;
+import sonar.logistics.client.gsi.components.ElementComponent;
+import sonar.logistics.client.gsi.components.buttons.EnumButtonIcons;
+import sonar.logistics.client.gsi.components.buttons.IconButtonComponent;
+import sonar.logistics.client.gsi.components.text.StyledTextComponent;
+import sonar.logistics.client.gsi.components.text.StyledTextString;
+import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
+import sonar.logistics.client.gsi.components.text.style.LineStyle;
+import sonar.logistics.client.gsi.containers.GridContainer;
 import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.elements.ItemStackElement;
+import sonar.logistics.client.gsi.properties.AbsoluteBounds;
+import sonar.logistics.client.gsi.properties.ScaleableBounds;
+import sonar.logistics.client.gsi.triggers.EmptyTrigger;
+import sonar.logistics.client.gsi.triggers.Trigger;
+import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.client.vectors.Vector2D;
-import sonar.logistics.common.multiparts.displays.api.IDisplay;
+import sonar.logistics.common.items.PL3Items;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-//TODO SYNC PACKETS & SAVING
+//TODO SIMPLIFY
 public class GSI implements INestedInteractionListener {
 
-
+    public final IGSIHost host;
     public List<IScaleableComponent> components = new ArrayList<>();
     public boolean queuedRebuild = true;
-    public IDisplay display;
 
-    public GSI(IDisplay display){
-        this.display = display;
+    public GSI(IGSIHost host){
+        this.host = host;
     }
 
-    private DisplayInteractionHandler defaultInteraction = null;
-
-    public DisplayInteractionHandler getDefaultInteractionHandler(PlayerEntity player){
-        if(defaultInteraction == null){
-            defaultInteraction = new DisplayInteractionHandler(this, Minecraft.getInstance().player, false);
-        }
-        Vector2D clickPosition = VectorHelper.getEntityLook(player, display, 8);
-        defaultInteraction.update(clickPosition);
-        return defaultInteraction;
+    public void build(){
+        components.forEach(c -> c.build(host.getGSIBounds()));
     }
 
     @Override
     public boolean mouseClicked(DisplayInteractionHandler handler, int button) {
         if(!handler.isUsingGui && handler.hasShiftDown()){
-            Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this, Minecraft.getInstance().player)));
+            Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this)));
             testStructure();
-            rebuild();
+            build();
             return true;
         }
         return INestedInteractionListener.super.mouseClicked(handler, button);
@@ -53,7 +62,7 @@ public class GSI implements INestedInteractionListener {
 
     public void render(ScaleableRenderContext context, DisplayInteractionHandler interact){
         if(queuedRebuild){
-            rebuild();
+            build();
             queuedRebuild = false;
         }
 
@@ -69,34 +78,54 @@ public class GSI implements INestedInteractionListener {
     ///TODO REMOVE ME!
     public void testStructure(){
         components.clear();
-        addComponent(new ButtonComponent(0, 176, 0));
+        //addComponent(new ButtonComponent(0, 176, 0));
 
-        /*
+        //components.add(new IconButtonComponent(EnumButtonIcons.MODE_SELECT, EmptyTrigger.INSTANCE));
+
+        addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_BOLD, new Trigger((b, h) -> GSIDesignSettings.toggleBoldStyling(), (b, h) -> GSIDesignSettings.glyphStyle.bold)));
+
+
         StyledTextComponent lines = new StyledTextComponent();
-        lines.bounds.setBoundPercentages(new Quad2D(0, 0, 1, 1));
+        lines.setBounds(new ScaleableBounds(new Quad2D(0, 0, 1, 0.5)));
 
+        lines.styling.marginWidth.value = 0.0625F/2;
+        lines.styling.marginHeight.value = 0.0625F/2;
+
+        lines.styling.borderSize.value = 0.0625F/4;
+        lines.styling.borderPadding.value = 0.0625F/4;
         StyledTextString element = new StyledTextString();
 
         LineStyle lineStyle = new LineStyle();
         lineStyle.wrappingType = LineStyle.WrappingType.WRAP_ON;
-        lineStyle.alignType = LineStyle.AlignType.CENTER;
-
+        lineStyle.justifyType = LineStyle.JustifyType.JUSTIFY;
         lineStyle.breakPreference = LineStyle.BreakPreference.SPACES;
-
-        element.addLineBreak(lineStyle);
-        element.addString("Simple test text, for typing on, this is now going to be much longer and more complicated!");
-
-        lineStyle = new LineStyle();
-        lineStyle.alignType = LineStyle.AlignType.ALIGN_TEXT_RIGHT;
-        element.addLineBreak(lineStyle);
-        element.addString("Here we have a seperate text with a different colour");
-        element.addElement(new ItemStackElement(new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK), 200));
+        element.addGlyph(new LineBreakGlyph(false, lineStyle));
+        element.addString("Insert text here");
 
         lines.pages.text = element;
 
         addComponent(lines);
-        */
 
+        GridContainer grid = new GridContainer();
+        grid.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.5)));
+
+        grid.styling.marginWidth.value = 0.0625F/2;
+        grid.styling.marginHeight.value = 0.0625F/2;
+
+        grid.styling.borderSize.value = 0.0625F/4;
+        grid.styling.borderPadding.value = 0.0625F/4;
+        grid.setGridSize(3, 3);
+
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.STONE), 200)));
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Items.SIGNALLING_PLATE), 200)));
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Items.SAPPHIRE_GEM), 200)));
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Items.STONE_PLATE), 200)));
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.DIAMOND), 200)));
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.ACACIA_LEAVES), 200)));
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.ACACIA_PLANKS), 200)));
+        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.BELL), 200)));
+
+        addComponent(grid);
         /*
         GridContainer subGrid = new GridContainer();
         subGrid.alignment.setAlignmentPercentages(new Vec3d(0, 0.5, 0), new Vec3d(1, 0.5 , 1));
@@ -148,32 +177,37 @@ public class GSI implements INestedInteractionListener {
         */
     }
 
-    public void rebuild(){
-        components.forEach(c -> c.build(display.getGSIBounds()));
-    }
-
-    public void addComponent(IScaleableComponent component){
+    public IScaleableComponent addComponent(IScaleableComponent component){
         components.add(component);
         queueRebuild();
+        return component;
     }
 
-    public void removeComponent(IScaleableComponent component){
+    public IScaleableComponent removeComponent(IScaleableComponent component){
         components.remove(component);
         queueRebuild();
+        return component;
     }
 
     @Nullable
     public IScaleableComponent getInteractedComponent(DisplayInteractionHandler handler){
-        return getInteractedComponent(components, handler);
+        return getComponent(components, component -> component.getInteraction(handler).isMouseOver(handler));
+    }
+
+    /** Doesn't test interactions
+     * @param mouseHit xy relative to the screen
+     * @return the first component's max bounds that falls within the given hit. */
+    public IScaleableComponent getComponentAt(Vector2D mouseHit){
+        return getComponent(components, component -> component.getBounds().maxBounds().contains(mouseHit));
     }
 
     @Nullable
-    public IScaleableComponent getInteractedComponent(List<IScaleableComponent> components, DisplayInteractionHandler handler){
+    public IScaleableComponent getComponent(List<IScaleableComponent> components, Function<IScaleableComponent, Boolean> filter){
         for(IScaleableComponent component : components){
-            if(component.canRayTrace() && component.getInteraction(handler).isMouseOver(handler)){
+            if(filter.apply(component)){
                 List<IScaleableComponent> subComponents = component.getSubComponents();
                 if(subComponents != null){
-                    IScaleableComponent result = getInteractedComponent(subComponents, handler);
+                    IScaleableComponent result = getComponent(subComponents, filter);
                     if(result != null){
                         return result;
                     }
@@ -186,21 +220,12 @@ public class GSI implements INestedInteractionListener {
 
     //// Triggers
 
-    public boolean testTrigger; //TODO REMOVE ME!
-
-    public boolean toggle(IInteractionListener listener, int triggerId){
-        if(triggerId == 0){
-            return testTrigger = !testTrigger;
-        }
+    public boolean toggle(Object source, int triggerId){
         return false; //TODO
     }
 
 
-    public boolean isActive(IInteractionListener listener, int triggerId){
-        if(triggerId == 0){
-            return testTrigger;
-        }
-
+    public boolean isActive(Object source, int triggerId){
         return false; //TODO
     }
 

@@ -1,5 +1,9 @@
 package sonar.logistics.client.design.gui.interactions;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.TextFormatting;
+import sonar.logistics.client.design.gui.EnumLineBreakGlyph;
+import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.design.gui.EnumLineStyling;
 import sonar.logistics.client.design.gui.GSIDesignSettings;
@@ -11,12 +15,14 @@ import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.*;
+import sonar.logistics.client.gsi.components.text.style.GlyphStyleHolder;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
+import sonar.logistics.client.gsi.properties.ColourProperty;
 import sonar.logistics.client.vectors.Vector2D;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 //TODO RENDER OFF PAGE GLYPHS???
 public class DefaultTextInteraction extends AbstractViewportInteraction implements IGlyphRenderer {
@@ -47,7 +53,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     public void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
         if(!glyphInfo.glyph.isVisible()){
             if(glyphInfo.glyph instanceof LineBreakGlyph){
-                StyledTextRenderer.renderCharGlyph(context, glyphInfo, new CharGlyph('#'));
+               // StyledTextRenderer.INSTANCE.renderCharGlyph(context, glyphInfo, new CharGlyph('#'));
             }
         }
 
@@ -56,7 +62,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         if(selectionEnd == null || selectionEnd.getInsertionIndex() == cursor.getInsertionIndex()){
             if(glyphInfo.index == cursor.getCharIndex() && GSIDesignSettings.canRenderCursor()){
                 float downscale = glyphInfo.glyph.downscale(context.fontType, glyphInfo.style);
-                StyledTextRenderer.addCursorToGlyph(context, glyphInfo, downscale, (float)(cursor.isLeading() ? 0 : glyphInfo.quad.width / downscale));
+                StyledTextRenderer.INSTANCE.addCursorToGlyph(context, glyphInfo, downscale, (float)(cursor.isLeading() ? 0 : glyphInfo.quad.width / downscale));
             }
         }else{
             CursorPoint startPoint = selectionEnd.getInsertionIndex() < cursor.getInsertionIndex() ? selectionEnd : cursor;
@@ -64,7 +70,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
 
             if(startPoint.getInsertionIndex() <= glyphInfo.index && endPoint.getInsertionIndex() > glyphInfo.index){
                 float downscale = glyphInfo.glyph.downscale(context.fontType, glyphInfo.style);
-                StyledTextRenderer.addHighlightToGlyph(context, glyphInfo, downscale, (float)(glyphInfo.quad.width / downscale));
+                StyledTextRenderer.INSTANCE.addHighlightToGlyph(context, glyphInfo, downscale, (float)(glyphInfo.quad.width / downscale));
             }
         }
     }
@@ -89,9 +95,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
 
     @Override
     public boolean charTyped(char aChar, int modifiers) {
-        CharGlyph glyph = new CharGlyph(aChar);
-        glyph.styleHolder.setFromStyle(GSIDesignSettings.glyphStyle);
-        addGlyph(glyph);
+        addGlyph(new CharGlyph(aChar), GSIDesignSettings.glyphStyle);
         return true;
     }
 
@@ -111,13 +115,16 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
 
     ////
 
-    public void addGlyph(Glyph glyph){
+    public void addGlyph(Glyph glyph, GlyphStyle style){
         deleteSelection();
-        pages.text.glyphs.add(getSafeInsertionIndex(), glyph);
-        viewport.gsi.rebuild();
-        cursor.setLeading(false);
-        cursor.moveRight(1);
-        onCursorMoved();
+
+        glyph.styleHolder = new GlyphStyleHolder();
+        glyph.styleHolder.setFromStyle(style);
+
+        int insert = getSafeGlyphInsertionIndex();
+        pages.text.glyphs.add(insert, glyph);
+        viewport.gsi.build();
+        moveCursorTo(cursor, insert, false);
     }
 
     public void deleteGlyph(boolean previous){
@@ -129,7 +136,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
             return;
         }
         pages.text.glyphs.remove(delete);
-        viewport.gsi.rebuild();
+        viewport.gsi.build();
         cursor.setIndex(cursor.isLeading() ? delete : delete - 1);
         onCursorMoved();
     }
@@ -141,8 +148,9 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         int startIndex = Math.min(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex());
         int endIndex = Math.max(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex());
 
+        clearSelection();
         if(pages.text.deleteGlyphs(startIndex, endIndex)){
-            viewport.gsi.rebuild();
+            viewport.gsi.build();
             selectionEnd = null;
             return true;
         }
@@ -163,34 +171,67 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         applyLineStyle(GSIDesignSettings.lineStyle);
     }
 
-    public void applyLineStyle(LineStyle style){
-        GlyphRenderInfo glyphInfo = pages.getPrevGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
+    @Override
+    public void onLineBreakGlyphChanged(EnumLineBreakGlyph settings) {
+        super.onLineBreakGlyphChanged(settings);
+        applyLineBreakGlyph(settings);
+    }
+
+    public void applyLineBreakGlyph(EnumLineBreakGlyph settings){
+        GlyphRenderInfo glyphInfo = pages.text.glyphs.isEmpty() ? null : pages.getPrevGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
         if(glyphInfo != null){
-            pages.text.glyphs.set(glyphInfo.index, new LineBreakGlyph(((LineBreakGlyph)glyphInfo.glyph).page, style.copy()));
-            viewport.gsi.rebuild();
+            LineBreakGlyph glyph = (LineBreakGlyph) glyphInfo.glyph;
+            pages.text.glyphs.set(glyphInfo.index, GSIDesignSettings.getLineBreakGlyph(glyph.pageBreak, glyph.lineStyle));
+            viewport.gsi.build();
         }else{
             //if we didn't find a line break glyph anywhere then the text is all one line, so we can add one to the start
-            pages.text.addLineBreak(style, 0);
-            viewport.gsi.rebuild();
-            cursor.moveRight(1);
-            onCursorMoved();
+            pages.text.addGlyph(GSIDesignSettings.getLineBreakGlyph(false, new LineStyle()), 0);
+            viewport.gsi.build();
+            moveCursorRight(cursor);
         }
     }
 
+    public void applyLineStyle(LineStyle style){
+        //TODO IF THERE IS A SELECTION, WE NEED TO DO THIS TO ALL SELECTED LINES!
+        GlyphRenderInfo glyphInfo = pages.getPrevGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
+        if(glyphInfo != null){
+            LineBreakGlyph glyph = (LineBreakGlyph) glyphInfo.glyph;
+            glyph.lineStyle = style.copy();
+            viewport.gsi.build();
+        }else{
+            //if we didn't find a line break glyph anywhere then the text is all one line, so we can add one to the start
+            pages.text.addGlyph(GSIDesignSettings.getLineBreakGlyph(false, style.copy()), 0);
+            viewport.gsi.build();
+            moveCursorRight(cursor);
+        }
+    }
+
+    public void clearFormatting(){
+        applyLineStyle(new LineStyle());
+        pages.text.clearAttributes(getSelectionStartIndex(), getSelectionEndIndex());
+        onCursorMoved();
+        viewport.gsi.build();
+    }
+
     public void applyAttribute(GlyphStyleAttributes attribute, Object attributeObj){
-        int startIndex, endIndex;
+        pages.text.applyAttribute(attribute, attributeObj, getSelectionStartIndex(), getSelectionEndIndex());
+        viewport.gsi.build();
+    }
+
+    public int getSelectionStartIndex(){
         if(selectionEnd == null){
             GlyphRenderInfo prev = pages.getPrevGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
-            GlyphRenderInfo next = pages.getNextGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
-
-            startIndex = prev == null ? 0 : prev.index + 1;
-            endIndex = next == null ? pages.styledGlyphs.size() - 1 : next.index - 1;
-        }else{
-            startIndex = Math.min(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex());
-            endIndex = Math.max(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex());
+            return prev == null ? 0 : prev.index; //note we set the style on the preceding line break glyph too!
         }
-        pages.text.applyAttribute(attribute, attributeObj, startIndex, endIndex);
-        viewport.gsi.rebuild();
+        return Math.min(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex());
+    }
+
+    public int getSelectionEndIndex(){
+        if(selectionEnd == null){
+            GlyphRenderInfo next = pages.getNextGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
+            return next == null ? pages.styledGlyphs.size() : next.index - 1;
+        }
+        return Math.max(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex()) - 1;
     }
 
     //// CURSOR MOVEMENT
@@ -203,7 +244,113 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     //should be called before moving the selection cursor, n.b. this is normally done by HotKeys
     public void checkSelection(){
         if(selectionEnd == null){
-            selectionEnd = cursor;
+            selectionEnd = new CursorPoint(cursor.isLeading(), cursor.getCharIndex());
+        }
+    }
+
+    public void selectAll(){
+        cursor = new CursorPoint(true, 0);
+        selectionEnd = new CursorPoint(false, pages.text.glyphs.size() - 1);
+    }
+
+    public void cut(){
+        copy();
+        deleteSelection();
+    }
+
+    public void copy(){
+        if(selectionEnd == null){
+            return;
+        }
+        int startIndex = Math.min(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex());
+        int endIndex = Math.max(cursor.getInsertionIndex(), selectionEnd.getInsertionIndex());
+
+        StringBuilder builder = new StringBuilder();
+        GlyphStyle style = new GlyphStyle();
+
+        for(int i = startIndex ; i <= Math.min(endIndex, pages.text.glyphs.size() - 1); i ++){
+            GlyphRenderInfo info = pages.getGlyphInfo(i);
+            if(!info.style.matches(style)){
+                builder.append(TextFormatting.RESET);
+                if(info.style.obfuscated){
+                    builder.append(TextFormatting.OBFUSCATED);
+                }
+                if(info.style.bold){
+                    builder.append(TextFormatting.BOLD);
+                }
+                if(info.style.strikethrough){
+                    builder.append(TextFormatting.STRIKETHROUGH);
+                }
+                if(info.style.underlined){
+                    builder.append(TextFormatting.UNDERLINE);
+                }
+                if(info.style.italic){
+                    builder.append(TextFormatting.ITALIC);
+                }
+                //COPYING COLOUR ISN'T SUPPORTED FOR NOW
+            }
+            style = info.style.copy();
+            if(info.glyph instanceof LineBreakGlyph){
+                builder.append('\n');
+            }else if(info.glyph instanceof CharGlyph){
+                builder.append(((CharGlyph) info.glyph).aChar);
+            }
+        }
+
+        Minecraft.getInstance().keyboardListener.setClipboardString(builder.toString());
+    }
+
+    ///pastes the clipboard's string, can use Minecraft Formatting.
+    public void paste(){
+        String string = Minecraft.getInstance().keyboardListener.getClipboardString();
+
+        GlyphStyle style = GSIDesignSettings.glyphStyle.copy();
+
+        //if we have formatting char '167' we reset all TextFormatting properties.
+        if(string.indexOf(167) != -1){
+            style.obfuscated = false;
+            style.bold = false;
+            style.strikethrough = false;
+            style.underlined = false;
+            style.italic = false;
+            style.textColour = new ColourProperty(255, 255, 255);
+        }
+
+        for(int i = 0; i < string.length(); ++i) {
+            char c0 = string.charAt(i);
+
+            if (c0 == 167 && i + 1 < string.length()) {
+                TextFormatting textformatting = TextFormatting.fromFormattingCode(string.charAt(i + 1));
+                if (textformatting != null) {
+                    if (textformatting.isNormalStyle()) {
+                        style.obfuscated = false;
+                        style.bold = false;
+                        style.strikethrough = false;
+                        style.underlined = false;
+                        style.italic = false;
+                        style.textColour = new ColourProperty(255, 255, 255);
+                    }
+                    if (textformatting.getColor() != null) {
+                        int j = textformatting.getColor();
+                        style.textColour = new ColourProperty((j >> 16 & 255), (j >> 8 & 255), (j & 255));
+                    } else if (textformatting == TextFormatting.OBFUSCATED) {
+                        style.obfuscated = true;
+                    } else if (textformatting == TextFormatting.BOLD) {
+                        style.bold = true;
+                    } else if (textformatting == TextFormatting.STRIKETHROUGH) {
+                        style.strikethrough = true;
+                    } else if (textformatting == TextFormatting.UNDERLINE) {
+                        style.underlined = true;
+                    } else if (textformatting == TextFormatting.ITALIC) {
+                        style.italic = true;
+                    }
+                }
+                ++i;
+            }else if('\n' == c0) {
+                addGlyph(GSIDesignSettings.getLineBreakGlyph(false, GSIDesignSettings.lineStyle.copy()), style);
+            }else{
+                addGlyph(new CharGlyph(c0), style);
+            }
         }
     }
 
@@ -215,6 +362,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         if(glyphRenderInfo != null) {
             StyledTextLine line = pages.getNextStyledLine(cursor.getCharIndex());
             updateCursorFromXHit(cursor, line, cursor.isLeading() ? glyphRenderInfo.quad.getX() : glyphRenderInfo.quad.getMaxX());
+            onCursorMoved();
         }
     }
 
@@ -224,21 +372,30 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         if(glyphRenderInfo != null) {
             StyledTextLine line = pages.getPrevStyledLine(cursor.getCharIndex());
             updateCursorFromXHit(cursor, line, cursor.isLeading() ? glyphRenderInfo.quad.getX() : glyphRenderInfo.quad.getMaxX());
+            onCursorMoved();
         }
     }
 
     ////
 
-    //moves the cursor to the previous visible glyph
     public void moveCursorLeft(CursorPoint cursor){
-        GlyphRenderInfo glyphInfo = pages.getPrevGlyphInfo(cursor.getInsertionIndex(), StyledTextPages.FILTER_VISIBLE);
-        setCursorTo(cursor, glyphInfo, true);
+        if(!cursor.isLeading()){
+            cursor.setLeading(true);
+            onCursorMoved();
+            return;
+        }
+        moveCursorTo(cursor, cursor.getInsertionIndex() - 1, true);
+        onCursorMoved();
     }
 
-    //moves the cursor to the next visible glyph
     public void moveCursorRight(CursorPoint cursor){
-        GlyphRenderInfo glyphInfo = pages.getNextGlyphInfo(cursor.getInsertionIndex(), StyledTextPages.FILTER_VISIBLE);
-        setCursorTo(cursor, glyphInfo, false);
+        if(cursor.isLeading()){
+            cursor.setLeading(false);
+            onCursorMoved();
+            return;
+        }
+        moveCursorTo(cursor,cursor.getCharIndex() + 1, false);
+        onCursorMoved();
     }
 
     ////
@@ -247,8 +404,8 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     public void moveCursorToStart(CursorPoint cursor){
         StyledTextLine line = pages.getStyledLine(cursor.getCharIndex());
         if(line != null) {
-            GlyphRenderInfo glyphInfo = pages.getNextGlyphInfo(line.getStartIndex() - 1, StyledTextPages.FILTER_VISIBLE);
-            setCursorTo(cursor, glyphInfo, true);
+            moveCursorTo(cursor, line.getStartIndex(), true);
+            onCursorMoved();
         }
     }
 
@@ -256,8 +413,8 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     public void moveCursorToEnd(CursorPoint cursor){
         StyledTextLine line = pages.getStyledLine(cursor.getCharIndex());
         if(line != null) {
-            GlyphRenderInfo glyphInfo = pages.getPrevGlyphInfo(line.getEndIndex() + 1, StyledTextPages.FILTER_VISIBLE);
-            setCursorTo(cursor, glyphInfo, false);
+            moveCursorTo(cursor, line.getEndIndex(), false);
+            onCursorMoved();
         }
     }
 
@@ -329,9 +486,36 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
 
     ////
 
+    ///doesn't call onCursorMoved
+    public void moveCursorTo(CursorPoint cursor, int index, boolean isLeading){
+        if(pages.styledGlyphs.isEmpty()){
+            cursor.setIndex(0);
+            cursor.setLeading(true);
+        }else{
+            int safeIndex = getSafeIndex(index);
+            GlyphRenderInfo info = pages.getGlyphInfo(safeIndex);
+            Objects.requireNonNull(info);
+            cursor.setIndex(info.index);
+            cursor.setLeading(isLeading);
+        }
+    }
+
     //returns a valid insertion index, within the bounds of the string
     public int getSafeInsertionIndex(){
         return Math.max(0, Math.min(pages.styledGlyphs.size(), cursor.getInsertionIndex()));
+    }
+
+    //if the cursor is on a line break glyph, it will place the char afterwards
+    public int getSafeGlyphInsertionIndex(){
+        int safeIndex = Math.max(0, Math.min(pages.styledGlyphs.size() - 1, cursor.getCharIndex()));
+        if(!pages.styledGlyphs.isEmpty()){
+            GlyphRenderInfo info = pages.getGlyphInfo(safeIndex);
+            Objects.requireNonNull(info);
+            if(info.glyph instanceof LineBreakGlyph){
+                return info.index + 1;
+            }
+        }
+        return getSafeInsertionIndex();
     }
 
     //returns a value within the bounds of the glyphs
@@ -339,20 +523,12 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         return Math.max(0, Math.min(pages.styledGlyphs.size()-1, index));
     }
 
-    //method for simplicity, makes sure onCursorMoved() is called.
-    public void setCursorTo(CursorPoint cursor, @Nullable GlyphRenderInfo glyphRenderInfo, boolean isLeading){
-        if(glyphRenderInfo != null){
-            cursor.setIndex(glyphRenderInfo.index);
-            cursor.setLeading(isLeading);
-            onCursorMoved();
-        }
-    }
-
     //updates the current GlyphStyle and LineStyle from the cursor's new position
     public void onCursorMoved(){
         if(selectionEnd == null && !pages.styledGlyphs.isEmpty()){
-            StyledTextLine line = pages.getStyledLine(getSafeIndex(cursor.getInsertionIndex()));
-            GlyphRenderInfo info = pages.getGlyphInfo(getSafeIndex(cursor.getInsertionIndex()));
+            ///we use the char index, as this will always be on the line the cursor is rendered on, the insertion index could refer to prev/next line
+            StyledTextLine line = pages.getStyledLine(getSafeIndex(cursor.getCharIndex()));
+            GlyphRenderInfo info = pages.getGlyphInfo(getSafeIndex(cursor.getCharIndex()));
             if(line != null && info != null) {
                 GSIDesignSettings.glyphStyle = info.glyph.getStyle();
                 GSIDesignSettings.lineStyle = line.lineStyle;
@@ -364,5 +540,6 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
             }
         }
     }
+
 
 }

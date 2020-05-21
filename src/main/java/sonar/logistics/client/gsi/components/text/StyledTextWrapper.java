@@ -51,8 +51,8 @@ public class StyledTextWrapper {
             if(glyph instanceof LineBreakGlyph){
                 finishRawLine();
 
-                currentLineStyle = ((LineBreakGlyph) glyph).styling;
-                currentPageBreak = ((LineBreakGlyph) glyph).page;
+                currentLineStyle = ((LineBreakGlyph) glyph).lineStyle;
+                currentPageBreak = ((LineBreakGlyph) glyph).pageBreak;
 
                 startRawLine();
             }
@@ -172,8 +172,8 @@ public class StyledTextWrapper {
             return;
         }
 
-        //if the glyph can fit on the current line we add it
-        if(checkAdvance(glyphInfo.quad.width, line.renderSize.width)){
+        //if the glyph can fit on the current line we add it, spaces always fit on the line, as if they go the edge of the page.
+        if(glyphInfo.glyph.isSpace() || checkAdvance(glyphInfo.quad.width, line.renderSize.width)){
             line.addGlyphInfo(glyphInfo);
             return;
         }
@@ -244,7 +244,7 @@ public class StyledTextWrapper {
 
             ////align
             boolean isLast = lineIndex == styledLines.size();
-            currentLineStyle.alignType.align(line, bounds.width, isLast);
+            currentLineStyle.justifyType.justify(line, bounds.width, isLast);
 
             double offsetX = 0;
             for(GlyphRenderInfo glyphInfo : line.glyphInfo){

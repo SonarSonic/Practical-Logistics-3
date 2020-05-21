@@ -1,5 +1,6 @@
 package sonar.logistics.client.gsi.components.text.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.gui.fonts.EmptyGlyph;
 import net.minecraft.client.gui.fonts.IGlyph;
@@ -7,31 +8,34 @@ import net.minecraft.client.gui.fonts.TexturedGlyph;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
-import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
 
-import java.util.List;
+public class StyledTextRenderer implements IGlyphRenderer {
 
-public class StyledTextRenderer {
-
-    public static IGlyphRenderer DEFAULT_RENDERER = (context, glyphInfo) -> glyphInfo.glyph.render(context, glyphInfo);
+    public static final StyledTextRenderer INSTANCE = new StyledTextRenderer();
 
     ///// CACHED RENDER METHODS \\\\\
 
-    public static void renderCurrentPage(ScaleableRenderContext context, ScaledFontType fontType, StyledTextPages pages) {
+    @Override
+    public void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
+        glyphInfo.glyph.render(context, glyphInfo);
+    }
+
+    public void renderCurrentPage(ScaleableRenderContext context, ScaledFontType fontType, StyledTextPages pages) {
+        RenderSystem.enableAlphaTest();
         GlyphRenderContext glyphContext = new GlyphRenderContext(context, fontType);
         context.startRenderBuffer(false);
         for(StyledTextLine line : pages.getCurrentPage()) {
-            renderCachedGlyphLine(glyphContext, line, pages.specialGlyphRenderer == null ? DEFAULT_RENDERER : pages.specialGlyphRenderer);
+            renderCachedGlyphLine(glyphContext, line, pages.specialGlyphRenderer == null ? this : pages.specialGlyphRenderer);
         }
         context.finishRenderBuffer(false);
     }
 
-    public static void renderCachedGlyphLine(GlyphRenderContext context, StyledTextLine line, IGlyphRenderer renderer) {
+    public void renderCachedGlyphLine(GlyphRenderContext context, StyledTextLine line, IGlyphRenderer renderer) {
         context.renderContext.matrix.push();
-        context.renderContext.matrix.scale(line.lineScaling, line.lineScaling, 0);
+        context.renderContext.matrix.scale(line.lineScaling, line.lineScaling, 1);
 
         context.startLine(line);
 
@@ -48,7 +52,7 @@ public class StyledTextRenderer {
 
     ///// CHAR RENDERING \\\\\
 
-    public static void renderCharGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, CharGlyph charGlyph) {
+    public void renderCharGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, CharGlyph charGlyph) {
 
         float downscale = charGlyph.downscale(context.getScaledFont(), glyphInfo.style);
         context.renderContext.matrix.scale(downscale, downscale, downscale);
@@ -61,14 +65,12 @@ public class StyledTextRenderer {
         if (glyphInfo.style.shadow) {
             renderCharGlyph(context, glyphInfo, charGlyph,  true);
         }
-
-        context.renderContext.matrix.translate(0, 0, -0.1F);
+        context.renderContext.matrix.translate(0, 0, ScaleableRenderHelper.MIN_Z_OFFSET);
         renderCharGlyph(context, glyphInfo, charGlyph, false);
-        context.renderContext.matrix.translate(0, 0, 0.1F);
-        return;
+        context.renderContext.matrix.translate(0, 0, -ScaleableRenderHelper.MIN_Z_OFFSET);
     }
 
-    private static void renderCharGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, CharGlyph charGlyph, boolean renderingShadow) {
+    private void renderCharGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, CharGlyph charGlyph, boolean renderingShadow) {
         context.updateColour(glyphInfo.style.textColour, renderingShadow ? 0.25F : 1);
 
         IGlyph glyph = context.getFont().findGlyph(charGlyph.getChar());
@@ -89,7 +91,7 @@ public class StyledTextRenderer {
 
     ///// EFFECT RENDERING \\\\\
 
-    public static void addScaledTextureEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth, float shadowOffset, boolean shadow){
+    public void addScaledTextureEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth, float shadowOffset, boolean shadow){
         if(shadow){
             context.updateColour(glyphInfo.style.textColour, 0.25F);
             addScaledTextureEffects(context, glyphInfo, downscale, glyphWidth, shadowOffset);
@@ -98,7 +100,7 @@ public class StyledTextRenderer {
         addScaledTextureEffects(context, glyphInfo, downscale, glyphWidth, 0);
     }
 
-    public static void addScaledTextureEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth, float shadowOffset){
+    public void addScaledTextureEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth, float shadowOffset){
 
         if (glyphInfo.style.strikethrough) {
             context.addScaledTextureEffect(glyphInfo, downscale, shadowOffset, shadowOffset + 4.5F*(context.getScaledFont().getElementScaling()/9F), shadowOffset + glyphWidth, shadowOffset + (4.5F - 1.0F)*(context.getScaledFont().getElementScaling()/9F), -0.01F, context.red, context.green, context.blue, context.alpha);
@@ -117,32 +119,28 @@ public class StyledTextRenderer {
         }
     }
 
-    public static void addCursorToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth){
+    public void addCursorToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth){
         context.addScaledTextureEffect(glyphInfo, downscale, glyphWidth - 1.0F, 9.0F * (context.getScaledFont().getElementScaling() / 9F), glyphWidth, 0, -0.01F, 1.0F, 1.0F, 1.0F, 1.0F);
      }
 
-    public static void addHighlightToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth){
+    public void addHighlightToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, float downscale, float glyphWidth){
         context.addScaledTextureEffect(glyphInfo, downscale, 0, 9.0F * (context.getScaledFont().getElementScaling() / 9F), glyphWidth, 0, 0.01F, 1.0F, 1.0F, 1.0F, 0.5F);
     }
 
     ///// SIZING \\\\\\
 
-    public static float getGlyphWidth(ScaledFontType fontType, GlyphStyle style, Glyph renderableGlyph){
-        if (renderableGlyph instanceof CharGlyph) {
-            CharGlyph charGlyph = (CharGlyph) renderableGlyph;
-            if(charGlyph.isSpace()){ //// SPACE
-                return fontType.getMinimumSpaceSize();
-            }
-            if(charGlyph.aChar == 167){ //// TEXT FORMATTING
-                return 0.0F;
-            }
-            IGlyph glyph = fontType.getFont().findGlyph(charGlyph.getChar());
-            return glyph.getAdvance(style.bold) + (style.shadow ? 1.0F : 0);
+    public float getCharWidth(ScaledFontType fontType, GlyphStyle style, char aChar){
+        if(aChar == ' '){ //// SPACE
+            return fontType.getMinimumSpaceSize();
         }
-        return 0;
+        if(aChar == 167){ //// TEXT FORMATTING
+            return 0.0F;
+        }
+        IGlyph glyph = fontType.getFont().findGlyph(aChar);
+        return glyph.getAdvance(style.bold) + (style.shadow ? 1.0F : 0);
     }
 
-    public static float getGlyphHeight(ScaledFontType fontType, GlyphStyle style, Glyph renderableGlyph){
+    public float getCharHeight(ScaledFontType fontType, GlyphStyle style, char aChar){
         return fontType.getFontScaling();
     }
 

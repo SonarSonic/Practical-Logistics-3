@@ -55,22 +55,12 @@ public class StyledTextString {
 
     /////
 
-    public void addLineBreak(LineStyle styling){
-        addLineBreak(styling, glyphs.size());
+    public void addGlyph(Glyph glyph){
+        addGlyph(glyph, glyphs.size());
     }
 
-    public void addLineBreak(LineStyle styling, int index){
-        glyphs.add(index, new LineBreakGlyph(false, styling));
-    }
-
-    /////
-
-    public void addPageBreak(LineStyle styling){
-        addPageBreak(styling, glyphs.size());
-    }
-
-    public void addPageBreak(LineStyle styling, int index){
-        glyphs.add(index, new LineBreakGlyph(false, styling));
+    public void addGlyph(Glyph glyph, int index){
+        glyphs.add(index, glyph);
     }
 
     /////
@@ -102,7 +92,7 @@ public class StyledTextString {
     }
 
     public void applyAttribute(GlyphStyleAttributes attribute, Object attributeObj, int startIndex, int endIndex){
-        for(int i = startIndex ; i < endIndex; i ++){
+        for(int i = startIndex ; i <= Math.min(endIndex, glyphs.size() - 1); i ++){
             Glyph glyph = glyphs.get(i);
 
             if(glyph.styleHolder == null){

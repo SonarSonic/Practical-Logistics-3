@@ -16,13 +16,13 @@ public class ElementComponent extends AbstractStyledScaleable implements IScalea
     }
 
     @Override
-    public boolean canRender(ScaleableRenderContext context, DisplayInteractionHandler interact) {
+    public boolean canRender(ScaleableRenderContext context, DisplayInteractionHandler handler) {
         return element.canRender(context);
     }
 
     @Override
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact) {
-        super.render(context, interact);
+    public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
+        super.render(context, handler);
         context.matrix.push();
         element.render(context, bounds.renderBounds());
         context.matrix.pop();

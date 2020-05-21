@@ -1,6 +1,7 @@
 package sonar.logistics.common.multiparts.displays;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
@@ -8,6 +9,7 @@ import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.opengl.GL11;
 import sonar.logistics.client.gsi.context.ScaleableRenderContext;
 import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.client.vectors.Quad2D;
@@ -40,9 +42,6 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
         Direction dir = tile.getFacing();
         Quaternion rotation = dir.getRotation();
         matrix.push();
-
-
-
         matrix.translate(0.5, 0.5, 0.5); ///// ALIGN TO THE CENTRE OF THE BLOCK
         matrix.rotate(rotation); ///// ROTATE THE RENDERER
         matrix.rotate(new Quaternion(90, 0, 0, true));
@@ -52,9 +51,9 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
         ///// START GSI RENDERING \\\\\
 
-        ScaleableRenderContext renderContext = new ScaleableRenderContext(tile.getGSI(), partialTicks, matrix, renderer, light, overlayLight, worldMatrix, false);
-        tile.getGSI().render(renderContext, tile.getGSI().getDefaultInteractionHandler(Minecraft.getInstance().player));
-
+        ScaleableRenderContext renderContext = new ScaleableRenderContext(tile.getGSI(), partialTicks, matrix, renderer, light, overlayLight, worldMatrix, dir, false);
+        tile.getInteractionHandler().updateMouseFromDisplay(Minecraft.getInstance().player, tile);
+        tile.getGSI().render(renderContext, tile.getInteractionHandler());
         ///// END GSI RENDERING \\\\\
 
 
