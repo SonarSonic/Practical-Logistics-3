@@ -1,5 +1,6 @@
 package sonar.logistics.client.gsi.components.text;
 
+import sonar.logistics.client.gsi.api.ComponentAlignment;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
@@ -33,12 +34,12 @@ public class StyledTextWrapper {
     public StyledTextPages styledTextPages;
 
     // builds wrapping pages
-    public void build(StyledTextPages pages, ScaledFontType fontType, Quad2D bounds){
+    public void build(StyledTextPages pages, ScaledFontType fontType, Quad2D bounds, LineStyle defLineStyle){
         pages.clearCache();
         this.fontType = fontType;
         this.bounds = bounds;
         this.index = 0;
-        this.currentLineStyle = new LineStyle();
+        this.currentLineStyle = defLineStyle;
         this.currentPageBreak = false;
         this.styledTextPages = pages;
 
@@ -253,7 +254,26 @@ public class StyledTextWrapper {
                 offsetX += glyphInfo.quad.width;
             }
         }
+    }
 
+    //this is a post build operation which will align pages vertically.
+    public void alignPages(ComponentAlignment yAlign){
+        for(List<StyledTextLine> page : styledTextPages.styledPages){
+            double pageHeight = 0;
+
+            for(StyledTextLine line : page){
+                pageHeight += line.renderSize.getHeight();
+            }
+
+            double offsetY = yAlign.align(pageHeight, bounds.getHeight());
+
+            for(StyledTextLine line : page){
+                line.renderSize.translate(0, offsetY);
+                for(GlyphRenderInfo glyph : line.glyphInfo){
+                    glyph.quad.translate(0, offsetY);
+                }
+            }
+        }
     }
 
 

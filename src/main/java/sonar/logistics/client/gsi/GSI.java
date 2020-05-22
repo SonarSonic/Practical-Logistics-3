@@ -1,31 +1,28 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import sonar.logistics.client.design.gui.GSIDesignScreen;
-import sonar.logistics.client.design.gui.GSIDesignSettings;
+import sonar.logistics.client.gsi.components.input.TextInputComponent;
+import sonar.logistics.client.gui.GSIDesignScreen;
+import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gsi.api.IGSIHost;
-import sonar.logistics.client.gsi.api.INestedInteractionListener;
-import sonar.logistics.client.gsi.api.IScaleableComponent;
-import sonar.logistics.client.gsi.components.ElementComponent;
-import sonar.logistics.client.gsi.components.buttons.EnumButtonIcons;
+import sonar.logistics.client.gsi.interactions.INestedInteractionListener;
+import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.components.basic.ElementComponent;
+import sonar.logistics.client.gsi.api.EnumButtonIcons;
 import sonar.logistics.client.gsi.components.buttons.IconButtonComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextString;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.containers.GridContainer;
+import sonar.logistics.client.gsi.components.containers.GridContainer;
 import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
-import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.elements.ItemStackElement;
-import sonar.logistics.client.gsi.properties.AbsoluteBounds;
 import sonar.logistics.client.gsi.properties.ScaleableBounds;
-import sonar.logistics.client.gsi.triggers.EmptyTrigger;
-import sonar.logistics.client.gsi.triggers.Trigger;
+import sonar.logistics.client.gsi.interactions.triggers.Trigger;
 import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.client.vectors.Vector2D;
 import sonar.logistics.common.items.PL3Items;
 
@@ -38,7 +35,7 @@ import java.util.function.Function;
 public class GSI implements INestedInteractionListener {
 
     public final IGSIHost host;
-    public List<IScaleableComponent> components = new ArrayList<>();
+    public List<IComponent> components = new ArrayList<>();
     public boolean queuedRebuild = true;
 
     public GSI(IGSIHost host){
@@ -60,7 +57,7 @@ public class GSI implements INestedInteractionListener {
         return INestedInteractionListener.super.mouseClicked(handler, button);
     }
 
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler interact){
+    public void render(GSIRenderContext context, DisplayInteractionHandler interact){
         if(queuedRebuild){
             build();
             queuedRebuild = false;
@@ -82,7 +79,7 @@ public class GSI implements INestedInteractionListener {
 
         //components.add(new IconButtonComponent(EnumButtonIcons.MODE_SELECT, EmptyTrigger.INSTANCE));
 
-        addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_BOLD, new Trigger((b, h) -> GSIDesignSettings.toggleBoldStyling(), (b, h) -> GSIDesignSettings.glyphStyle.bold)));
+        //addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_BOLD, new Trigger((b, h) -> GSIDesignSettings.toggleBoldStyling(), (b, h) -> GSIDesignSettings.glyphStyle.bold)));
 
 
         StyledTextComponent lines = new StyledTextComponent();
@@ -106,6 +103,12 @@ public class GSI implements INestedInteractionListener {
 
         addComponent(lines);
 
+        TextInputComponent textInput = new TextInputComponent();
+        textInput.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.5)));
+        textInput.maxInputLength = 3;
+        textInput.inputType = TextInputComponent.EnumTextInputType.DIGIT_ONLY;
+        addComponent(textInput);
+        /*
         GridContainer grid = new GridContainer();
         grid.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.5)));
 
@@ -126,6 +129,8 @@ public class GSI implements INestedInteractionListener {
         grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.BELL), 200)));
 
         addComponent(grid);
+
+         */
         /*
         GridContainer subGrid = new GridContainer();
         subGrid.alignment.setAlignmentPercentages(new Vec3d(0, 0.5, 0), new Vec3d(1, 0.5 , 1));
@@ -177,37 +182,37 @@ public class GSI implements INestedInteractionListener {
         */
     }
 
-    public IScaleableComponent addComponent(IScaleableComponent component){
+    public IComponent addComponent(IComponent component){
         components.add(component);
         queueRebuild();
         return component;
     }
 
-    public IScaleableComponent removeComponent(IScaleableComponent component){
+    public IComponent removeComponent(IComponent component){
         components.remove(component);
         queueRebuild();
         return component;
     }
 
     @Nullable
-    public IScaleableComponent getInteractedComponent(DisplayInteractionHandler handler){
+    public IComponent getInteractedComponent(DisplayInteractionHandler handler){
         return getComponent(components, component -> component.getInteraction(handler).isMouseOver(handler));
     }
 
     /** Doesn't test interactions
      * @param mouseHit xy relative to the screen
      * @return the first component's max bounds that falls within the given hit. */
-    public IScaleableComponent getComponentAt(Vector2D mouseHit){
+    public IComponent getComponentAt(Vector2D mouseHit){
         return getComponent(components, component -> component.getBounds().maxBounds().contains(mouseHit));
     }
 
     @Nullable
-    public IScaleableComponent getComponent(List<IScaleableComponent> components, Function<IScaleableComponent, Boolean> filter){
-        for(IScaleableComponent component : components){
+    public IComponent getComponent(List<IComponent> components, Function<IComponent, Boolean> filter){
+        for(IComponent component : components){
             if(filter.apply(component)){
-                List<IScaleableComponent> subComponents = component.getSubComponents();
+                List<IComponent> subComponents = component.getSubComponents();
                 if(subComponents != null){
-                    IScaleableComponent result = getComponent(subComponents, filter);
+                    IComponent result = getComponent(subComponents, filter);
                     if(result != null){
                         return result;
                     }
@@ -232,7 +237,7 @@ public class GSI implements INestedInteractionListener {
     //// INestedInteractionListener
 
     public boolean isDragging;
-    public IScaleableComponent focused;
+    public IComponent focused;
 
     @Override
     public boolean isDragging() {
@@ -246,17 +251,17 @@ public class GSI implements INestedInteractionListener {
 
     @Nullable
     @Override
-    public IScaleableComponent getFocused() {
+    public IComponent getFocused() {
         return focused;
     }
 
     @Override
-    public void setFocused(@Nullable IScaleableComponent component) {
+    public void setFocused(@Nullable IComponent component) {
         this.focused = component;
     }
 
     @Override
-    public List<IScaleableComponent> children() {
+    public List<IComponent> children() {
         return components;
     }
 

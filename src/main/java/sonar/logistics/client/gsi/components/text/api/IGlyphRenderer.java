@@ -7,4 +7,5 @@ public interface IGlyphRenderer {
 
     void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo);
 
+    void renderEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo);
 }

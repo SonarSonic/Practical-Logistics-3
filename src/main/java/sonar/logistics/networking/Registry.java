@@ -15,7 +15,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import sonar.logistics.PL3;
-import sonar.logistics.client.design.gui.GSIDesignContainer;
+import sonar.logistics.client.gui.GSIDesignContainer;
 import sonar.logistics.common.blocks.PL3Blocks;
 import sonar.logistics.common.blocks.hammer.ForgingHammerBlock;
 import sonar.logistics.common.blocks.hammer.ForgingHammerContainer;

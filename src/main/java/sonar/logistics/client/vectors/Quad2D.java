@@ -1,6 +1,6 @@
 package sonar.logistics.client.vectors;
 
-import sonar.logistics.client.gsi.api.ElementAlignment;
+import sonar.logistics.client.gsi.api.ComponentAlignment;
 
 public class Quad2D {
 
@@ -242,7 +242,7 @@ public class Quad2D {
     }
 
     /**aligns the quad within the given alignments, the adjusts the quad it is called on.*/
-    public Quad2D align(Quad2D bounds, ElementAlignment alignX, ElementAlignment alignY){
+    public Quad2D align(Quad2D bounds, ComponentAlignment alignX, ComponentAlignment alignY){
         x = alignX.align(width, bounds.getWidth()) + bounds.getX();
         y = alignY.align(height, bounds.getHeight()) + bounds.getY();
         return this;

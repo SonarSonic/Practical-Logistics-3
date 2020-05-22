@@ -1,14 +1,14 @@
 package sonar.logistics.client.gsi.components.buttons;
 
-import sonar.logistics.client.design.gui.ScreenUtils;
+import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gsi.api.IInteractableComponent;
 import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
-import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
-import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
-import sonar.logistics.client.gsi.triggers.ITrigger;
+import sonar.logistics.client.gsi.render.GSIRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderHelper;
+import sonar.logistics.client.gsi.components.AbstractComponent;
+import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 
-public class ColouredButtonComponent extends AbstractStyledScaleable implements IInteractableComponent {
+public class ColouredButtonComponent extends AbstractComponent implements IInteractableComponent {
 
     public ITrigger trigger;
     public int activatedColour = ScreenUtils.transparent_activated_button.rgba;
@@ -29,10 +29,10 @@ public class ColouredButtonComponent extends AbstractStyledScaleable implements 
     }
 
     @Override
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
+    public void render(GSIRenderContext context, DisplayInteractionHandler handler) {
         super.render(context, handler);
         context.matrix.translate(0,0, -0.0001F);
         int rgba = trigger.isActive(this, handler) ? activatedColour : isMouseOver(handler) ? hoveredColour : disabledColour;
-        ScaleableRenderHelper.renderColouredRect(context, true, bounds.renderBounds(), rgba);
+        GSIRenderHelper.renderColouredRect(context, true, bounds.renderBounds(), rgba);
     }
 }

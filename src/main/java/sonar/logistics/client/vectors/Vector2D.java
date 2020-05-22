@@ -1,6 +1,6 @@
 package sonar.logistics.client.vectors;
 
-import sonar.logistics.client.gsi.api.ElementAlignment;
+import sonar.logistics.client.gsi.api.ComponentAlignment;
 
 public class Vector2D {
 
@@ -74,7 +74,7 @@ public class Vector2D {
         return new Vector2D(width, height);
     }
 
-    public static Vector2D align(Vector2D scale, Vector2D max, ElementAlignment xAlign, ElementAlignment yAlign) {
+    public static Vector2D align(Vector2D scale, Vector2D max, ComponentAlignment xAlign, ComponentAlignment yAlign) {
         double x = xAlign.align(scale.x, max.x);
         double y = yAlign.align(scale.y, max.y);
         return new Vector2D(x, y);

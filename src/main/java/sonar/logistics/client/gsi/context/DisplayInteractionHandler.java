@@ -3,8 +3,7 @@ package sonar.logistics.client.gsi.context;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.entity.player.PlayerEntity;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.api.IInteractionListener;
-import sonar.logistics.client.gsi.api.IScaleableComponent;
+import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.vectors.Vector2D;
 import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
@@ -18,7 +17,7 @@ public class DisplayInteractionHandler implements IGuiEventListener {
     public boolean isUsingGui;
 
     public Vector2D mousePos = new Vector2D(-1, -1);
-    public IScaleableComponent hovered;
+    public IComponent hovered;
 
     public DisplayInteractionHandler(GSI gsi, PlayerEntity player, boolean isUsingGui){
         this.gsi = gsi;

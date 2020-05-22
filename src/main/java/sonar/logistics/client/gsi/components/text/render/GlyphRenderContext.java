@@ -1,50 +1,25 @@
 package sonar.logistics.client.gsi.components.text.render;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.gui.fonts.Font;
-import net.minecraft.client.gui.fonts.TexturedGlyph;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
-import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
-import sonar.logistics.client.vectors.Quad2D;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GlyphRenderContext {
 
-    public ScaleableRenderContext renderContext;
+    public GSIRenderContext renderContext;
     public ScaledFontType fontType;
 
-    public StyledTextLine line;
     public float red, green, blue, alpha;
 
-    public List<TexturedGlyph.Effect> effects;
-
-    public GlyphRenderContext(ScaleableRenderContext renderContext, ScaledFontType fontType){
+    public GlyphRenderContext(GSIRenderContext renderContext, ScaledFontType fontType){
         this.renderContext = renderContext;
         this.fontType = fontType;
     }
 
-    public void startLine(StyledTextLine line){
-        this.line = line;
-        this.effects = new ArrayList<>();
-    }
+    public void startLine(StyledTextLine line){}
 
-    public void finishLine(StyledTextLine line){
-        flushEffects();
-    }
-
-    public void flushEffects(){
-        if (!effects.isEmpty()) {
-            TexturedGlyph whiteGlyph = ScaledFontType.DEFAULT_MINECRAFT.getFont().getWhiteGlyph();
-            IVertexBuilder builder = renderContext.getRenderBuffer(false).getBuffer(ScaledFontType.DEFAULT_MINECRAFT.getRenderType(whiteGlyph));
-            for (TexturedGlyph.Effect effect : effects) {
-                whiteGlyph.renderEffect(effect, renderContext.getMatrix4f(), builder, renderContext.light);
-            }
-            effects.clear();
-        }
-    }
+    public void finishLine(StyledTextLine line){}
 
     public ScaledFontType getScaledFont(){
         return fontType;
@@ -61,10 +36,5 @@ public class GlyphRenderContext {
         green = colour.getGreen() / 255.0F * brightness;
         blue = colour.getBlue() / 255.0F  * brightness;
         alpha = colour.getAlpha() / 255.0F;
-    }
-
-    /**effects are batched so their position isn't relative to the chars scaling*/
-    public void addScaledTextureEffect(GlyphRenderInfo glyphInfo, float glyphScaling, float x0, float y0, float x1, float y1, float depth, float r, float g, float b, float a) {
-        effects.add(new TexturedGlyph.Effect((float)glyphInfo.quad.x + x0*glyphScaling, (float)glyphInfo.quad.y  + y0*glyphScaling, (float)glyphInfo.quad.x + x1*glyphScaling, (float)glyphInfo.quad.y + y1*glyphScaling, depth, r, g, b, a));
     }
 }

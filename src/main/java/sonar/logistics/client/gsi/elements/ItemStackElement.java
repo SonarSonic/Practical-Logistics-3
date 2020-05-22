@@ -3,7 +3,7 @@ package sonar.logistics.client.gsi.elements;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.api.IRenderableElement;
-import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.vectors.Quad2D;
 
 public class ItemStackElement implements IRenderableElement {
@@ -17,17 +17,17 @@ public class ItemStackElement implements IRenderableElement {
     }
 
     @Override
-    public boolean isUniformScaling(ScaleableRenderContext context) {
+    public boolean isUniformScaling(GSIRenderContext context) {
         return true;
     }
 
     @Override
-    public boolean canRender(ScaleableRenderContext context) {
+    public boolean canRender(GSIRenderContext context) {
         return !stack.isEmpty();
     }
 
     @Override
-    public void render(ScaleableRenderContext context, Quad2D bounds) {
+    public void render(GSIRenderContext context, Quad2D bounds) {
         context.itemStackRenderer.addBatchedItemStack(stack, bounds);
     }
 

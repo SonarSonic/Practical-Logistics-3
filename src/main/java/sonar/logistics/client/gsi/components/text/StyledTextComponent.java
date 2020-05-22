@@ -2,16 +2,18 @@ package sonar.logistics.client.gsi.components.text;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import sonar.logistics.client.gsi.api.IScaleableComponent;
+import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.render.*;
+import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
-import sonar.logistics.client.gsi.context.ScaleableRenderContext;
-import sonar.logistics.client.gsi.render.ScaleableRenderHelper;
-import sonar.logistics.client.gsi.scaleables.AbstractStyledScaleable;
+import sonar.logistics.client.gsi.render.GSIRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderHelper;
+import sonar.logistics.client.gsi.components.AbstractComponent;
 import sonar.logistics.client.vectors.Quad2D;
 
-public class StyledTextComponent extends AbstractStyledScaleable implements IScaleableComponent {
+public class StyledTextComponent extends AbstractComponent implements ITextComponent {
 
     @OnlyIn(Dist.CLIENT)
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
@@ -22,15 +24,20 @@ public class StyledTextComponent extends AbstractStyledScaleable implements ISca
     @Override
     public void build(Quad2D bounds) {
         super.build(bounds);
-        StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.renderBounds());
+        StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.renderBounds(), new LineStyle());
     }
 
     @Override
-    public void render(ScaleableRenderContext context, DisplayInteractionHandler handler) {
+    public void render(GSIRenderContext context, DisplayInteractionHandler handler) {
         super.render(context, handler);
         context.matrix.push();
-        context.matrix.translate(0, 0, ScaleableRenderHelper.MIN_Z_OFFSET);
+        context.matrix.translate(0, 0, -0.01);
         StyledTextRenderer.INSTANCE.renderCurrentPage(context, fontType, pages);
         context.matrix.pop();
+    }
+
+    @Override
+    public StyledTextPages pages() {
+        return pages;
     }
 }

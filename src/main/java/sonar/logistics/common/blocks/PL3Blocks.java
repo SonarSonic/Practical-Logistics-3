@@ -3,7 +3,7 @@ package sonar.logistics.common.blocks;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.registries.ObjectHolder;
-import sonar.logistics.client.design.gui.GSIDesignContainer;
+import sonar.logistics.client.gui.GSIDesignContainer;
 import sonar.logistics.common.blocks.hammer.ForgingHammerBlock;
 import sonar.logistics.common.blocks.hammer.ForgingHammerContainer;
 import sonar.logistics.common.blocks.hammer.ForgingHammerTile;

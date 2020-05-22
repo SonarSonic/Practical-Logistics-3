@@ -6,7 +6,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import sonar.logistics.PL3;
-import sonar.logistics.client.design.gui.ScreenUtils;
+import sonar.logistics.client.gui.ScreenUtils;
 
 public class ForgingHammerScreen extends ContainerScreen<ForgingHammerContainer> {
 

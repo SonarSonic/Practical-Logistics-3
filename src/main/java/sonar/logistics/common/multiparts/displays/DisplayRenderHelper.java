@@ -10,7 +10,7 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fluids.FluidStack;
-import sonar.logistics.client.gsi.context.ScaleableRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 
 public class DisplayRenderHelper {
@@ -27,7 +27,7 @@ public class DisplayRenderHelper {
     }
 
     @Deprecated
-    public static void colouredRect(ScaleableRenderContext context, float left, float top, float width, float height, int red, int green, int blue, int alpha) {
+    public static void colouredRect(GSIRenderContext context, float left, float top, float width, float height, int red, int green, int blue, int alpha) {
        // colouredRect(context.matrix.getLast(), context.getWorldBuffer(), context.light, context.overlay, left, top, width, height, red, green, blue, alpha);
     }
 

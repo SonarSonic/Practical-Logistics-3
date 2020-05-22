@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 public abstract class ComponentBounds {
 
-    public abstract void build(Quad2D bounds, @Nullable ScaleableStyling properties);
+    public abstract void build(Quad2D bounds, @Nullable ComponentStyling properties);
 
     public abstract Quad2D maxBounds();
 
