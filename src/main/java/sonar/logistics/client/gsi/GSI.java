@@ -1,80 +1,143 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
-import sonar.logistics.client.gui.GSIDesignScreen;
-import sonar.logistics.client.gui.GSIDesignSettings;
-import sonar.logistics.client.gsi.api.IGSIHost;
-import sonar.logistics.client.gsi.interactions.INestedInteractionListener;
+import sonar.logistics.client.gsi.interactions.DraggingInteraction;
+import sonar.logistics.client.gsi.interactions.ResizingInteraction;
+import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.components.basic.ElementComponent;
-import sonar.logistics.client.gsi.api.EnumButtonIcons;
-import sonar.logistics.client.gsi.components.buttons.IconButtonComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextString;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.components.containers.GridContainer;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
+import sonar.logistics.client.gsi.interactions.api.INestedInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.elements.ItemStackElement;
 import sonar.logistics.client.gsi.properties.ScaleableBounds;
-import sonar.logistics.client.gsi.interactions.triggers.Trigger;
+import sonar.logistics.client.gui.GSIDesignScreen;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
-import sonar.logistics.common.items.PL3Items;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-//TODO SIMPLIFY
 public class GSI implements INestedInteractionListener {
 
-    public final IGSIHost host;
-    public List<IComponent> components = new ArrayList<>();
-    public boolean queuedRebuild = true;
+    public GSIInteractionHandler interactionHandler = new GSIInteractionHandler(this, Minecraft.getInstance().player);
+    private List<IComponent> components = new ArrayList<>();
+    private List<IInteractionListener> interactions = new ArrayList<>();
+    private Quad2D bounds;
 
-    public GSI(IGSIHost host){
-        this.host = host;
+    public GSI(Quad2D bounds){
+        this.bounds = bounds;
+    }
+
+    public Quad2D getGSIBounds(){
+        return bounds;
     }
 
     public void build(){
-        components.forEach(c -> c.build(host.getGSIBounds()));
+        components.forEach(c -> c.build(bounds));
     }
 
-    @Override
-    public boolean mouseClicked(DisplayInteractionHandler handler, int button) {
-        if(!handler.isUsingGui && handler.hasShiftDown()){
-            Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this)));
-            testStructure();
-            build();
-            return true;
-        }
-        return INestedInteractionListener.super.mouseClicked(handler, button);
-    }
-
-    public void render(GSIRenderContext context, DisplayInteractionHandler interact){
-        if(queuedRebuild){
-            build();
-            queuedRebuild = false;
-        }
-
+    public void render(GSIRenderContext context){
         context.preRender();
-        components.forEach(c -> c.render(context, interact));
+        components.forEach(c -> c.render(context));
+        renderInteraction(context);
         context.postRender();
     }
 
-    public void queueRebuild(){
-        queuedRebuild = true;
+    public IComponent addComponent(IComponent component){
+        component.setGSI(this);
+        components.add(component);
+        if(component instanceof  IInteractionListener){
+            interactions.add((IInteractionListener)component);
+        }
+        return component;
     }
+
+    public IComponent removeComponent(IComponent component){
+        component.setGSI(null);
+        components.remove(component);
+        if(component instanceof  IInteractionListener){
+            interactions.remove(component);
+        }
+        return component;
+    }
+
+    public IComponent getComponentAt(Vector2D mouseHit) {
+        return getComponent(components, component -> component.getBounds().maxBounds().contains(mouseHit));
+    }
+
+    @Nullable
+    public IComponent getComponent(List<IComponent> components, Function<IComponent, Boolean> filter){
+        for (IComponent component : components) {
+            if (filter.apply(component)) {
+                List<IComponent> subComponents = component.getSubComponents();
+                if (subComponents != null) {
+                    IComponent result = getComponent(subComponents, filter);
+                    if (result != null) {
+                        return result;
+                    }
+                }
+                return component;
+            }
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean mouseClicked(int button) {
+        if(focused != null && focused.isDragging()){
+            return focused.mouseClicked(button);
+        }
+
+        switch (interactionHandler.getInteractionType()){
+            case WORLD_INTERACTION:
+                if(interactionHandler.hasShiftDown()) {
+                    Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this)));
+                    testStructure();
+                    build();
+                    return true;
+                }
+                break;
+            case GUI_INTERACTION:
+                break;
+            case GUI_EDITING:
+                break;
+            case GUI_RESIZING:
+                if(focused instanceof ResizingInteraction && focused.mouseClicked(button)){
+                    return true;
+                }
+                IComponent hovered = getComponent(components, c -> c.getBounds().maxBounds().contains(interactionHandler.mousePos));
+                if(hovered != null) {
+                    this.setFocused(new ResizingInteraction(hovered));
+                    return true;
+                }
+                setFocused(null);
+                return false;
+        }
+        for(IInteractionListener child : getChildren()){
+            if(child.isMouseOver()){
+                setFocused(child);
+                return child.mouseClicked(button);
+            }
+        }
+        setFocused(null);
+        return false;
+    }
+
+
+
 
     ///TODO REMOVE ME!
     public void testStructure(){
         components.clear();
+        interactions.clear();
+        setFocused(null);
         //addComponent(new ButtonComponent(0, 176, 0));
 
         //components.add(new IconButtonComponent(EnumButtonIcons.MODE_SELECT, EmptyTrigger.INSTANCE));
@@ -182,87 +245,34 @@ public class GSI implements INestedInteractionListener {
         */
     }
 
-    public IComponent addComponent(IComponent component){
-        components.add(component);
-        queueRebuild();
-        return component;
+
+
+    public boolean toggle(Object source, int triggerId) {
+        return false;
     }
 
-    public IComponent removeComponent(IComponent component){
-        components.remove(component);
-        queueRebuild();
-        return component;
+    public boolean isActive(Object source, int triggerId) {
+        return false;
     }
 
-    @Nullable
-    public IComponent getInteractedComponent(DisplayInteractionHandler handler){
-        return getComponent(components, component -> component.getInteraction(handler).isMouseOver(handler));
-    }
+    ///
 
-    /** Doesn't test interactions
-     * @param mouseHit xy relative to the screen
-     * @return the first component's max bounds that falls within the given hit. */
-    public IComponent getComponentAt(Vector2D mouseHit){
-        return getComponent(components, component -> component.getBounds().maxBounds().contains(mouseHit));
-    }
-
-    @Nullable
-    public IComponent getComponent(List<IComponent> components, Function<IComponent, Boolean> filter){
-        for(IComponent component : components){
-            if(filter.apply(component)){
-                List<IComponent> subComponents = component.getSubComponents();
-                if(subComponents != null){
-                    IComponent result = getComponent(subComponents, filter);
-                    if(result != null){
-                        return result;
-                    }
-                }
-                return component;
-            }
-        }
-        return null;
-    }
-
-    //// Triggers
-
-    public boolean toggle(Object source, int triggerId){
-        return false; //TODO
-    }
-
-
-    public boolean isActive(Object source, int triggerId){
-        return false; //TODO
-    }
-
-    //// INestedInteractionListener
-
-    public boolean isDragging;
-    public IComponent focused;
+    private IInteractionListener focused = null;
 
     @Override
-    public boolean isDragging() {
-        return isDragging;
-    }
-
-    @Override
-    public void setDragging(boolean dragging) {
-        this.isDragging = dragging;
+    public List<IInteractionListener> getChildren() {
+        return interactions;
     }
 
     @Nullable
     @Override
-    public IComponent getFocused() {
+    public IInteractionListener getFocused() {
         return focused;
     }
 
-    @Override
-    public void setFocused(@Nullable IComponent component) {
-        this.focused = component;
-    }
 
     @Override
-    public List<IComponent> children() {
-        return components;
+    public void setFocused(IInteractionListener listener) {
+        this.focused = listener;
     }
-
 }

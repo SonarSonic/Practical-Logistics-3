@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.interactions.triggers;
 
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 
 public class ActionTrigger implements ITrigger {
 
@@ -11,12 +11,12 @@ public class ActionTrigger implements ITrigger {
     }
 
     @Override
-    public void trigger(Object source, DisplayInteractionHandler handler) {
+    public void trigger(Object source, GSIInteractionHandler handler) {
         handler.trigger(source, triggerID);
     }
 
     @Override
-    public boolean isActive(Object source, DisplayInteractionHandler handler) {
+    public boolean isActive(Object source, GSIInteractionHandler handler) {
         return handler.isActive(source, triggerID);
     }
 }

@@ -1,7 +1,7 @@
 package sonar.logistics.client.gsi.components.containers;
 
+import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
@@ -28,15 +28,15 @@ public class GridContainer extends AbstractContainer {
     }
 
     @Override
-    public void render(GSIRenderContext context, DisplayInteractionHandler handler) {
-        super.render(context, handler);
+    public void render(GSIRenderContext context) {
+        super.render(context);
         for(int r = 0; r < rows; r ++) {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r*columns) + c;
                 IComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
-                if(component != null && component.canRender(context, handler)){
+                if(component != null && component.canRender(context)){
                     context.matrix.push();
-                    component.render(context, handler);
+                    component.render(context);
                     context.matrix.pop();
                 }
             }

@@ -9,7 +9,7 @@ import sonar.logistics.client.gui.api.IFlexibleGuiEventListener;
 import sonar.logistics.client.gui.api.IInteractWidget;
 import sonar.logistics.client.gui.api.ISimpleWidget;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.vectors.Quad2D;
 
@@ -18,39 +18,32 @@ public class GSIWidget extends AbstractGui implements IFlexibleGuiEventListener,
 
     public Quad2D bounds;
     public GSI gsi;
-    public DisplayInteractionHandler internalHandler;
 
-    public GSIWidget(){
-        this.gsi = new GSI(this::getQuad);
-        this.internalHandler = new DisplayInteractionHandler(gsi, Minecraft.getInstance().player, true);
-    }
-
-    public GSIWidget(GSI gsi, DisplayInteractionHandler internalHandler){
-        this.gsi = gsi;
-        this.internalHandler = internalHandler;
-    }
-
-    public void build(Quad2D bounds){
+    public GSIWidget(Quad2D bounds){
         this.bounds = bounds;
-        this.gsi.build();
+        this.gsi = new GSI(bounds);
+    }
+
+    public void build(){
+        gsi.build();
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         GSIRenderContext context = new GSIRenderContext(gsi, partialTicks, new MatrixStack());
-        internalHandler.updateMouseFromGui(mouseX - bounds.x, mouseY - bounds.y);
+        gsi.interactionHandler.updateMouseFromGui(mouseX - bounds.x, mouseY - bounds.y);
         RenderSystem.enableDepthTest();
         context.matrix.scale(1, 1, -1); //GUI'S are rendered back to front.
         context.matrix.translate(bounds.x, bounds.y, 0);
         context.scaleNormals(1, 1, -1);
-        gsi.render(context, internalHandler);
+        gsi.render(context);
         context.matrix.scale(1, 1, -1); //revert the scaling
         RenderSystem.disableDepthTest();
     }
 
     @Override
     public IGuiEventListener getEventListener() {
-        return internalHandler;
+        return gsi.interactionHandler;
     }
 
     @Override

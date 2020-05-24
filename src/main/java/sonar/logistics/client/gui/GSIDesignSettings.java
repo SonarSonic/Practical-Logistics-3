@@ -112,7 +112,8 @@ public class GSIDesignSettings {
     }
 
     public static void onGlyphAttributeChanged(GlyphStyleAttributes attribute){
-        screen.onGlyphAttributeChanged(attribute, attribute.get(glyphStyle));
+        screen.onSettingChanged(attribute, attribute.get(glyphStyle));
+
     }
 
     //// LINE STYLING
@@ -121,27 +122,27 @@ public class GSIDesignSettings {
 
     public static void setLineSpacing(double lineSpacing){
         lineStyle.lineSpacing = lineSpacing;
-        screen.onLineStyleChanged(EnumLineStyling.LINE_SPACING);
+        screen.onSettingChanged(EnumLineStyling.LINE_SPACING, lineStyle);
     }
 
     public static void setCharSpacing(double charSpacing){
         lineStyle.charSpacing = charSpacing;
-        screen.onLineStyleChanged(EnumLineStyling.CHAR_SPACING);
+        screen.onSettingChanged(EnumLineStyling.CHAR_SPACING, lineStyle);
     }
 
     public static void setWrappingType(LineStyle.WrappingType wrappingType){
         lineStyle.wrappingType = wrappingType;
-        screen.onLineStyleChanged(EnumLineStyling.WRAPPING_TYPE);
+        screen.onSettingChanged(EnumLineStyling.WRAPPING_TYPE, lineStyle);
     }
 
     public static void setJustifyType(LineStyle.JustifyType justifyType){
         lineStyle.justifyType = justifyType;
-        screen.onLineStyleChanged(EnumLineStyling.ALIGN_TYPE);
+        screen.onSettingChanged(EnumLineStyling.ALIGN_TYPE, lineStyle);
     }
 
     public static void setBreakPreference(LineStyle.BreakPreference breakPreference){
         lineStyle.breakPreference = breakPreference;
-        screen.onLineStyleChanged(EnumLineStyling.BREAK_PREFERENCE);
+        screen.onSettingChanged(EnumLineStyling.BREAK_PREFERENCE, lineStyle);
     }
 
     //// LINE BREAK GLYPH TYPES
@@ -151,7 +152,7 @@ public class GSIDesignSettings {
 
     public static void toggleLineBreakStyle(){
         currentLineBreakStyle = currentLineBreakStyle == selectedLineBreakStyle ? EnumLineBreakGlyph.DEFAULT_BREAK : selectedLineBreakStyle;
-        screen.onLineBreakGlyphChanged(currentLineBreakStyle);
+        screen.onSettingChanged(currentLineBreakStyle, null);
     }
 
     public static LineBreakGlyph getLineBreakGlyph(boolean pageBreak, LineStyle lineStyle){

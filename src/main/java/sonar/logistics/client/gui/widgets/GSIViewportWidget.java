@@ -4,22 +4,23 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
 import org.lwjgl.opengl.GL11;
 import sonar.logistics.client.gsi.api.ITextComponent;
+import sonar.logistics.client.gsi.interactions.EditStandardTextInteraction;
+import sonar.logistics.client.gsi.interactions.EditStyledTextInteraction;
 import sonar.logistics.client.gui.api.IFlexibleGuiEventListener;
 import sonar.logistics.client.gui.api.IInteractWidget;
 import sonar.logistics.client.gui.EnumLineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gui.EnumLineStyling;
-import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gui.interactions.*;
 import sonar.logistics.client.gui.api.EnumRescaleType;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.components.text.StyledTextComponent;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.properties.ScaleableBounds;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
@@ -37,19 +38,10 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     public double centreX, centreY;
     public double scaling;
-    public EnumRescaleType currentRescaleType = null;
-
-    private DefaultTextInteraction textInteraction = null;
-    public DefaultResizeInteraction resizeInteraction = new DefaultResizeInteraction(this);
-    public DefaultDragInteraction dragInteraction = new DefaultDragInteraction(this);
-    public AbstractViewportInteraction currentInteraction = dragInteraction;
-
-    DisplayInteractionHandler handler;
 
     public GSIViewportWidget(GSI gsi, double x, double y, double width, double height){
         this.gsi = gsi;
         this.bounds = new Quad2D(x, y, width, height);
-        this.handler = new DisplayInteractionHandler(gsi, Minecraft.getInstance().player, true);
         this.defaultCentre();
         this.defaultScaling();
     }
@@ -78,22 +70,12 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     //the total render width of the gsi, including borders
     public double getGSIRenderWidth(){
-        return gsi.host.getGSIBounds().getWidth() + getGSIBorderWidth()*2;
+        return gsi.getGSIBounds().getWidth() + getGSIBorderWidth()*2;
     }
 
     //the total render height of the gsi, including borders
     public double getGSIRenderHeight(){
-        return gsi.host.getGSIBounds().getHeight() + getGSIBorderHeight()*2;
-    }
-
-    //the drag x value relative to the display, snapped to the nearest pixel(s) according to the current grid size
-    public double getSnappedDragX(double dragX){
-        return GSIDesignSettings.snapToScaledGrid(dragX, scaling);
-    }
-
-    //the drag x value relative to the display, snapped to the nearest pixel(s) according to the current grid size
-    public double getSnappedDragY(double dragY) {
-        return GSIDesignSettings.snapToScaledGrid(dragY, scaling);
+        return gsi.getGSIBounds().getHeight() + getGSIBorderHeight()*2;
     }
 
     //// GUI RELATIVE VALUES \\\\
@@ -118,31 +100,6 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         return getCentreOffsetY() + (-(getGSIRenderHeight() - getGSIBorderHeight()*2)/2)*scaling;
     }
 
-    //the bounds of the display relative to the gui
-    public Quad2D getBoundsForDisplay(){
-        return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.host.getGSIBounds().getWidth() * scaling, gsi.host.getGSIBounds().getHeight() * scaling);
-    }
-
-    //the components window relative to the gui
-    public Quad2D getScaledBoundsForComponent(IComponent component){
-        return component.getBounds().maxBounds().copy().factor(scaling).translate(getRenderOffsetX(), getRenderOffsetY());
-    }
-
-    //converts the gui relative window sizing to display relative sizing
-    public void setBoundsFromScaledBounds(IComponent component, Quad2D scaledBounds){
-        Quad2D bounds = getBoundsForDisplay();
-        double x = (scaledBounds.x - bounds.x) / bounds.width;
-        double y = (scaledBounds.y - bounds.y) / bounds.height;
-        double width = scaledBounds.width / bounds.width;
-        double height = scaledBounds.height / bounds.height;
-        component.setBounds(new ScaleableBounds(new Quad2D(x, y, width, height)));
-        gsi.queueRebuild();
-    }
-
-    //gets the hit display hit vector, note this could be negative / off the display
-    public Vector2D getHitVecFromMouse(double mouseX, double mouseY){
-        return new Vector2D((mouseX - getRenderOffsetX()) / scaling, (mouseY - getRenderOffsetY()) / scaling);
-    }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
@@ -157,7 +114,8 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         //gsi rendering - context / interaction handler update
         RenderSystem.enableDepthTest();
         GSIRenderContext context = new GSIRenderContext(gsi, partialTicks, new MatrixStack());
-        handler.update(new Vector2D((mouseX - getRenderOffsetX()) / scaling, (mouseY - getRenderOffsetY()) / scaling));
+        context.gsiScaling = (float)scaling;
+        gsi.interactionHandler.update(new Vector2D((mouseX - getRenderOffsetX()) / scaling, (mouseY - getRenderOffsetY()) / scaling));
 
         //gsi rendering - alignment & scaling
         context.matrix.translate(getCentreOffsetX(), getCentreOffsetY(), 0);
@@ -170,19 +128,15 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
         //screen background - scissored
         context.matrix.translate(-getGSIBorderWidth(),-getGSIBorderHeight(), 1); //
-        GSIRenderHelper.renderColouredRect(context, true, gsi.host.getGSIBounds(), 0, 0, getGSIRenderWidth(), getGSIRenderHeight(), ScreenUtils.display_black_border);
-        GSIRenderHelper.renderColouredRect(context, true, gsi.host.getGSIBounds(), getGSIBorderWidth()/2, getGSIBorderHeight()/2, getGSIRenderWidth() - getGSIBorderWidth(), getGSIRenderHeight() - getGSIBorderHeight(), ScreenUtils.display_blue_border);
-        GSIRenderHelper.renderColouredRect(context, true, gsi.host.getGSIBounds(), getGSIBorderWidth(), getGSIBorderHeight(), getGSIRenderWidth() - getGSIBorderWidth()*2, getGSIRenderHeight() - getGSIBorderHeight()*2, ScreenUtils.display_grey_bgd);
+        GSIRenderHelper.renderColouredRect(context, true, gsi.getGSIBounds(), 0, 0, getGSIRenderWidth(), getGSIRenderHeight(), ScreenUtils.display_black_border);
+        GSIRenderHelper.renderColouredRect(context, true, gsi.getGSIBounds(), getGSIBorderWidth()/2, getGSIBorderHeight()/2, getGSIRenderWidth() - getGSIBorderWidth(), getGSIRenderHeight() - getGSIBorderHeight(), ScreenUtils.display_blue_border);
+        GSIRenderHelper.renderColouredRect(context, true, gsi.getGSIBounds(), getGSIBorderWidth(), getGSIBorderHeight(), getGSIRenderWidth() - getGSIBorderWidth()*2, getGSIRenderHeight() - getGSIBorderHeight()*2, ScreenUtils.display_grey_bgd);
         context.matrix.translate(+getGSIBorderWidth(), +getGSIBorderHeight(), -1);
 
-        gsi.render(context, handler);
+        gsi.render(context);
         context.matrix.scale(1, 1, -1); //revert the scaling
 
         RenderSystem.disableDepthTest();
-
-
-        //interaction rendering - scissored
-        currentInteraction.renderScissored(mouseX, mouseY, partialTicks);
 
         //render coordinates + zoom scaling
         RenderSystem.enableDepthTest();
@@ -195,9 +149,6 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         //end scissor test
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-        //interaction rendering - non scissored
-        currentInteraction.render(mouseX, mouseY, partialTicks);
-
 
     }
 
@@ -207,56 +158,49 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-
-        if(!isMouseOver(mouseX, mouseY)){
-            return false;
-        }
-
-        //update the selected component
-        if(currentInteraction.mouseClicked(mouseX, mouseY, button)){
-            return true;
-        }
-        selectedComponent = gsi.getComponentAt(handler.mousePos);
-        ///note resize is not clicked again
-        return dragInteraction.mouseClicked(mouseX, mouseY, button);
-    }
-
-    ///// NESTED INTERACTIONS
-
-    public void setTextInteraction(){
-        if(selectedComponent != null && selectedComponent instanceof ITextComponent){
-            ITextComponent textComponent = (ITextComponent) selectedComponent;
-            if(textComponent.canStyle()){
-                textInteraction = new StyledTextInteraction(this, textComponent);
-            }else{
-                textInteraction = new DefaultTextInteraction(this, textComponent);
-            }
-            currentInteraction = textInteraction;
-        }
-    }
-
-    public void onGlyphAttributeChanged(GlyphStyleAttributes attribute, Object attributeObj) {
-        currentInteraction.onGlyphStyleChanged(attribute, attributeObj);
-    }
-
-    public void onLineStyleChanged(EnumLineStyling settings){
-        currentInteraction.onLineStyleChanged(settings);
-    }
-
-    public void onLineBreakGlyphChanged(EnumLineBreakGlyph settings){
-        currentInteraction.onLineBreakGlyphChanged(settings);
-    }
-
-    @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
         return bounds.contains(mouseX, mouseY);
     }
 
     @Override
-    public AbstractViewportInteraction getEventListener() {
-        return currentInteraction;
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if(gsi.interactionHandler.mouseClicked(mouseX, mouseY, button)){
+            return true;
+        }
+        if (isMouseOver(mouseX, mouseY)) {
+            if(button == 1) {
+                defaultScaling();
+                defaultCentre();
+            }
+            return true;
+        }
+        return false;
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
+        if(gsi.interactionHandler.mouseScrolled(mouseX, mouseY, scroll)){
+            return true;
+        }
+        if(isMouseOver(mouseX, mouseY)){
+            scaling += scroll;
+            return true;
+        }
+        return false;
+    }
 
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if(gsi.interactionHandler.mouseDragged(mouseX, mouseY, button, dragX, dragY)){
+            return true;
+        }
+        centreX += dragX;
+        centreY += dragY;
+        return false;
+    }
+
+    @Override
+    public IGuiEventListener getEventListener() {
+        return gsi.interactionHandler;
+    }
 }

@@ -5,15 +5,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IGSIHost;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.vectors.VectorHelper;
-import sonar.logistics.client.vectors.Quad2D;
 
 public interface IDisplay extends IGSIHost {
 
     GSI getGSI();
-
-    DisplayInteractionHandler getInteractionHandler();
 
     Direction getFacing();
 

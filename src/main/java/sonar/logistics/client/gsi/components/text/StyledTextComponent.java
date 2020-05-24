@@ -2,22 +2,24 @@ package sonar.logistics.client.gsi.components.text;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
+import sonar.logistics.client.gsi.interactions.EditStandardTextInteraction;
+import sonar.logistics.client.gsi.interactions.EditStyledTextInteraction;
+import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.components.AbstractComponent;
 import sonar.logistics.client.vectors.Quad2D;
 
-public class StyledTextComponent extends AbstractComponent implements ITextComponent {
+public class StyledTextComponent extends AbstractComponent implements ITextComponent, IFlexibleInteractionListener {
 
     @OnlyIn(Dist.CLIENT)
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
     public StyledTextPages pages = new StyledTextPages(new StyledTextString());
+    public EditStyledTextInteraction<ITextComponent> textInteraction = new EditStyledTextInteraction<>(this);
 
     public StyledTextComponent() {}
 
@@ -28,8 +30,8 @@ public class StyledTextComponent extends AbstractComponent implements ITextCompo
     }
 
     @Override
-    public void render(GSIRenderContext context, DisplayInteractionHandler handler) {
-        super.render(context, handler);
+    public void render(GSIRenderContext context) {
+        super.render(context);
         context.matrix.push();
         context.matrix.translate(0, 0, -0.01);
         StyledTextRenderer.INSTANCE.renderCurrentPage(context, fontType, pages);
@@ -39,5 +41,10 @@ public class StyledTextComponent extends AbstractComponent implements ITextCompo
     @Override
     public StyledTextPages pages() {
         return pages;
+    }
+
+    @Override
+    public IInteractionListener getInteractionListener() {
+        return textInteraction;
     }
 }

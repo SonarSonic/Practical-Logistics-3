@@ -16,9 +16,9 @@ public class ScreenUtils {
     public static ColourProperty transparent_blue_bgd = new ColourProperty(8, 8, 32, 50);
 
     public static ColourProperty transparent_disabled_button = new ColourProperty(80, 80, 80, 80);
-    public static ColourProperty transparent_hovered_button = new ColourProperty(120, 120, 120, 120);
-    public static ColourProperty transparent_activated_button = new ColourProperty(120, 160, 120, 120);
-    public static ColourProperty transparent_alert_button = new ColourProperty(160, 120, 120, 120);
+    public static ColourProperty transparent_hovered_button = new ColourProperty(120, 120, 120, 100);
+    public static ColourProperty transparent_activated_button = new ColourProperty(120, 255, 120, 100);
+    public static ColourProperty transparent_alert_button = new ColourProperty(160, 120, 120, 100);
 
     public static ColourProperty light_grey = new ColourProperty(120, 120, 120);
     public static ColourProperty white = new ColourProperty(255, 255, 255);

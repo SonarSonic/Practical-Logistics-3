@@ -2,12 +2,9 @@ package sonar.logistics.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.properties.ColourProperty;
 import sonar.logistics.client.gui.api.ISimpleWidget;
-import sonar.logistics.client.gui.interactions.DefaultDragInteraction;
-import sonar.logistics.client.gui.interactions.DefaultResizeInteraction;
-import sonar.logistics.client.gui.interactions.DefaultTextInteraction;
-import sonar.logistics.client.gui.interactions.StyledTextInteraction;
 import sonar.logistics.client.gui.widgets.GSIWidget;
 import sonar.logistics.client.gsi.api.EnumButtonIcons;
 import sonar.logistics.client.gsi.components.buttons.IconButtonComponent;
@@ -20,18 +17,19 @@ import sonar.logistics.client.vectors.Quad2D;
 
 import java.awt.*;
 
+
 public class DesignInterfaces {
 
-    public static GSIWidget normalToolsWidget = new GSIWidget();
-    public static GSIWidget textToolsWidget = new GSIWidget();
+    public static GSIWidget normalToolsWidget;
+    public static GSIWidget textToolsWidget;
 
 
 
     public static ISimpleWidget initNormalTools(GSIDesignScreen screen){
-
-        normalToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_SELECT, new Trigger((b, h) -> GSIDesignSettings.screen.gsiViewportWidget.currentInteraction = GSIDesignSettings.screen.gsiViewportWidget.dragInteraction, (b, h) -> GSIDesignSettings.screen.gsiViewportWidget.currentInteraction instanceof DefaultDragInteraction))).setBounds(new AbsoluteBounds(8, 16*2, 16, 16));
-        normalToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_MOVE, new Trigger((b, h) -> GSIDesignSettings.screen.gsiViewportWidget.currentInteraction = GSIDesignSettings.screen.gsiViewportWidget.resizeInteraction, (b, h) -> GSIDesignSettings.screen.gsiViewportWidget.currentInteraction instanceof DefaultResizeInteraction))).setBounds(new AbsoluteBounds(8, 16*3, 16, 16));
-        normalToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_EDIT_TEXT, new Trigger((b, h) -> GSIDesignSettings.screen.gsiViewportWidget.setTextInteraction(), (b, h) -> GSIDesignSettings.screen.gsiViewportWidget.currentInteraction instanceof DefaultTextInteraction))).setBounds(new AbsoluteBounds(8, 16*4, 16, 16));
+        normalToolsWidget = new GSIWidget(new Quad2D(screen.guiLeft, screen.guiTop, screen.xSize, screen.ySize));
+        normalToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_SELECT, new Trigger((b, h) -> GSIDesignSettings.screen.displayGSI.interactionHandler.setInteractionType(GSIInteractionHandler.InteractionType.GUI_EDITING), (b, h) -> GSIDesignSettings.screen.displayGSI.interactionHandler.getInteractionType() == GSIInteractionHandler.InteractionType.GUI_EDITING))).setBounds(new AbsoluteBounds(8, 16*2, 16, 16));
+        normalToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_MOVE, new Trigger((b, h) -> GSIDesignSettings.screen.displayGSI.interactionHandler.setInteractionType(GSIInteractionHandler.InteractionType.GUI_RESIZING), (b, h) -> GSIDesignSettings.screen.displayGSI.interactionHandler.getInteractionType() == GSIInteractionHandler.InteractionType.GUI_RESIZING))).setBounds(new AbsoluteBounds(8, 16*3, 16, 16));
+        //normalToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.MODE_EDIT_TEXT, new Trigger((b, h) -> GSIDesignSettings.screen.gsiViewportWidget.setTextInteraction(), (b, h) -> GSIDesignSettings.screen.gsiViewportWidget.currentInteraction instanceof EditStandardTextInteraction))).setBounds(new AbsoluteBounds(8, 16*4, 16, 16));
 
         ///
 
@@ -39,7 +37,7 @@ public class DesignInterfaces {
 
         ///
 
-        normalToolsWidget.build(new Quad2D(screen.guiLeft, screen.guiTop, screen.xSize, screen.ySize));
+        normalToolsWidget.build();
 
         ///
 
@@ -48,6 +46,7 @@ public class DesignInterfaces {
 
 
     public static ISimpleWidget initTextTools(GSIDesignScreen screen){
+        textToolsWidget = new GSIWidget(new Quad2D(screen.guiLeft, screen.guiTop, screen.xSize, screen.ySize));
 
         textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_BOLD, new Trigger((b, h) -> GSIDesignSettings.toggleBoldStyling(), (b, h) -> GSIDesignSettings.glyphStyle.bold))).setBounds(new AbsoluteBounds(16*2, 12, 16, 16));
         textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_ITALIC, new Trigger((b, h) -> GSIDesignSettings.toggleItalicStyling(), (b, h) -> GSIDesignSettings.glyphStyle.italic))).setBounds(new AbsoluteBounds(16*3, 12, 16, 16));
@@ -68,7 +67,7 @@ public class DesignInterfaces {
         textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.DECREASE_FONT_SIZE, new Trigger((b, h) -> GSIDesignSettings.decreaseFontHeight(), (b, h) -> false))).setBounds(new AbsoluteBounds(16*16, 12, 16, 16));
         textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.INCREASE_FONT_SIZE, new Trigger((b, h) -> GSIDesignSettings.increaseFontHeight(), (b, h) -> false))).setBounds(new AbsoluteBounds(16*17, 12, 16, 16));
         textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.BULLET_POINT_TOGGLE, new Trigger((b, h) -> GSIDesignSettings.toggleLineBreakStyle(), (b, h) -> GSIDesignSettings.currentLineBreakStyle == GSIDesignSettings.selectedLineBreakStyle))).setBounds(new AbsoluteBounds(16*18, 12, 16, 16));
-        textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.CLEAR_FORMATTING, new Trigger((b, h) -> { if(GSIDesignSettings.screen.gsiViewportWidget.currentInteraction instanceof StyledTextInteraction) ((StyledTextInteraction) GSIDesignSettings.screen.gsiViewportWidget.currentInteraction).clearFormatting();}, (b, h) -> false))).setBounds(new AbsoluteBounds(16*19, 12, 16, 16));
+       // textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.CLEAR_FORMATTING, new Trigger((b, h) -> { if(GSIDesignSettings.screen.gsiViewportWidget.currentInteraction instanceof EditStyledTextInteraction) ((EditStyledTextInteraction) GSIDesignSettings.screen.gsiViewportWidget.currentInteraction).clearFormatting();}, (b, h) -> false))).setBounds(new AbsoluteBounds(16*19, 12, 16, 16));
 
         ///
 
@@ -108,7 +107,7 @@ public class DesignInterfaces {
         textToolsWidget.gsi.addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_TEXT_COLOUR, new Trigger((b, h) -> colourSelection.toggle(), (b, h) -> colourSelection.isVisible))).setBounds(new AbsoluteBounds(16*20, 12, 16, 16));
 
 
-        textToolsWidget.build(new Quad2D(screen.guiLeft, screen.guiTop, screen.xSize, screen.ySize));
+        textToolsWidget.build();
 
         ///
 

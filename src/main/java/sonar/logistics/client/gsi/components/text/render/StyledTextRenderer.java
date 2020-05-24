@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.gui.fonts.EmptyGlyph;
 import net.minecraft.client.gui.fonts.IGlyph;
 import net.minecraft.client.gui.fonts.TexturedGlyph;
+import sonar.logistics.client.gsi.components.text.api.CursorPoint;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
@@ -130,10 +131,14 @@ public class StyledTextRenderer implements IGlyphRenderer {
         */
     }
 
-    public void addCursorToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo){
+    public void addCursorToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, CursorPoint cursor){
         float downscale = glyphInfo.glyph.downscale(context.fontType, glyphInfo.style);
         float cursorWidth = 1.0F * downscale;
-        GSIRenderHelper.renderColouredRect(context.renderContext, false, (float)glyphInfo.quad.getMaxX(), (float)glyphInfo.quad.getY(), (float)glyphInfo.quad.getMaxX() + cursorWidth, (float)glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
+        if(cursor.isLeading()){
+            GSIRenderHelper.renderColouredRect(context.renderContext, false, (float) glyphInfo.quad.getX() - cursorWidth, (float) glyphInfo.quad.getY(), (float) glyphInfo.quad.getX(), (float) glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
+        }else {
+            GSIRenderHelper.renderColouredRect(context.renderContext, false, (float) glyphInfo.quad.getMaxX(), (float) glyphInfo.quad.getY(), (float) glyphInfo.quad.getMaxX() + cursorWidth, (float) glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
+        }
      }
 
     public void addHighlightToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo){

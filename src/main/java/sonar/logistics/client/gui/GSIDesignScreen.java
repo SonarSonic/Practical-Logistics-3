@@ -1,5 +1,6 @@
 package sonar.logistics.client.gui;
 
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.gui.widgets.PL3TextWidget;
 import sonar.logistics.client.gsi.GSI;
@@ -14,6 +15,7 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
 
     public GSIDesignScreen(GSI displayGSI){
         this.displayGSI = displayGSI;
+        this.displayGSI.interactionHandler.setInteractionType(GSIInteractionHandler.InteractionType.GUI_EDITING);
         GSIDesignSettings.setDesignScreen(this);
     }
 
@@ -38,8 +40,6 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
             }
         });
         addWidget(fontHeight);
-
-
 
         addWidget(gsiViewportWidget = new GSIViewportWidget(displayGSI, this.guiLeft + 32, this.guiTop + 32, this.xSize - 64, this.ySize - 64));
     }
@@ -67,23 +67,13 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
 
     }
 
-
-
-    public void onGlyphAttributeChanged(GlyphStyleAttributes attribute, Object attributeObj) {
-        gsiViewportWidget.onGlyphAttributeChanged(attribute, attributeObj);
-        if(attribute == GlyphStyleAttributes.FONT_HEIGHT){
-            String value = String.valueOf((int)((float)(attributeObj) * 256F));
+    public void onSettingChanged(Object setting, Object settingObj){
+        displayGSI.onSettingChanged(setting, settingObj);
+        if(setting == GlyphStyleAttributes.FONT_HEIGHT){
+            String value = String.valueOf((int)((float)(settingObj) * 256F));
             if(!fontHeight.getText().equals(value))
                 fontHeight.setText(value);
         }
-    }
-
-    public void onLineStyleChanged(EnumLineStyling lineStyling) {
-        gsiViewportWidget.onLineStyleChanged(lineStyling);
-    }
-
-    public void onLineBreakGlyphChanged(EnumLineBreakGlyph currentLineBreakStyle) {
-        gsiViewportWidget.onLineBreakGlyphChanged(currentLineBreakStyle);
     }
 
     public void onCursorStyleChanged() {

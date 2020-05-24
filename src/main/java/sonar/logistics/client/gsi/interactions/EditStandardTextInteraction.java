@@ -1,12 +1,11 @@
-package sonar.logistics.client.gui.interactions;
+package sonar.logistics.client.gsi.interactions;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gui.GSIDesignSettings;
-import sonar.logistics.client.gui.interactions.hotkeys.HotKeyFunctions;
-import sonar.logistics.client.gui.widgets.GSIViewportWidget;
+import sonar.logistics.client.gsi.interactions.hotkeys.HotKeyFunctions;
 import sonar.logistics.client.gsi.components.text.api.CursorPoint;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
@@ -15,40 +14,32 @@ import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleHolder;
 import sonar.logistics.client.gsi.properties.ColourProperty;
-import sonar.logistics.client.vectors.Vector2D;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
-public class DefaultTextInteraction extends AbstractViewportInteraction implements IGlyphRenderer {
+public class EditStandardTextInteraction<C extends ITextComponent> extends DraggingInteraction<C> implements IGlyphRenderer {
 
     @Nonnull
-    public CursorPoint cursor = new CursorPoint(false, 0);
-    public CursorPoint selectionEnd = null;
-    public ITextComponent textComponent;
+    public CursorPoint cursor;
+    public CursorPoint selectionEnd;
     public StyledTextPages pages;
 
-    public DefaultTextInteraction(GSIViewportWidget viewport, ITextComponent textComponent) {
-        super(viewport);
-        this.textComponent = textComponent;
-        this.pages = textComponent.pages();
+    public EditStandardTextInteraction(C component) {
+        super(component);
+        this.cursor = new CursorPoint(false, 0);
+        this.selectionEnd = null;
+        this.pages = component.pages();
         this.pages.specialGlyphRenderer = this;
     }
+
 
     public GlyphStyle getGlyphStyle(){
         return new GlyphStyle();
     }
 
     /////
-
-    public boolean isDrawingHighlights = false;
-
-    @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        super.render(mouseX, mouseY, partialTicks);
-        isDrawingHighlights = false;
-    }
 
     //IGlyphRenderer method, used for rendering cursors / selections etc.
     @Override
@@ -60,16 +51,18 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     public void renderEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
         StyledTextRenderer.INSTANCE.addStylingEffects(context, glyphInfo);
 
-        if(selectionEnd == null || selectionEnd.getInsertionIndex() == cursor.getInsertionIndex()){
-            if(glyphInfo.index == cursor.getCharIndex() && GSIDesignSettings.canRenderCursor()){
-                StyledTextRenderer.INSTANCE.addCursorToGlyph(context, glyphInfo);
-            }
-        }else{
-            CursorPoint startPoint = selectionEnd.getInsertionIndex() < cursor.getInsertionIndex() ? selectionEnd : cursor;
-            CursorPoint endPoint = selectionEnd.getInsertionIndex() > cursor.getInsertionIndex() ? selectionEnd : cursor;
+        if(getGSI().getFocused() == component) {
+            if (selectionEnd == null || selectionEnd.getInsertionIndex() == cursor.getInsertionIndex()) {
+                if (glyphInfo.index == cursor.getCharIndex() && GSIDesignSettings.canRenderCursor()) {
+                    StyledTextRenderer.INSTANCE.addCursorToGlyph(context, glyphInfo, cursor);
+                }
+            } else {
+                CursorPoint startPoint = selectionEnd.getInsertionIndex() < cursor.getInsertionIndex() ? selectionEnd : cursor;
+                CursorPoint endPoint = selectionEnd.getInsertionIndex() > cursor.getInsertionIndex() ? selectionEnd : cursor;
 
-            if(startPoint.getInsertionIndex() <= glyphInfo.index && endPoint.getInsertionIndex() > glyphInfo.index){
-                StyledTextRenderer.INSTANCE.addHighlightToGlyph(context, glyphInfo);
+                if (startPoint.getInsertionIndex() <= glyphInfo.index && endPoint.getInsertionIndex() > glyphInfo.index) {
+                    StyledTextRenderer.INSTANCE.addHighlightToGlyph(context, glyphInfo);
+                }
             }
         }
     }
@@ -77,10 +70,10 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     /////
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        boolean dragged = super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseClicked(int button) {
+        boolean dragged = super.mouseClicked(button);
         if (button == 0) {
-            cursor = getTextCursorFromMouse(mouseX, mouseY);
+            cursor = getCursorFromMouse();
             selectionEnd = null;
             onCursorMoved();
         }
@@ -88,28 +81,28 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     }
 
     @Override
-    public boolean keyPressed(int key, int scanCode, int modifiers) {
-        return HotKeyFunctions.triggerHotKey(this, key, scanCode, modifiers);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return HotKeyFunctions.triggerHotKey(this, getInteractionHandler(), keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean charTyped(char aChar, int modifiers) {
-        addGlyph(new CharGlyph(aChar), getGlyphStyle());
+    public boolean charTyped(char c, int modifiers) {
+        addGlyph(new CharGlyph(c), getGlyphStyle());
         return true;
     }
 
     ////
 
     @Override
-    public void onDragStarted(double mouseX, double mouseY, int button) {
-        super.onDragStarted(mouseX, mouseY, button);
+    public void onDragStarted(int button) {
+        super.onDragStarted(button);
         selectionEnd = null;
     }
 
     @Override
-    public void onDragged(double mouseX, double mouseY, int button) {
-        super.onDragged(mouseX, mouseY, button);
-        selectionEnd = getTextCursorFromMouse(mouseX, mouseY);
+    public void onDragged(int button) {
+        super.onDragged(button);
+        selectionEnd = getCursorFromMouse();
     }
 
     ////
@@ -120,13 +113,13 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         glyph.styleHolder = new GlyphStyleHolder();
         glyph.styleHolder.setFromStyle(style);
 
-        if(!textComponent.canAddGlyph(glyph)){
+        if(!component.canAddGlyph(glyph)){
             return;
         }
 
         int insert = getSafeGlyphInsertionIndex();
         pages.text.glyphs.add(insert, glyph);
-        viewport.gsi.build();
+        getGSI().build();
         moveCursorTo(cursor, insert, false);
     }
 
@@ -139,7 +132,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
             return;
         }
         pages.text.glyphs.remove(delete);
-        viewport.gsi.build();
+        getGSI().build();
         cursor.setIndex(cursor.isLeading() ? delete : delete - 1);
         onCursorMoved();
     }
@@ -153,7 +146,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
 
         clearSelection();
         if(pages.text.deleteGlyphs(startIndex, endIndex)){
-            viewport.gsi.build();
+            getGSI().build();
             selectionEnd = null;
             return true;
         }
@@ -367,15 +360,14 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
     /////
 
     @Nonnull
-    public CursorPoint getTextCursorFromMouse(double mouseX, double mouseY){
-        Vector2D displayHit = viewport.getHitVecFromMouse(mouseX, mouseY);
+    public CursorPoint getCursorFromMouse(){
         List<StyledTextLine> page = pages.getCurrentPage();
 
         //if the page is empty we move to the previous one, unless it's the first
         if(page.isEmpty()){
             if(pages.page > 0){
                 pages.page--;
-                return getTextCursorFromMouse(mouseX, mouseY);
+                return getCursorFromMouse();
             }
             return new CursorPoint(false, 0);
         }
@@ -383,7 +375,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         //first we find the line the mouses' y hit lines up with
         StyledTextLine line = null;
         for(StyledTextLine l : pages.getCurrentPage()){
-            if(l.renderSize.containsY(displayHit.y)){
+            if(l.renderSize.containsY(getInteractionHandler().mousePos.y)){
                 line = l;
                 break;
             }
@@ -393,7 +385,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         //if we didn't find the line, we will set the cursor to either the first or last line instead
         if(line == null){
             StyledTextLine firstLine = page.get(0);
-            if(displayHit.y < firstLine.renderSize.getY()){
+            if(getInteractionHandler().mousePos.y < firstLine.renderSize.getY()){
                 line = firstLine;
             }else{
                 line = page.get(page.size() -1 );
@@ -401,7 +393,7 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
         }
 
         CursorPoint cursor = new CursorPoint(false, 0);
-        updateCursorFromXHit(cursor, line, displayHit.x);
+        updateCursorFromXHit(cursor, line, getInteractionHandler().mousePos.x);
         return cursor;
     }
 
@@ -478,6 +470,5 @@ public class DefaultTextInteraction extends AbstractViewportInteraction implemen
             }
         }
     }
-
 
 }

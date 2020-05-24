@@ -32,9 +32,7 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
         }
     }
 
-    protected void onFocusedChanged(boolean focused) {
-
-    }
+    protected void onFocusedChanged(boolean focused) {}
 
     public boolean isMouseOver(double mouseX, double mouseY) {
         EnumRescaleType box  = EnumRescaleType.getRescaleTypeFromMouse(window, mouseX, mouseY, 4.0F);

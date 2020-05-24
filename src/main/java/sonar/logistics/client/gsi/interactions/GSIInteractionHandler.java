@@ -1,58 +1,81 @@
-package sonar.logistics.client.gsi.context;
+package sonar.logistics.client.gsi.interactions;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.vectors.Vector2D;
 import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
 
-public class DisplayInteractionHandler implements IGuiEventListener {
+public class GSIInteractionHandler implements IGuiEventListener {
 
     public GSI gsi;
     public PlayerEntity player;
-    public boolean isUsingGui;
+    private InteractionType interactionType = InteractionType.WORLD_INTERACTION;
 
     public Vector2D mousePos = new Vector2D(-1, -1);
-    public IComponent hovered;
 
-    public DisplayInteractionHandler(GSI gsi, PlayerEntity player, boolean isUsingGui){
+    public GSIInteractionHandler(GSI gsi, PlayerEntity player){
         this.gsi = gsi;
         this.player = player;
-        this.isUsingGui = isUsingGui;
+    }
+
+    public InteractionType getInteractionType(){
+        return interactionType;
+    }
+
+    public void setInteractionType(InteractionType interactionType){
+        this.interactionType = interactionType;
+        this.gsi.setFocused(null);
     }
 
     ///
 
     public void updateMouseFromGui(double mouseX, double mouseY){
+        if(!interactionType.isUsingGui()){
+            setInteractionType(InteractionType.GUI_INTERACTION);
+        }
         update(new Vector2D(mouseX, mouseY));
     }
 
     public void updateMouseFromDisplay(PlayerEntity player, IDisplay display){
-        update(VectorHelper.getEntityLook(player, display, 8));
+        if(Minecraft.getInstance().currentScreen == null) { //only update from the display if no screen is open
+            if(interactionType.isUsingGui()){
+                setInteractionType(InteractionType.WORLD_INTERACTION);
+            }
+            update(VectorHelper.getEntityLook(player, display, 8));
+        }
     }
 
     public void update(@Nullable  Vector2D mousePos){ //click position relative to the display
-        if(mousePos == null || !mousePos.equals(this.mousePos)) {
-            this.mousePos = mousePos == null ? new Vector2D(-1, -1 ): mousePos;
-            this.hovered = mousePos == null ? null : gsi.getInteractedComponent(this);
-        }
+        this.mousePos = mousePos == null ? new Vector2D(-1, -1 ): mousePos;
+        //
     }
 
     ///
 
     public boolean hasShiftDown(){
+        if(getInteractionType().isUsingGui()){
+            return Screen.hasShiftDown();
+        }
         return player.isSneaking();
     }
 
     public boolean hasControlDown() {
+        if(getInteractionType().isUsingGui()){
+            return Screen.hasControlDown();
+        }
         return false;
     }
 
     public boolean hasAltDown(){
+        if(getInteractionType().isUsingGui()){
+            return Screen.hasAltDown();
+        }
         return false;
     }
 
@@ -70,51 +93,65 @@ public class DisplayInteractionHandler implements IGuiEventListener {
 
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
-        gsi.mouseMoved(this);
+        gsi.mouseMoved();
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return gsi.mouseClicked(this, button);
+        return gsi.mouseClicked(button);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return gsi.mouseReleased(this, button);
+        return gsi.mouseReleased(button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        return gsi.mouseDragged(this, button, dragX, dragY);
+        return gsi.mouseDragged(button);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
-        return gsi.mouseScrolled(this, scroll);
+        return gsi.mouseScrolled(scroll);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return gsi.keyPressed(this, keyCode, scanCode, modifiers);
+        return gsi.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        return gsi.keyReleased(this, keyCode, scanCode, modifiers);
+        return gsi.keyReleased(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean charTyped(char c, int modifiers) {
-        return gsi.charTyped(this, c, modifiers);
+        return gsi.charTyped(c, modifiers);
     }
 
     @Override
     public boolean changeFocus(boolean change) {
-        return gsi.changeFocus(this, change);
+        return gsi.changeFocus(change);
     }
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return gsi.isMouseOver(this);
+        return gsi.isMouseOver();
+    }
+
+
+    public enum InteractionType{
+
+        WORLD_INTERACTION,
+        GUI_INTERACTION,
+        GUI_EDITING,
+        GUI_RESIZING; //handled by the GSI
+
+        public boolean isUsingGui(){
+            return this != WORLD_INTERACTION;
+        }
+
     }
 }

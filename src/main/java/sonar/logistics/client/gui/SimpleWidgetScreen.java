@@ -43,6 +43,9 @@ public class SimpleWidgetScreen extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
+        RenderSystem.disableDepthTest();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.defaultAlphaFunc();
         renderBackground();
 
         RenderSystem.translated(0, 0 ,-10);

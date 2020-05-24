@@ -2,7 +2,6 @@ package sonar.logistics.client.gui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.IGuiEventListener;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gui.api.IInteractWidget;
 import sonar.logistics.client.gui.api.IMultipleGuiEventListener;

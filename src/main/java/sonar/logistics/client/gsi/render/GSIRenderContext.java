@@ -24,6 +24,7 @@ public class GSIRenderContext {
 
     public int bakedLight;
     public Vector3f normal = new Vector3f(0, 0, 0);
+    public float gsiScaling = 256F; //if this gsi is being displayed at a scaled size the factor is stored here, can be ignored in most situations, used primarily for maintaining the size of rescale boxes
 
     //// GUI RENDER CONTEXT \\\\
     public GSIRenderContext(GSI gsi, float partialTicks, MatrixStack matrix){

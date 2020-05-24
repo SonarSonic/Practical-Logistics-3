@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.common.multiparts.base.MultipartTile;
@@ -18,14 +18,12 @@ import sonar.logistics.util.network.EnumSyncType;
 public class DisplayScreenTile extends MultipartTile implements IDisplay {
 
     public final Quad2D bounds;
-    public GSI gsi = new GSI(this);
-
-    @OnlyIn(Dist.CLIENT)
-    public DisplayInteractionHandler handler = new DisplayInteractionHandler(gsi, Minecraft.getInstance().player, false);
+    public GSI gsi;
 
     public DisplayScreenTile(MultipartEntry entry, Quad2D bounds) {
         super(entry);
         this.bounds = bounds;
+        this.gsi = new GSI(bounds);
     }
 
     public void tick() {
@@ -43,11 +41,6 @@ public class DisplayScreenTile extends MultipartTile implements IDisplay {
     @Override
     public GSI getGSI() {
         return gsi;
-    }
-
-    @Override
-    public DisplayInteractionHandler getInteractionHandler() {
-        return handler;
     }
 
     @Override

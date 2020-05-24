@@ -3,7 +3,6 @@ package sonar.logistics.client.gsi.components.input;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import sonar.logistics.client.gsi.api.ComponentAlignment;
-import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.components.AbstractComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextString;
@@ -15,22 +14,21 @@ import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.StyledTextPages;
 import sonar.logistics.client.gsi.components.text.render.StyledTextRenderer;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
-import sonar.logistics.client.gsi.interactions.DefaultInteraction;
-import sonar.logistics.client.gsi.interactions.IInteractionListener;
+import sonar.logistics.client.gsi.interactions.EditStandardTextInteraction;
+import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.vectors.Quad2D;
 
-import javax.annotation.Nonnull;
-
-public class TextInputComponent extends AbstractComponent implements ITextComponent {
+public class TextInputComponent extends AbstractComponent implements ITextComponent, IFlexibleInteractionListener {
 
     @OnlyIn(Dist.CLIENT)
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
     public StyledTextPages pages = new StyledTextPages(new StyledTextString());
     public EnumTextInputType inputType = EnumTextInputType.STRING;
+    public EditStandardTextInteraction<ITextComponent> textInteraction = new EditStandardTextInteraction<>(this);
     public int maxInputLength = -1;
 
     public static LineStyle inputLineStyle;
@@ -49,8 +47,8 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
     }
 
     @Override
-    public void render(GSIRenderContext context, DisplayInteractionHandler handler) {
-        super.render(context, handler);
+    public void render(GSIRenderContext context) {
+        super.render(context);
 
         context.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET);
         GSIRenderHelper.renderColouredRect(context, true, bounds.renderBounds(), ScreenUtils.transparent_grey_bgd.rgba);
@@ -78,6 +76,24 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
             return inputType.canAddChar(charGlyph.aChar);
         }
         return false;
+    }
+
+    @Override
+    public boolean isMouseOver() {
+        return getBounds().maxBounds().contains(getInteractionHandler().mousePos);
+    }
+
+    @Override
+    public IInteractionListener getInteractionListener() {
+        switch (getInteractionHandler().getInteractionType()){
+            case WORLD_INTERACTION:
+                break;
+            case GUI_INTERACTION:
+                break;
+            case GUI_EDITING:
+                return textInteraction;
+        }
+        return null;
     }
 
     @Override

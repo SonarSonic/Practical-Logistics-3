@@ -50,8 +50,8 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
         ///// START GSI RENDERING \\\\\
 
         GSIRenderContext renderContext = new GSIRenderContext(tile.getGSI(), partialTicks, matrix, renderer, light, overlayLight, worldMatrix, dir, false);
-        tile.getInteractionHandler().updateMouseFromDisplay(Minecraft.getInstance().player, tile);
-        tile.getGSI().render(renderContext, tile.getInteractionHandler());
+        tile.getGSI().interactionHandler.updateMouseFromDisplay(Minecraft.getInstance().player, tile);
+        tile.getGSI().render(renderContext);
         ///// END GSI RENDERING \\\\\
 
 

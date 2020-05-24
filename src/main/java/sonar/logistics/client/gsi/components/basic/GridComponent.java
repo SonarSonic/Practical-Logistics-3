@@ -2,7 +2,6 @@ package sonar.logistics.client.gsi.components.basic;
 
 import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.context.DisplayInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.components.AbstractComponent;
 import sonar.logistics.client.vectors.Quad2D;
@@ -45,8 +44,8 @@ public class GridComponent extends AbstractComponent implements IComponent {
     }
 
     @Override
-    public void render(GSIRenderContext context, DisplayInteractionHandler handler) {
-        super.render(context, handler);
+    public void render(GSIRenderContext context) {
+        super.render(context);
         for(int r = 0; r < rows; r ++) {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r * columns) + c;

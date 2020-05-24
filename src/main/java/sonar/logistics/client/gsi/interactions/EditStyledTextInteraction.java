@@ -1,35 +1,21 @@
-package sonar.logistics.client.gui.interactions;
+package sonar.logistics.client.gsi.interactions;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextFormatting;
+import org.lwjgl.opengl.GL;
 import sonar.logistics.client.gsi.api.ITextComponent;
-import sonar.logistics.client.gsi.components.text.api.CursorPoint;
 import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
-import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
-import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
-import sonar.logistics.client.gsi.components.text.style.GlyphStyleHolder;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.properties.ColourProperty;
 import sonar.logistics.client.gui.EnumLineBreakGlyph;
 import sonar.logistics.client.gui.EnumLineStyling;
 import sonar.logistics.client.gui.GSIDesignSettings;
-import sonar.logistics.client.gui.interactions.hotkeys.HotKeyFunctions;
-import sonar.logistics.client.gui.widgets.GSIViewportWidget;
-import sonar.logistics.client.vectors.Vector2D;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Objects;
+public class EditStyledTextInteraction<C extends ITextComponent> extends EditStandardTextInteraction<C> implements IGlyphRenderer {
 
-public class StyledTextInteraction extends DefaultTextInteraction implements IGlyphRenderer {
-
-    public StyledTextInteraction(GSIViewportWidget viewport, ITextComponent textComponent) {
-        super(viewport, textComponent);
-        this.pages.specialGlyphRenderer = this;
+    public EditStyledTextInteraction(C component) {
+        super(component);
     }
 
     @Override
@@ -38,21 +24,17 @@ public class StyledTextInteraction extends DefaultTextInteraction implements IGl
     }
 
     @Override
-    public void onGlyphStyleChanged(GlyphStyleAttributes attribute, Object attributeObj) {
-        super.onGlyphStyleChanged(attribute, attributeObj);
-        applyAttribute(attribute, attributeObj);
-    }
+    public void onSettingChanged(Object setting, Object settingObj) {
+        if(setting instanceof GlyphStyleAttributes){
+            applyAttribute((GlyphStyleAttributes)setting, settingObj);
+        }
+        if(setting instanceof EnumLineStyling){
+            applyLineStyle((LineStyle) settingObj);
+        }
+        if(setting instanceof EnumLineBreakGlyph){
+            applyLineBreakGlyph((EnumLineBreakGlyph) setting);
+        }
 
-    @Override
-    public void onLineStyleChanged(EnumLineStyling styling) {
-        super.onLineStyleChanged(styling);
-        applyLineStyle(GSIDesignSettings.lineStyle);
-    }
-
-    @Override
-    public void onLineBreakGlyphChanged(EnumLineBreakGlyph settings) {
-        super.onLineBreakGlyphChanged(settings);
-        applyLineBreakGlyph(settings);
     }
 
     public void applyLineBreakGlyph(EnumLineBreakGlyph settings){
@@ -60,11 +42,11 @@ public class StyledTextInteraction extends DefaultTextInteraction implements IGl
         if(glyphInfo != null){
             LineBreakGlyph glyph = (LineBreakGlyph) glyphInfo.glyph;
             pages.text.glyphs.set(glyphInfo.index, GSIDesignSettings.getLineBreakGlyph(glyph.pageBreak, glyph.lineStyle));
-            viewport.gsi.build();
+            getGSI().build();
         }else{
             //if we didn't find a line break glyph anywhere then the text is all one line, so we can add one to the start
             pages.text.addGlyph(GSIDesignSettings.getLineBreakGlyph(false, new LineStyle()), 0);
-            viewport.gsi.build();
+            getGSI().build();
             moveCursorRight(cursor);
         }
     }
@@ -75,11 +57,11 @@ public class StyledTextInteraction extends DefaultTextInteraction implements IGl
         if(glyphInfo != null){
             LineBreakGlyph glyph = (LineBreakGlyph) glyphInfo.glyph;
             glyph.lineStyle = style.copy();
-            viewport.gsi.build();
+            getGSI().build();
         }else{
             //if we didn't find a line break glyph anywhere then the text is all one line, so we can add one to the start
             pages.text.addGlyph(GSIDesignSettings.getLineBreakGlyph(false, style.copy()), 0);
-            viewport.gsi.build();
+            getGSI().build();
             moveCursorRight(cursor);
         }
     }
@@ -88,12 +70,12 @@ public class StyledTextInteraction extends DefaultTextInteraction implements IGl
         applyLineStyle(new LineStyle());
         pages.text.clearAttributes(getSelectionStartIndex(), getSelectionEndIndex());
         onCursorMoved();
-        viewport.gsi.build();
+        getGSI().build();
     }
 
     public void applyAttribute(GlyphStyleAttributes attribute, Object attributeObj){
         pages.text.applyAttribute(attribute, attributeObj, getSelectionStartIndex(), getSelectionEndIndex());
-        viewport.gsi.build();
+        getGSI().build();
     }
 
     //updates the current GlyphStyle and LineStyle from the cursor's new position
