@@ -1,13 +1,12 @@
-package sonar.logistics.client.gsi.interactions;
+package sonar.logistics.client.gsi.interactions.text;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
+import sonar.logistics.client.gsi.interactions.DraggingInteraction;
 import sonar.logistics.client.gui.GSIDesignSettings;
-import sonar.logistics.client.gsi.interactions.hotkeys.HotKeyFunctions;
-import sonar.logistics.client.gsi.components.text.api.CursorPoint;
-import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
+import sonar.logistics.client.gsi.components.text.render.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
@@ -19,14 +18,14 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
-public class EditStandardTextInteraction<C extends ITextComponent> extends DraggingInteraction<C> implements IGlyphRenderer {
+public class StandardTextInteraction<C extends ITextComponent> extends DraggingInteraction<C> implements IGlyphRenderer {
 
     @Nonnull
     public CursorPoint cursor;
     public CursorPoint selectionEnd;
     public StyledTextPages pages;
 
-    public EditStandardTextInteraction(C component) {
+    public StandardTextInteraction(C component) {
         super(component);
         this.cursor = new CursorPoint(false, 0);
         this.selectionEnd = null;
@@ -82,7 +81,7 @@ public class EditStandardTextInteraction<C extends ITextComponent> extends Dragg
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return HotKeyFunctions.triggerHotKey(this, getInteractionHandler(), keyCode, scanCode, modifiers);
+        return TextHotKeyFunctions.triggerHotKey(this, getInteractionHandler(), keyCode, scanCode, modifiers);
     }
 
     @Override

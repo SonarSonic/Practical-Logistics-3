@@ -18,17 +18,38 @@ import sonar.logistics.client.vectors.Quad2D;
 
 public class GSIRenderHelper {
 
+    /// TEXTURES \\\
     public static final ResourceLocation BATCHED_RECT_TEXTURE = new ResourceLocation(PL3.MODID,"textures/gui/batched_rect_texture.png" );
 
-    public static final RenderType RECT_RENDER_TYPE = GSIRenderTypes.getEntityTranslucentCullNoDiffuse(BATCHED_RECT_TEXTURE);
-    public static final RenderType BUTTON_RENDER_TYPE = GSIRenderTypes.getEntityTranslucentCullNoDiffuse(ScreenUtils.BUTTONS_ALPHA);
+    /// RENDER TYPES \\\
+    public static final RenderType RECT_RENDER_TYPE = GSIRenderTypes.getTranslucentCullNoDiffuse(BATCHED_RECT_TEXTURE);
+    public static final RenderType BUTTON_RENDER_TYPE = GSIRenderTypes.getTranslucentCullNoDiffuse(ScreenUtils.BUTTONS_ALPHA);
 
+    /// LIGHTING STATES \\\
     public static final int FULL_LIGHT = 15728880;
 
+    /// Z OFFSETS \\\
     public static final float MIN_Z_OFFSET = -0.001F;
     public static final float ITEM_OFFSET = -0.001F;
     public static final float ITEM_Z_SCALE = 0.01F;
 
+    //0 = Background
+
+
+    /**layer 0 has no offset from the display*/
+    public static float layerZOffset(int layer){
+        return MIN_Z_OFFSET * layer;
+    }
+
+    /**simple helper method to translate the context to a specific z layer*/
+    public static void pushLayerOffset(GSIRenderContext context, int layer){
+        context.matrix.translate(0, 0, layerZOffset(layer));
+    }
+
+    /**simple helper method to translate the context back from specific z layer*/
+    public static void popLayerOffset(GSIRenderContext context, int layer){
+        context.matrix.translate(0, 0, -layerZOffset(layer));
+    }
 
     ///// COLOURED RECTS \\\\\
 

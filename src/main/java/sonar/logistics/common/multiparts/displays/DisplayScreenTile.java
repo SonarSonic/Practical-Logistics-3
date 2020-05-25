@@ -54,7 +54,7 @@ public class DisplayScreenTile extends MultipartTile implements IDisplay {
     }
 
     @Override
-    public Quad2D getGSIBounds() {
+    public Quad2D getHostBounds() {
         return bounds;
     }
 }

@@ -1,7 +1,5 @@
 package sonar.logistics.client.vectors;
 
-import net.minecraft.client.renderer.Quaternion;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
@@ -335,12 +333,12 @@ public class VectorHelper {
      * @param vertical the screens vertical vector
      * @return the exact click position, taking into account the origin*/
     @Nullable
-    public static Vector2D getClickedPosition(Quad2D sizing, Vec3d origin, Vec3d intersect, Vec3d horizontal, Vec3d vertical){
+    public static Vector2D getClickedPosition(Quad2D sizing, Vec3d origin, Vec3d intersect, Vec3d horizontal, Vec3d vertical, boolean withinBounds){
         Vec3d pos = intersect.subtract(origin);
         double intersect_hoz = pos.dotProduct(horizontal);
         double intersect_ver = pos.dotProduct(vertical);
 
-        if(-sizing.getWidth()/2D < intersect_hoz && intersect_hoz < sizing.getWidth()/2D && -sizing.getHeight()/2D < intersect_ver && intersect_ver < sizing.getHeight()/2D){
+        if(!withinBounds || -sizing.getWidth()/2D < intersect_hoz && intersect_hoz < sizing.getWidth()/2D && -sizing.getHeight()/2D < intersect_ver && intersect_ver < sizing.getHeight()/2D){
             return new Vector2D(sizing.getWidth() - (pos.dotProduct(horizontal)+sizing.getWidth()/2D), sizing.getHeight() - (pos.dotProduct(vertical)+sizing.getHeight()/2D));
         }
         return null;
@@ -356,7 +354,7 @@ public class VectorHelper {
      * @param maxDist the maximum block reach of the player
      * @return the exact click position, taking into account the origin*/
     @Nullable
-    public static Vector2D getEntityLook(Entity from, IDisplay to, double maxDist){
+    public static Vector2D getEntityLook(Entity from, IDisplay to, double maxDist, boolean withinBounds){
         if(from == null || to == null){
             return null;
         }
@@ -370,7 +368,7 @@ public class VectorHelper {
                intersect = getIntersection(lookOrigin, playerV, distance);
                Vec3d[] vectors = getScreenVectors(to.getScreenRotation(), screenV);
                horizontal = vectors[0]; vertical = vectors[1];
-               return getClickedPosition(to.getGSIBounds(), origin, intersect, horizontal, vertical);
+               return getClickedPosition(to.getHostBounds(), origin, intersect, horizontal, vertical, withinBounds);
             }
         }
         return null;

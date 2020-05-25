@@ -9,8 +9,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.gsi.GSIInputEvents;
 import sonar.logistics.common.blocks.PL3Blocks;
 import sonar.logistics.common.blocks.hammer.ForgingHammerRenderer;
 import sonar.logistics.common.blocks.hammer.ForgingHammerScreen;
@@ -23,6 +26,7 @@ import sonar.logistics.common.multiparts.base.MultipartTile;
 import sonar.logistics.common.multiparts.displays.DisplayScreenRenderer;
 import sonar.logistics.common.multiparts.displays.DisplayScreenTile;
 import sonar.logistics.common.multiparts.displays.LargeDisplayScreenTile;
+import sonar.logistics.common.multiparts.displays.api.IDisplay;
 import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.MultipartRemovePacket;
 import sonar.logistics.server.data.DataManager;
@@ -37,6 +41,7 @@ public class ClientProxy implements IProxy {
     @Override
     public void init() {
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(GSIInputEvents.class);
         ScreenManager.registerFactory(PL3Blocks.FORGING_HAMMER_CONTAINER, ForgingHammerScreen::new);
         multipartRenderers.put(DisplayScreenTile.class, new DisplayScreenRenderer());
         multipartRenderers.put(LargeDisplayScreenTile.class, new DisplayScreenRenderer());
@@ -79,7 +84,7 @@ public class ClientProxy implements IProxy {
     public int timeToBreak = 2 * 1000; ////2 seconds
     public int timeToReset = 3 * 1000; ////3 seconds
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onLeftClickEvent(PlayerInteractEvent.LeftClickBlock event){ //TODO reset block breaking when player looks at different multipart + optimise timer.
         BlockState state = event.getWorld().getBlockState(event.getPos());
         if(state.getBlock() == PL3Blocks.MULTIPART_HOST_BLOCK){
@@ -97,10 +102,16 @@ public class ClientProxy implements IProxy {
                 timer = 0;
                 isBreaking = false;
                 MultipartEntry entry = MultipartHostHelper.getRayTraceMultipart(event.getWorld(), event.getPos(), event.getEntity());
+
                 if(entry != null) {
-                    state.addDestroyEffects(event.getWorld(), event.getPos(), Minecraft.getInstance().particles);
-                    entry.getHost().doRemoveMultipart(entry);
-                    PL3PacketHandler.INSTANCE.sendToServer(new MultipartRemovePacket(event.getPos(), entry.slot));
+                    if(!(entry.getMultipartTile() instanceof IDisplay) || event.getFace() == ((IDisplay)entry.getMultipartTile()).getFacing().getOpposite()) {
+                        state.addDestroyEffects(event.getWorld(), event.getPos(), Minecraft.getInstance().particles);
+                        entry.getHost().doRemoveMultipart(entry);
+                        PL3PacketHandler.INSTANCE.sendToServer(new MultipartRemovePacket(event.getPos(), entry.slot));
+                    }else{
+                        cancel = true;
+                    }
+
                 }else{
                     MultipartHostTile tile = MultipartHostHelper.getMultipartHostTile(event.getWorld(), event.getPos());
                     if(tile == null || tile.MULTIPARTS.isEmpty()){

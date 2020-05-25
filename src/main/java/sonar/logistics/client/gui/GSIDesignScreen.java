@@ -82,7 +82,11 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
             fontHeight.setText(value);
     }
 
-
+    @Override
+    public void tick() {
+        super.tick();
+        GSIDesignSettings.tickCursorCounter();
+    }
 
     @Override
     public boolean isPauseScreen() {

@@ -1,4 +1,4 @@
-package sonar.logistics.client.gsi.components.text.api;
+package sonar.logistics.client.gsi.components.text.render;
 
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;

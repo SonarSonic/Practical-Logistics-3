@@ -2,8 +2,8 @@ package sonar.logistics.client.gsi.api;
 
 import sonar.logistics.client.vectors.Quad2D;
 
-public interface IGSIHost {
+public interface IComponentHost {
 
-    Quad2D getGSIBounds();
+    Quad2D getHostBounds();
 
 }

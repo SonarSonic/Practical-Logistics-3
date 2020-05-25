@@ -1,8 +1,7 @@
-package sonar.logistics.client.gsi.interactions;
+package sonar.logistics.client.gsi.interactions.text;
 
-import org.lwjgl.opengl.GL;
 import sonar.logistics.client.gsi.api.ITextComponent;
-import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
+import sonar.logistics.client.gsi.components.text.render.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
@@ -12,9 +11,9 @@ import sonar.logistics.client.gui.EnumLineBreakGlyph;
 import sonar.logistics.client.gui.EnumLineStyling;
 import sonar.logistics.client.gui.GSIDesignSettings;
 
-public class EditStyledTextInteraction<C extends ITextComponent> extends EditStandardTextInteraction<C> implements IGlyphRenderer {
+public class StyledTextInteraction<C extends ITextComponent> extends StandardTextInteraction<C> implements IGlyphRenderer {
 
-    public EditStyledTextInteraction(C component) {
+    public StyledTextInteraction(C component) {
         super(component);
     }
 

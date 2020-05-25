@@ -1,6 +1,7 @@
 package sonar.logistics.common.multiparts.displays;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
@@ -8,6 +9,8 @@ import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import org.lwjgl.opengl.GL11;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.vectors.VectorHelper;
 import sonar.logistics.client.vectors.Quad2D;
@@ -19,18 +22,19 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
     @Override
     public void render(TileEntityRendererDispatcher renderDispatcher, DisplayScreenTile tile, MultipartEntry entry, float partialTicks, MatrixStack matrix, IRenderTypeBuffer renderer, int light, int overlayLight, Matrix4f lightingMatrix) {
 
+        //// obtain the world matrix, then reset the translation
+
         matrix.pop();
         Matrix4f worldMatrix = matrix.getLast().getMatrix().copy();
         matrix.push();
 
+        Vec3i pos = tile.getPos();
         Vec3d vec3d = renderDispatcher.renderInfo.getProjectedView();
-        double d0 = vec3d.getX();
-        double d1 = vec3d.getY();
-        double d2 = vec3d.getZ();
+        matrix.translate(pos.getX() - vec3d.getX(), pos.getY() - vec3d.getY(), pos.getZ() - vec3d.getZ());
 
-        matrix.translate((double)tile.getPos().getX() - d0, (double)tile.getPos().getY() - d1, (double)tile.getPos().getZ() - d2);
+        ////
 
-        Quad2D sizing = tile.getGSIBounds();
+        Quad2D sizing = tile.getHostBounds();
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5);
         origin = origin.add(VectorHelper.getFaceOffset(tile.getFacing(), 0.5));
 
@@ -50,7 +54,6 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
         ///// START GSI RENDERING \\\\\
 
         GSIRenderContext renderContext = new GSIRenderContext(tile.getGSI(), partialTicks, matrix, renderer, light, overlayLight, worldMatrix, dir, false);
-        tile.getGSI().interactionHandler.updateMouseFromDisplay(Minecraft.getInstance().player, tile);
         tile.getGSI().render(renderContext);
         ///// END GSI RENDERING \\\\\
 

@@ -19,10 +19,6 @@ public class FloatingContainer extends AbstractContainer {
 
     @Override
     public void render(GSIRenderContext context) {
-        subComponents.forEach(e -> {
-            if(e.canRender(context)) {
-                e.render(context);
-            }
-        });
+        subComponents.forEach(e -> e.render(context));
     }
 }

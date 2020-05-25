@@ -14,7 +14,7 @@ import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.StyledTextPages;
 import sonar.logistics.client.gsi.components.text.render.StyledTextRenderer;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.interactions.EditStandardTextInteraction;
+import sonar.logistics.client.gsi.interactions.text.StandardTextInteraction;
 import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionListener;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
@@ -28,7 +28,7 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
     public StyledTextPages pages = new StyledTextPages(new StyledTextString());
     public EnumTextInputType inputType = EnumTextInputType.STRING;
-    public EditStandardTextInteraction<ITextComponent> textInteraction = new EditStandardTextInteraction<>(this);
+    public StandardTextInteraction<ITextComponent> textInteraction = new StandardTextInteraction<>(this);
     public int maxInputLength = -1;
 
     public static LineStyle inputLineStyle;

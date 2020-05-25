@@ -1,6 +1,7 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
+import sonar.logistics.client.gsi.components.input.SliderComponent;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
 import sonar.logistics.client.gsi.interactions.DraggingInteraction;
 import sonar.logistics.client.gsi.interactions.ResizingInteraction;
@@ -91,10 +92,6 @@ public class GSI implements INestedInteractionListener {
 
     @Override
     public boolean mouseClicked(int button) {
-        if(focused != null && focused.isDragging()){
-            return focused.mouseClicked(button);
-        }
-
         switch (interactionHandler.getInteractionType()){
             case WORLD_INTERACTION:
                 if(interactionHandler.hasShiftDown()) {
@@ -103,7 +100,6 @@ public class GSI implements INestedInteractionListener {
                     build();
                     return true;
                 }
-                break;
             case GUI_INTERACTION:
                 break;
             case GUI_EDITING:
@@ -120,14 +116,7 @@ public class GSI implements INestedInteractionListener {
                 setFocused(null);
                 return false;
         }
-        for(IInteractionListener child : getChildren()){
-            if(child.isMouseOver()){
-                setFocused(child);
-                return child.mouseClicked(button);
-            }
-        }
-        setFocused(null);
-        return false;
+        return INestedInteractionListener.super.mouseClicked(button);
     }
 
 
@@ -167,10 +156,16 @@ public class GSI implements INestedInteractionListener {
         addComponent(lines);
 
         TextInputComponent textInput = new TextInputComponent();
-        textInput.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.5)));
+        textInput.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.2)));
         textInput.maxInputLength = 3;
         textInput.inputType = TextInputComponent.EnumTextInputType.DIGIT_ONLY;
         addComponent(textInput);
+
+
+        SliderComponent slider = new SliderComponent(0.5);
+        slider.setBounds(new ScaleableBounds(new Quad2D(0, 0.7, 1, 0.3)));
+        addComponent(slider);
+
         /*
         GridContainer grid = new GridContainer();
         grid.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.5)));

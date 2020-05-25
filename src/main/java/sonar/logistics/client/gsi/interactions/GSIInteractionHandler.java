@@ -47,7 +47,7 @@ public class GSIInteractionHandler implements IGuiEventListener {
             if(interactionType.isUsingGui()){
                 setInteractionType(InteractionType.WORLD_INTERACTION);
             }
-            update(VectorHelper.getEntityLook(player, display, 8));
+            update(VectorHelper.getEntityLook(player, display, 8, false));
         }
     }
 

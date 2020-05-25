@@ -4,11 +4,10 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.api.IGSIHost;
-import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
+import sonar.logistics.client.gsi.api.IComponentHost;
 import sonar.logistics.client.vectors.VectorHelper;
 
-public interface IDisplay extends IGSIHost {
+public interface IDisplay extends IComponentHost {
 
     GSI getGSI();
 
@@ -37,7 +36,7 @@ public interface IDisplay extends IGSIHost {
 
     /**gets the transform required to start the rendering at the top left of the screen*/
     default Vec3d getRenderOffset(){
-        return new Vec3d(-getGSIBounds().getWidth()/2, -getGSIBounds().getHeight()/2, 0);
+        return new Vec3d(-getHostBounds().getWidth()/2, -getHostBounds().getHeight()/2, 0);
     }
 
     default void onGSIInvalidate(){}

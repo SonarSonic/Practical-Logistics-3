@@ -1,11 +1,11 @@
-package sonar.logistics.client.gsi.interactions.hotkeys;
+package sonar.logistics.client.gsi.interactions.text;
 
 import net.minecraft.client.gui.screen.Screen;
+import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gui.GSIDesignSettings;
-import sonar.logistics.client.gsi.interactions.EditStandardTextInteraction;
 
-public enum HotKeyFunctions {
+public enum TextHotKeyFunctions {
 
 	//cursor move
 	HOME((handler, key, scanCode, mod) -> key == 268 && !handler.hasShiftDown(), interaction -> {interaction.clearSelection(); interaction.moveCursorToStart(interaction.cursor);}),//
@@ -33,34 +33,48 @@ public enum HotKeyFunctions {
 	OBFUSCATED((handler, key, scanCode, mod) -> key == 79 && handler.hasControlDown() && !handler.hasShiftDown() && !handler.hasAltDown(), interaction -> GSIDesignSettings.toggleObfuscatedStyling()),//
 
 
-	ENTER((handler, key, scanCode, mod) -> key == 257 && !handler.hasShiftDown(), EditStandardTextInteraction::enter),//
-	COPY((handler, key, scanCode, mod) -> Screen.isCopy(key), EditStandardTextInteraction::copy),//
-	PASTE((handler, key, scanCode, mod) -> Screen.isPaste(key), EditStandardTextInteraction::paste),//
-	CUT((handler, key, scanCode, mod) -> Screen.isCut(key), EditStandardTextInteraction::cut),//
+	ENTER((handler, key, scanCode, mod) -> key == 257 && !handler.hasShiftDown(), StandardTextInteraction::enter),//
+	COPY((handler, key, scanCode, mod) -> Screen.isCopy(key), StandardTextInteraction::copy),//
+	PASTE((handler, key, scanCode, mod) -> Screen.isPaste(key), StandardTextInteraction::paste),//
+	CUT((handler, key, scanCode, mod) -> Screen.isCut(key), StandardTextInteraction::cut),//
 	BACKSPACE((handler, key, scanCode, mod) -> key == 259, i -> i.deleteGlyph(true)),//
 	DEL((handler, key, scanCode, mod) -> key == 261, i -> i.deleteGlyph(false)),//
 	
 	//no line required
 	//SAVE((key, scanCode, mod) -> key == Keyboard.KEY_S && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown(), (gui, chr, key) -> gui.save()),//
-	SELECT_ALL((handler, key, scanCode, mod) -> Screen.isSelectAll(key), EditStandardTextInteraction::selectAll); //
+	SELECT_ALL((handler, key, scanCode, mod) -> Screen.isSelectAll(key), StandardTextInteraction::selectAll); //
 	//DESELECT_ALL((key, scanCode, mod) -> c == 4, (gui, chr, key) -> GuiActions.DESELECT_ALL.trigger(gui)); //
 
 
 	public IKeyMatch key;
 	public ITextFunction textFunction;
 
-	HotKeyFunctions(IKeyMatch key, ITextFunction textFunction) {
+	TextHotKeyFunctions(IKeyMatch key, ITextFunction textFunction) {
 		this.key = key;
 		this.textFunction = textFunction;
 	}
 
-	public static boolean triggerHotKey(EditStandardTextInteraction textInteraction, GSIInteractionHandler handler, int key, int scanCode, int modifiers) {
-		for (HotKeyFunctions func : HotKeyFunctions.values()) {
+	public static boolean triggerHotKey(StandardTextInteraction textInteraction, GSIInteractionHandler handler, int key, int scanCode, int modifiers) {
+		for (TextHotKeyFunctions func : TextHotKeyFunctions.values()) {
 			if (func.key.canTrigger(handler, key, scanCode, modifiers)) {
 				func.textFunction.trigger(textInteraction);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	@FunctionalInterface
+	public interface IKeyMatch {
+
+		boolean canTrigger(GSIInteractionHandler handler, int key, int scanCode, int modifiers);
+
+	}
+
+	@FunctionalInterface
+	public interface ITextFunction {
+
+		void trigger(StandardTextInteraction<ITextComponent> textInteraction);
+
 	}
 }

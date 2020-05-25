@@ -9,7 +9,6 @@ import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 
 public class ColouredButtonComponent extends AbstractComponent implements IInteractionComponent {
 
-
     public ITrigger trigger;
     public int activatedColour = ScreenUtils.transparent_activated_button.rgba;
     public int disabledColour = ScreenUtils.transparent_disabled_button.rgba;

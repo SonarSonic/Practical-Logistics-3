@@ -7,22 +7,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IRenderable;
 import org.lwjgl.opengl.GL11;
-import sonar.logistics.client.gsi.api.ITextComponent;
-import sonar.logistics.client.gsi.interactions.EditStandardTextInteraction;
-import sonar.logistics.client.gsi.interactions.EditStyledTextInteraction;
 import sonar.logistics.client.gui.api.IFlexibleGuiEventListener;
 import sonar.logistics.client.gui.api.IInteractWidget;
-import sonar.logistics.client.gui.EnumLineBreakGlyph;
-import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
-import sonar.logistics.client.gui.EnumLineStyling;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.gui.interactions.*;
-import sonar.logistics.client.gui.api.EnumRescaleType;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.properties.ScaleableBounds;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
@@ -100,6 +90,10 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         return getCentreOffsetY() + (-(getGSIRenderHeight() - getGSIBorderHeight()*2)/2)*scaling;
     }
 
+    //the bounds of the display relative to the gui
+    public Quad2D getBoundsForDisplay(){
+        return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * scaling, gsi.getGSIBounds().getHeight() * scaling);
+    }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
@@ -115,7 +109,7 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         RenderSystem.enableDepthTest();
         GSIRenderContext context = new GSIRenderContext(gsi, partialTicks, new MatrixStack());
         context.gsiScaling = (float)scaling;
-        gsi.interactionHandler.update(new Vector2D((mouseX - getRenderOffsetX()) / scaling, (mouseY - getRenderOffsetY()) / scaling));
+        gsi.interactionHandler.updateMouseFromGui((mouseX - getRenderOffsetX()) / scaling, (mouseY - getRenderOffsetY()) / scaling);
 
         //gsi rendering - alignment & scaling
         context.matrix.translate(getCentreOffsetX(), getCentreOffsetY(), 0);
@@ -162,12 +156,16 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         return bounds.contains(mouseX, mouseY);
     }
 
+    public boolean isMouseOverGSI(double mouseX, double mouseY){
+        return getBoundsForDisplay().contains(mouseX, mouseY);
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(gsi.interactionHandler.mouseClicked(mouseX, mouseY, button)){
-            return true;
-        }
         if (isMouseOver(mouseX, mouseY)) {
+            if(isMouseOverGSI(mouseX, mouseY)){
+                return IFlexibleGuiEventListener.super.mouseClicked(mouseX, mouseY, button);
+            }
             if(button == 1) {
                 defaultScaling();
                 defaultCentre();
@@ -191,11 +189,16 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if(gsi.interactionHandler.mouseDragged(mouseX, mouseY, button, dragX, dragY)){
+        if (isMouseOver(mouseX, mouseY)) {
+            if(isMouseOverGSI(mouseX, mouseY)){
+                return IFlexibleGuiEventListener.super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+            }
+            if(button == 0) {
+                centreX += dragX;
+                centreY += dragY;
+            }
             return true;
         }
-        centreX += dragX;
-        centreY += dragY;
         return false;
     }
 

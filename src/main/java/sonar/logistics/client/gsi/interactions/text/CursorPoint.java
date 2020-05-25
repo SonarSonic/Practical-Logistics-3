@@ -1,4 +1,4 @@
-package sonar.logistics.client.gsi.components.text.api;
+package sonar.logistics.client.gsi.interactions.text;
 
 public class CursorPoint {
 

@@ -23,14 +23,7 @@ public class AbstractScreenBlock extends OrientatedMultipart implements IMultipa
 
     @Override
     public ActionResultType onMultipartActivated(MultipartEntry entry, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        if(world.isRemote) {
-            MultipartTile tile = entry.getMultipartTile();
-            if (tile instanceof IDisplay) {
-                IDisplay display = (IDisplay) tile;
-                return display.getGSI().mouseClicked(1) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
-            }
-        }
-        return ActionResultType.FAIL;
+        return ActionResultType.SUCCESS;
     }
 
     @Override

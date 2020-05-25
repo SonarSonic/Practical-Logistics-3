@@ -15,13 +15,11 @@ public class ElementComponent extends AbstractComponent implements IComponent {
     }
 
     @Override
-    public boolean canRender(GSIRenderContext context) {
-        return element.canRender(context);
-    }
-
-    @Override
     public void render(GSIRenderContext context) {
         super.render(context);
+        if(!element.canRender(context)){
+            return;
+        }
         context.matrix.push();
         element.render(context, bounds.renderBounds());
         context.matrix.pop();

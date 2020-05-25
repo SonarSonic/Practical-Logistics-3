@@ -34,7 +34,7 @@ public class GridContainer extends AbstractContainer {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r*columns) + c;
                 IComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
-                if(component != null && component.canRender(context)){
+                if(component != null){
                     context.matrix.push();
                     component.render(context);
                     context.matrix.pop();

@@ -9,6 +9,9 @@ import sonar.logistics.client.gsi.properties.ScaleableBounds;
 import sonar.logistics.client.gsi.properties.ComponentStyling;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
+
+import javax.annotation.Nonnull;
 
 public abstract class AbstractComponent implements IComponent {
 
@@ -34,11 +37,13 @@ public abstract class AbstractComponent implements IComponent {
 
     ///
 
+    @Nonnull
     @Override
     public ComponentBounds getBounds() {
         return bounds;
     }
 
+    @Nonnull
     @Override
     public ComponentStyling getStyling() {
         return styling;
@@ -66,6 +71,16 @@ public abstract class AbstractComponent implements IComponent {
     @Override
     public void render(GSIRenderContext context) {
         GSIRenderHelper.renderBorders(context, bounds, styling);
+    }
+
+    ///
+
+    public Vector2D getMousePos(){
+        return getInteractionHandler().mousePos;
+    }
+
+    public Vector2D getRelativeMousePos(){
+        return getMousePos().copy().sub(getBounds().renderBounds().getAlignment());
     }
 
 }

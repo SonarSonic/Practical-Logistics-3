@@ -5,14 +5,14 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.gui.fonts.EmptyGlyph;
 import net.minecraft.client.gui.fonts.IGlyph;
 import net.minecraft.client.gui.fonts.TexturedGlyph;
-import sonar.logistics.client.gsi.components.text.api.CursorPoint;
-import sonar.logistics.client.gsi.components.text.api.IGlyphRenderer;
+import sonar.logistics.client.gsi.interactions.text.CursorPoint;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.render.GSIRenderHelper;
+
 import sonar.logistics.client.gui.ScreenUtils;
+import static sonar.logistics.client.gsi.render.GSIRenderHelper.*;
 
 public class StyledTextRenderer implements IGlyphRenderer {
 
@@ -70,11 +70,13 @@ public class StyledTextRenderer implements IGlyphRenderer {
         }
 
         if (glyphInfo.style.shadow) {
+            pushLayerOffset(context.renderContext, 1);
             renderCharGlyph(context, glyphInfo, charGlyph,  true);
+            popLayerOffset(context.renderContext, 1);
         }
-        context.renderContext.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET);
+        pushLayerOffset(context.renderContext, 2);
         renderCharGlyph(context, glyphInfo, charGlyph, false);
-        context.renderContext.matrix.translate(0, 0, -GSIRenderHelper.MIN_Z_OFFSET);
+        popLayerOffset(context.renderContext, 2);
     }
 
     private void renderCharGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo, CharGlyph charGlyph, boolean renderingShadow) {
@@ -98,28 +100,29 @@ public class StyledTextRenderer implements IGlyphRenderer {
 
     public void addStylingEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo, boolean shadow){
         if(shadow){
+            pushLayerOffset(context.renderContext, 3);
             context.updateColour(glyphInfo.style.textColour, 0.25F);
             addStylingEffects(context, glyphInfo);
             context.updateColour(glyphInfo.style.textColour, 1F);
+            popLayerOffset(context.renderContext, 3);
         }
+        pushLayerOffset(context.renderContext, 4);
         addStylingEffects(context, glyphInfo);
+        popLayerOffset(context.renderContext, 4);
     }
 
     public void addStylingEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo){
 
-        context.renderContext.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET);
-
         if (glyphInfo.style.strikethrough) {
             float strikeOffset = (float) (glyphInfo.quad.getHeight()/9)*4;
-            GSIRenderHelper.renderColouredRect(context.renderContext, false, (float)glyphInfo.quad.getX(), (float)glyphInfo.quad.getY() + strikeOffset, (float)glyphInfo.quad.getMaxX(), (float)glyphInfo.quad.getMaxY() - strikeOffset, glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
+            renderColouredRect(context.renderContext, false, (float)glyphInfo.quad.getX(), (float)glyphInfo.quad.getY() + strikeOffset, (float)glyphInfo.quad.getMaxX(), (float)glyphInfo.quad.getMaxY() - strikeOffset, glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
         }
 
         if (glyphInfo.style.underlined) {
             float lineOffset = (float) (glyphInfo.quad.getHeight()/9)*8;
-            GSIRenderHelper.renderColouredRect(context.renderContext, false, (float)glyphInfo.quad.getX(), (float)glyphInfo.quad.getY() + lineOffset, (float)glyphInfo.quad.getMaxX(), (float)glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
+            renderColouredRect(context.renderContext, false, (float)glyphInfo.quad.getX(), (float)glyphInfo.quad.getY() + lineOffset, (float)glyphInfo.quad.getMaxX(), (float)glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
         }
 
-        context.renderContext.matrix.translate(0, 0, -GSIRenderHelper.MIN_Z_OFFSET);
         /*
         if (context.renderContext.overlay != 0) {
             float overlayRed = (float) (context.renderContext.overlay >> 24 & 255) / 255.0F;
@@ -135,15 +138,15 @@ public class StyledTextRenderer implements IGlyphRenderer {
         float downscale = glyphInfo.glyph.downscale(context.fontType, glyphInfo.style);
         float cursorWidth = 1.0F * downscale;
         if(cursor.isLeading()){
-            GSIRenderHelper.renderColouredRect(context.renderContext, false, (float) glyphInfo.quad.getX() - cursorWidth, (float) glyphInfo.quad.getY(), (float) glyphInfo.quad.getX(), (float) glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
+            renderColouredRect(context.renderContext, false, (float) glyphInfo.quad.getX() - cursorWidth, (float) glyphInfo.quad.getY(), (float) glyphInfo.quad.getX(), (float) glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
         }else {
-            GSIRenderHelper.renderColouredRect(context.renderContext, false, (float) glyphInfo.quad.getMaxX(), (float) glyphInfo.quad.getY(), (float) glyphInfo.quad.getMaxX() + cursorWidth, (float) glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
+            renderColouredRect(context.renderContext, false, (float) glyphInfo.quad.getMaxX(), (float) glyphInfo.quad.getY(), (float) glyphInfo.quad.getMaxX() + cursorWidth, (float) glyphInfo.quad.getMaxY(), glyphInfo.style.textColour.getRed(), glyphInfo.style.textColour.getGreen(), glyphInfo.style.textColour.getBlue(), glyphInfo.style.textColour.getAlpha());
         }
      }
 
     public void addHighlightToGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo){
         context.renderContext.matrix.translate(0, 0, -0.01);
-        GSIRenderHelper.renderColouredRect(context.renderContext, false, glyphInfo.quad, ScreenUtils.transparent_hovered_button.rgba);
+        renderColouredRect(context.renderContext, false, glyphInfo.quad, ScreenUtils.transparent_hovered_button.rgba);
         context.renderContext.matrix.translate(0, 0, 0.01);
     }
 

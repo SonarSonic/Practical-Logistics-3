@@ -6,8 +6,7 @@ import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.interactions.EditStandardTextInteraction;
-import sonar.logistics.client.gsi.interactions.EditStyledTextInteraction;
+import sonar.logistics.client.gsi.interactions.text.StyledTextInteraction;
 import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionListener;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
@@ -19,7 +18,7 @@ public class StyledTextComponent extends AbstractComponent implements ITextCompo
     @OnlyIn(Dist.CLIENT)
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
     public StyledTextPages pages = new StyledTextPages(new StyledTextString());
-    public EditStyledTextInteraction<ITextComponent> textInteraction = new EditStyledTextInteraction<>(this);
+    public StyledTextInteraction<ITextComponent> textInteraction = new StyledTextInteraction<>(this);
 
     public StyledTextComponent() {}
 
