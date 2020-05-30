@@ -15,10 +15,10 @@ import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
 
 import java.text.DecimalFormat;
 
+//TODO REPLACE WITH COMPONENT? would this be a massive pain with scissoring though?
 public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener, IInteractWidget {
 
     public GSI gsi;
@@ -90,9 +90,14 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
         return getCentreOffsetY() + (-(getGSIRenderHeight() - getGSIBorderHeight()*2)/2)*scaling;
     }
 
-    //the bounds of the display relative to the gui
-    public Quad2D getBoundsForDisplay(){
+    //the bounds of the gsi, within the "fake" screen
+    public Quad2D getBoundsForGSI(){
         return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * scaling, gsi.getGSIBounds().getHeight() * scaling);
+    }
+
+    //the bounds of the gsi, including the fake screens borders
+    public Quad2D getBoundsForFakeDisplay(){
+        return new Quad2D(getCentreOffsetX() - getGSIRenderWidth()/2, getCentreOffsetY() - getGSIRenderHeight()/2, getGSIRenderWidth(), getGSIRenderHeight());
     }
 
     @Override
@@ -157,14 +162,14 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     }
 
     public boolean isMouseOverGSI(double mouseX, double mouseY){
-        return getBoundsForDisplay().contains(mouseX, mouseY);
+        return getBoundsForGSI().contains(mouseX, mouseY);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isMouseOver(mouseX, mouseY)) {
-            if(isMouseOverGSI(mouseX, mouseY)){
-                return IFlexibleGuiEventListener.super.mouseClicked(mouseX, mouseY, button);
+            if(IFlexibleGuiEventListener.super.mouseClicked(mouseX, mouseY, button)){
+                return true;
             }
             if(button == 1) {
                 defaultScaling();
@@ -193,9 +198,11 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
             if(isMouseOverGSI(mouseX, mouseY)){
                 return IFlexibleGuiEventListener.super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
             }
-            if(button == 0) {
-                centreX += dragX;
-                centreY += dragY;
+            if(!gsi.isDragging() && !getBoundsForFakeDisplay().contains(mouseX, mouseY)) {
+                if (button == 0) {
+                    centreX += dragX;
+                    centreY += dragY;
+                }
             }
             return true;
         }

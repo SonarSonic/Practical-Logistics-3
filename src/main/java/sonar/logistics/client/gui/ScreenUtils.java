@@ -17,11 +17,17 @@ public class ScreenUtils {
 
     public static ColourProperty transparent_disabled_button = new ColourProperty(80, 80, 80, 80);
     public static ColourProperty transparent_hovered_button = new ColourProperty(120, 120, 120, 100);
-    public static ColourProperty transparent_activated_button = new ColourProperty(120, 255, 120, 100);
-    public static ColourProperty transparent_alert_button = new ColourProperty(160, 120, 120, 100);
+    public static ColourProperty transparent_red_button = new ColourProperty(255, 120, 120, 100);
+    public static ColourProperty transparent_green_button = new ColourProperty(120, 255, 120, 100);
+    public static ColourProperty transparent_blue_button = new ColourProperty(120, 120, 255, 100);
+
+    public static ColourProperty red_button = new ColourProperty(255, 120, 120);
+    public static ColourProperty green_button = new ColourProperty(120, 255, 120);
+    public static ColourProperty blue_button = new ColourProperty(120, 120, 255);
 
     public static ColourProperty light_grey = new ColourProperty(120, 120, 120);
     public static ColourProperty white = new ColourProperty(255, 255, 255);
+    public static ColourProperty dark_grey = new ColourProperty(48, 48, 48);
 
     // display screen colours
     public static ColourProperty display_black_border = new ColourProperty(34, 34, 34);

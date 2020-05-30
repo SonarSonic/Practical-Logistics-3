@@ -131,6 +131,9 @@ public class StyledTextPages {
 
     @Nullable
     public GlyphRenderInfo getNextGlyphInfo(int index, Function<GlyphRenderInfo, Boolean> func){
+        if(styledGlyphs.isEmpty()){
+            return null;
+        }
         for(int i = index+1; i < styledGlyphs.size(); i++){
             GlyphRenderInfo renderInfo = styledGlyphs.get(i);
             if(func.apply(renderInfo)){
@@ -148,6 +151,9 @@ public class StyledTextPages {
 
     @Nullable
     public GlyphRenderInfo getPrevGlyphInfo(int index, Function<GlyphRenderInfo, Boolean> func){
+        if(styledGlyphs.isEmpty()){
+            return null;
+        }
         for(int i = index-1; i >= 0; i--){
             GlyphRenderInfo renderInfo = styledGlyphs.get(i);
             if(func.apply(renderInfo)){

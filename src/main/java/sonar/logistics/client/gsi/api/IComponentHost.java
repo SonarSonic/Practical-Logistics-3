@@ -1,9 +1,10 @@
 package sonar.logistics.client.gsi.api;
 
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.gsi.interactions.api.INestedInteractionListener;
 
-public interface IComponentHost {
+public interface IComponentHost extends INestedInteractionListener {
 
-    Quad2D getHostBounds();
+    GSI getGSI();
 
 }

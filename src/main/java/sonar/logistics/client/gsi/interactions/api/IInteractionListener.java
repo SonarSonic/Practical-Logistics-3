@@ -9,32 +9,40 @@ public interface IInteractionListener {
 
     ///
 
+    /** only called if the component is "focused" */
     default void mouseMoved() {}
 
+    /** only called if the component is "hovered" */
     default boolean mouseClicked(int button) {
         return false;
     }
 
+    /** only called if the component is "hovered" */
     default boolean mouseReleased(int button) {
         return false;
     }
 
-    default boolean mouseDragged(int button) {
+    /** only called if the component is "focused" */
+    default boolean mouseDragged() {
         return false;
     }
 
+    /** only called if the component is "hovered" */
     default boolean mouseScrolled(double scroll) {
         return false;
     }
 
+    /** only called if the component is "focused" */
     default boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return false;
     }
 
+    /** only called if the component is "focused" */
     default boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         return false;
     }
 
+    /** only called if the component is "focused" */
     default boolean charTyped(char c, int modifiers) {
         return false;
     }
@@ -43,13 +51,26 @@ public interface IInteractionListener {
         return false;
     }
 
+    /**enables clicking / and focusing*/
     default boolean isMouseOver() {
         return false;
     }
 
-    default boolean isDragging() {
-        return false;
+    /// special dragging methods
+
+    default boolean isDragButton(int button){
+        return button == 0 || button == 1;
     }
+
+    default boolean canStartDrag(int button){
+        return isDragButton(button);
+    }
+
+    default void onDragStarted(int button){}
+
+
+    default void onDragFinished(int button){}
+
 
     ///
 

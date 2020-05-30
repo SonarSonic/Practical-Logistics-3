@@ -36,8 +36,8 @@ public interface IFlexibleInteractionListener extends IInteractionListener {
     }
 
     @Override
-    default boolean mouseDragged(int button) {
-        return getInteractionListener() != null && getInteractionListener().mouseDragged(button);
+    default boolean mouseDragged() {
+        return getInteractionListener() != null && getInteractionListener().mouseDragged();
     }
 
     @Override
@@ -68,11 +68,6 @@ public interface IFlexibleInteractionListener extends IInteractionListener {
     @Override
     default boolean isMouseOver() {
         return getInteractionListener() != null && getInteractionListener().isMouseOver();
-    }
-
-    @Override
-    default boolean isDragging() {
-        return getInteractionListener() != null && getInteractionListener().isDragging();
     }
 
     ///

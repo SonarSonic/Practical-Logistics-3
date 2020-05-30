@@ -34,7 +34,7 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
         ////
 
-        Quad2D sizing = tile.getHostBounds();
+        Quad2D sizing = tile.getGSI().getGSIBounds();
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5);
         origin = origin.add(VectorHelper.getFaceOffset(tile.getFacing(), 0.5));
 

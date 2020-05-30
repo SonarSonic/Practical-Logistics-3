@@ -7,10 +7,10 @@ import javax.annotation.Nullable;
 public class ScaleableBounds extends ComponentBounds {
 
     // stored value of percentages for the size of x, y, width, height
-    private Quad2D percentages = Quad2D.DEFAULT_PERCENTAGES;
+    protected Quad2D percentages = Quad2D.DEFAULT_PERCENTAGES;
 
-    private Quad2D size;
-    private Quad2D renderSize;
+    protected Quad2D size;
+    protected Quad2D renderSize;
 
     public ScaleableBounds(){}
 

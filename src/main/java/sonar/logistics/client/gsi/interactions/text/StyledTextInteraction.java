@@ -33,7 +33,6 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
         if(setting instanceof EnumLineBreakGlyph){
             applyLineBreakGlyph((EnumLineBreakGlyph) setting);
         }
-
     }
 
     public void applyLineBreakGlyph(EnumLineBreakGlyph settings){
@@ -48,6 +47,8 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
             getGSI().build();
             moveCursorRight(cursor);
         }
+
+        component.onStylingChanged();
     }
 
     public void applyLineStyle(LineStyle style){
@@ -63,6 +64,8 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
             getGSI().build();
             moveCursorRight(cursor);
         }
+
+        component.onStylingChanged();
     }
 
     public void clearFormatting(){
@@ -70,11 +73,15 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
         pages.text.clearAttributes(getSelectionStartIndex(), getSelectionEndIndex());
         onCursorMoved();
         getGSI().build();
+
+        component.onStylingChanged();
     }
 
     public void applyAttribute(GlyphStyleAttributes attribute, Object attributeObj){
         pages.text.applyAttribute(attribute, attributeObj, getSelectionStartIndex(), getSelectionEndIndex());
         getGSI().build();
+
+        component.onStylingChanged();
     }
 
     //updates the current GlyphStyle and LineStyle from the cursor's new position

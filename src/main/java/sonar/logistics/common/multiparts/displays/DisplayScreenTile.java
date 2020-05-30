@@ -1,13 +1,9 @@
 package sonar.logistics.common.multiparts.displays;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.common.multiparts.base.MultipartTile;
@@ -24,10 +20,14 @@ public class DisplayScreenTile extends MultipartTile implements IDisplay {
         super(entry);
         this.bounds = bounds;
         this.gsi = new GSI(bounds);
+        this.gsi.display = this;
     }
 
     public void tick() {
         super.tick();
+        if(getHostWorld().isRemote) {
+            gsi.tick();
+        }
     }
 
     public CompoundNBT write(CompoundNBT tag, EnumSyncType syncType) {
@@ -51,10 +51,5 @@ public class DisplayScreenTile extends MultipartTile implements IDisplay {
     @Override
     public BlockPos getPos() {
         return getHostPos();
-    }
-
-    @Override
-    public Quad2D getHostBounds() {
-        return bounds;
     }
 }

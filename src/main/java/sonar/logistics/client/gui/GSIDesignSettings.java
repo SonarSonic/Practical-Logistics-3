@@ -15,6 +15,10 @@ public class GSIDesignSettings {
         GSIDesignSettings.screen = screen;
     }
 
+    public static void onSettingChanged(Object setting, Object settingObj){
+        screen.onSettingChanged(setting, settingObj);
+        DesignInterfaces.onSettingChanged(setting, settingObj);
+    }
 
     //// GLYPH STYLING
 
@@ -112,8 +116,7 @@ public class GSIDesignSettings {
     }
 
     public static void onGlyphAttributeChanged(GlyphStyleAttributes attribute){
-        screen.onSettingChanged(attribute, attribute.get(glyphStyle));
-
+        onSettingChanged(attribute, attribute.get(glyphStyle));
     }
 
     //// LINE STYLING
@@ -122,27 +125,27 @@ public class GSIDesignSettings {
 
     public static void setLineSpacing(double lineSpacing){
         lineStyle.lineSpacing = lineSpacing;
-        screen.onSettingChanged(EnumLineStyling.LINE_SPACING, lineStyle);
+        onSettingChanged(EnumLineStyling.LINE_SPACING, lineStyle);
     }
 
     public static void setCharSpacing(double charSpacing){
         lineStyle.charSpacing = charSpacing;
-        screen.onSettingChanged(EnumLineStyling.CHAR_SPACING, lineStyle);
+        onSettingChanged(EnumLineStyling.CHAR_SPACING, lineStyle);
     }
 
     public static void setWrappingType(LineStyle.WrappingType wrappingType){
         lineStyle.wrappingType = wrappingType;
-        screen.onSettingChanged(EnumLineStyling.WRAPPING_TYPE, lineStyle);
+        onSettingChanged(EnumLineStyling.WRAPPING_TYPE, lineStyle);
     }
 
     public static void setJustifyType(LineStyle.JustifyType justifyType){
         lineStyle.justifyType = justifyType;
-        screen.onSettingChanged(EnumLineStyling.ALIGN_TYPE, lineStyle);
+        onSettingChanged(EnumLineStyling.ALIGN_TYPE, lineStyle);
     }
 
     public static void setBreakPreference(LineStyle.BreakPreference breakPreference){
         lineStyle.breakPreference = breakPreference;
-        screen.onSettingChanged(EnumLineStyling.BREAK_PREFERENCE, lineStyle);
+        onSettingChanged(EnumLineStyling.BREAK_PREFERENCE, lineStyle);
     }
 
     //// LINE BREAK GLYPH TYPES
@@ -152,7 +155,7 @@ public class GSIDesignSettings {
 
     public static void toggleLineBreakStyle(){
         currentLineBreakStyle = currentLineBreakStyle == selectedLineBreakStyle ? EnumLineBreakGlyph.DEFAULT_BREAK : selectedLineBreakStyle;
-        screen.onSettingChanged(currentLineBreakStyle, null);
+        onSettingChanged(currentLineBreakStyle, null);
     }
 
     public static LineBreakGlyph getLineBreakGlyph(boolean pageBreak, LineStyle lineStyle){
@@ -162,7 +165,7 @@ public class GSIDesignSettings {
 
     //// GRID SNAPPING
 
-    public static double snapping = 0;
+    public static double snapping = 0.0625;
 
     public static void setOrResetSnapping(double value) {
         snapping = snapping == value ? 0 : value;

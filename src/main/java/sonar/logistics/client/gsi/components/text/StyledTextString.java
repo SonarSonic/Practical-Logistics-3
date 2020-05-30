@@ -107,4 +107,24 @@ public class StyledTextString {
         }
     }
 
+    ////
+
+    public String getRawString(){
+        StringBuilder builder = new StringBuilder();
+        for(Glyph g : glyphs){
+            if(g instanceof CharGlyph){
+                builder.append(((CharGlyph) g).aChar);
+            }
+        }
+        return builder.toString();
+    }
+
+    public int getIntegerFromText(){
+        if(glyphs.isEmpty()){
+            return 0;
+        }
+        String rawString = getRawString();
+        return Integer.parseInt(rawString);
+    }
+
 }

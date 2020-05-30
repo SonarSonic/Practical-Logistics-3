@@ -121,6 +121,13 @@ public class GSIRenderHelper {
     }
 
 
+    public static void renderBasicString(GSIRenderContext context, String text, double x, double y, int rgba, boolean shadow){
+        IRenderTypeBuffer buffer = context.startRenderBuffer(false);
+        Minecraft.getInstance().fontRenderer.renderString(text, (float)x, (float)y, rgba, shadow, context.getMatrix4f(), buffer, false, context.overlay, context.light);
+        context.finishRenderBuffer(false);
+
+    }
+
     ///// FLUID STACKS \\\\\
 
     public static void renderScaledFluidStack(GSIRenderContext context, FluidStack toRender, float startX, float startY, float width, float height){

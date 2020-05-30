@@ -2,11 +2,11 @@ package sonar.logistics.client.gsi.interactions.triggers;
 
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 
-public interface ITrigger {
+public interface ITrigger<O extends Object> {
 
-    void trigger(Object source, GSIInteractionHandler handler);
+    void trigger(O source, GSIInteractionHandler handler);
 
-    default boolean isActive(Object source, GSIInteractionHandler handler){
+    default boolean isActive(O source, GSIInteractionHandler handler){
         return false;
     }
 }

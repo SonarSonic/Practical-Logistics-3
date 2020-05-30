@@ -9,7 +9,7 @@ public class ComponentStyling {
     public ComponentAlignment alignY = ComponentAlignment.CENTERED;
 
     public ColourProperty textColour = new ColourProperty(255, 255, 255, 255);
-    public ColourProperty bgdColour = new ColourProperty(0, 0, 0, 0);;
+    public ColourProperty bgdColour = new ColourProperty(0, 0, 0, 0);
     public ColourProperty borderColour = new ColourProperty(200, 200, 200, 255);
 
     public BorderProperty marginWidth = new BorderProperty(0, false);

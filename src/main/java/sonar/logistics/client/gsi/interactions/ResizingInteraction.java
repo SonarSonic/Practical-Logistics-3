@@ -8,8 +8,11 @@ import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gui.api.EnumRescaleType;
 import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 
-public class ResizingInteraction extends DraggingInteraction<IComponent> {
+public class ResizingInteraction extends AbstractComponentInteraction<IComponent> {
+
+    private Vector2D dragStart;
 
     EnumRescaleType currentRescaleType = null;
     float clickBoxSize = 0.0625F/2;
@@ -35,47 +38,44 @@ public class ResizingInteraction extends DraggingInteraction<IComponent> {
             }
         }
         if (currentRescaleType != null) { //render resize box
-            GSIRenderHelper.renderColouredRect(context, false, rescaledBounds, ScreenUtils.transparent_activated_button.rgba);
+            GSIRenderHelper.renderColouredRect(context, false, rescaledBounds, ScreenUtils.transparent_green_button.rgba);
         }
     }
 
     @Override
     public boolean canStartDrag(int button) {
-        return getRescaleTypeFromMouse(component, getInteractionHandler()) != null && super.canStartDrag(button);
-    }
-
-    @Override
-    public void onDragged(int button) {
-        super.onDragged(button);
-        if (currentRescaleType == null) {
-            currentRescaleType = EnumRescaleType.MOVE;
-        }
+        return getRescaleTypeFromMouse(component, getInteractionHandler()) != null && isDragButton(button);
     }
 
     @Override
     public void onDragStarted(int button) {
         super.onDragStarted(button);
         currentRescaleType = getRescaleTypeFromMouse(component, getInteractionHandler());
+        dragStart = getInteractionHandler().mousePos.copy();
     }
 
     @Override
     public void onDragFinished(int button) {
         super.onDragFinished(button);
-        if (currentRescaleType != null) {
-            Quad2D gsiBounds = getGSI().getGSIBounds();
-            Quad2D componentBounds = getRescaledBounds();
-            double x = (componentBounds.x - gsiBounds.x) / gsiBounds.width;
-            double y = (componentBounds.y - gsiBounds.y) / gsiBounds.height;
-            double width = componentBounds.width / gsiBounds.width;
-            double height = componentBounds.height / gsiBounds.height;
-            component.setBounds(new ScaleableBounds(new Quad2D(x, y, width, height)));
-            getGSI().build();
-            currentRescaleType = null;
-        }
+        Quad2D gsiBounds = getGSI().getGSIBounds();
+        Quad2D componentBounds = getRescaledBounds();
+        double x = (componentBounds.x - gsiBounds.x) / gsiBounds.width;
+        double y = (componentBounds.y - gsiBounds.y) / gsiBounds.height;
+        double width = componentBounds.width / gsiBounds.width;
+        double height = componentBounds.height / gsiBounds.height;
+        component.setBounds(new ScaleableBounds(new Quad2D(x, y, width, height)));
+        getGSI().build();
+        currentRescaleType = null;
+        dragStart = null;
+    }
+
+    @Override
+    public boolean isMouseOver() {
+        return getRescaleTypeFromMouse(component, getInteractionHandler()) != null && super.isMouseOver();
     }
 
     public Quad2D getRescaledBounds(){
-        return currentRescaleType == null ? component.getBounds().maxBounds() : currentRescaleType.rescaleWindow(component.getBounds().maxBounds(), getGSI().getGSIBounds(), GSIDesignSettings.snapToNormalGrid(getDragX()), GSIDesignSettings.snapToNormalGrid(getDragY()), getInteractionHandler().hasShiftDown());
+        return currentRescaleType == null ? component.getBounds().maxBounds() : currentRescaleType.rescaleWindow(component.getBounds().maxBounds(), getGSI().getGSIBounds(), GSIDesignSettings.snapToNormalGrid(getMousePos().x - dragStart.x), GSIDesignSettings.snapToNormalGrid(getMousePos().y - dragStart.y), getInteractionHandler().hasShiftDown());
     }
 
     public EnumRescaleType getRescaleTypeFromMouse(IComponent component, GSIInteractionHandler handler) {

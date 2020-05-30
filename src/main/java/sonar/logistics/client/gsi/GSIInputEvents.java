@@ -19,6 +19,7 @@ import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
 
+//this class handles all GSI interactions, it uses the DrawHighlightEvent to update the the focused gsi and then uses standard input events on the focused gsi.
 public class GSIInputEvents {
 
     public static GSI focusedGSI = null;
@@ -28,8 +29,14 @@ public class GSIInputEvents {
             focusedGSI = gsi;
         }
 
-        if(focusedGSI != null) {
+        if(focusedGSI != null && display != null) {
             focusedGSI.interactionHandler.updateMouseFromDisplay(Minecraft.getInstance().player, display);
+        }
+    }
+
+    public static void defocusGSI(GSI gsi){
+        if(gsi != null){
+            gsi.changeFocus(false);
         }
     }
 
@@ -37,8 +44,15 @@ public class GSIInputEvents {
     public static void drawHighlights(DrawHighlightEvent.HighlightBlock event){
 
         if(Minecraft.getInstance().currentScreen != null){
-            //if the player is in a gui disable any GSI interactions
+            //if the player is in a gui disable any GSI interactions and defocus the current gsi
+            defocusGSI(focusedGSI);
             updateFocusedGSI(null, null);
+            return;
+        }
+
+        if(focusedGSI != null && focusedGSI.isDragging()){
+            //if the player is dragging we will fire the mouse update.
+            updateFocusedGSI(focusedGSI.display, focusedGSI);
             return;
         }
 
@@ -68,8 +82,6 @@ public class GSIInputEvents {
                     break;
                 case GLFW.GLFW_PRESS:
                     focusedGSI.mouseClicked(event.getButton());
-                    break;
-                case GLFW.GLFW_REPEAT:
                     break;
             }
         }

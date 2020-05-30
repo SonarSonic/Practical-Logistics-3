@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 import sonar.logistics.client.gsi.api.ITextComponent;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
-import sonar.logistics.client.gsi.interactions.DraggingInteraction;
+import sonar.logistics.client.gsi.interactions.AbstractComponentInteraction;
 import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gsi.components.text.render.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
-public class StandardTextInteraction<C extends ITextComponent> extends DraggingInteraction<C> implements IGlyphRenderer {
+public class StandardTextInteraction<C extends ITextComponent> extends AbstractComponentInteraction<C> implements IGlyphRenderer {
 
     @Nonnull
     public CursorPoint cursor;
@@ -38,9 +38,8 @@ public class StandardTextInteraction<C extends ITextComponent> extends DraggingI
         return new GlyphStyle();
     }
 
-    /////
+    /////IGlyphRenderer - used for rendering cursors / selections etc.
 
-    //IGlyphRenderer method, used for rendering cursors / selections etc.
     @Override
     public void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
         glyphInfo.glyph.render(context, glyphInfo);
@@ -50,7 +49,7 @@ public class StandardTextInteraction<C extends ITextComponent> extends DraggingI
     public void renderEffects(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
         StyledTextRenderer.INSTANCE.addStylingEffects(context, glyphInfo);
 
-        if(getGSI().getFocused() == component) {
+        if(component.isFocusedComponent()) {
             if (selectionEnd == null || selectionEnd.getInsertionIndex() == cursor.getInsertionIndex()) {
                 if (glyphInfo.index == cursor.getCharIndex() && GSIDesignSettings.canRenderCursor()) {
                     StyledTextRenderer.INSTANCE.addCursorToGlyph(context, glyphInfo, cursor);
@@ -70,13 +69,13 @@ public class StandardTextInteraction<C extends ITextComponent> extends DraggingI
 
     @Override
     public boolean mouseClicked(int button) {
-        boolean dragged = super.mouseClicked(button);
         if (button == 0) {
             cursor = getCursorFromMouse();
             selectionEnd = null;
             onCursorMoved();
+            return true;
         }
-        return dragged;
+        return false;
     }
 
     @Override
@@ -90,18 +89,32 @@ public class StandardTextInteraction<C extends ITextComponent> extends DraggingI
         return true;
     }
 
+    @Override
+    public boolean changeFocus(boolean focused) {
+        if(!focused){
+            this.cursor = new CursorPoint(false, 0);
+            this.selectionEnd = null;
+        }
+        return true;
+    }
+
     ////
+
+
+    @Override
+    public boolean canStartDrag(int button) {
+        return isDragButton(button);
+    }
 
     @Override
     public void onDragStarted(int button) {
-        super.onDragStarted(button);
         selectionEnd = null;
     }
 
     @Override
-    public void onDragged(int button) {
-        super.onDragged(button);
+    public boolean mouseDragged() {
         selectionEnd = getCursorFromMouse();
+        return true;
     }
 
     ////
@@ -120,6 +133,7 @@ public class StandardTextInteraction<C extends ITextComponent> extends DraggingI
         pages.text.glyphs.add(insert, glyph);
         getGSI().build();
         moveCursorTo(cursor, insert, false);
+        component.onTextChanged();
     }
 
     public void deleteGlyph(boolean previous){
@@ -134,6 +148,7 @@ public class StandardTextInteraction<C extends ITextComponent> extends DraggingI
         getGSI().build();
         cursor.setIndex(cursor.isLeading() ? delete : delete - 1);
         onCursorMoved();
+        component.onTextChanged();
     }
 
     public boolean deleteSelection(){
@@ -147,6 +162,7 @@ public class StandardTextInteraction<C extends ITextComponent> extends DraggingI
         if(pages.text.deleteGlyphs(startIndex, endIndex)){
             getGSI().build();
             selectionEnd = null;
+            component.onTextChanged();
             return true;
         }
         return false;

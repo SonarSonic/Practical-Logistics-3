@@ -12,6 +12,7 @@ import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.vectors.Quad2D;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,16 +31,20 @@ public class StyledTextWrapper {
     private LineStyle currentLineStyle;
     private boolean currentPageBreak;
 
+    ///extras
+    public GlyphStyle forceStyle = null;
+
     ///outputs
     public StyledTextPages styledTextPages;
 
     // builds wrapping pages
-    public void build(StyledTextPages pages, ScaledFontType fontType, Quad2D bounds, LineStyle defLineStyle){
+    public void build(StyledTextPages pages, ScaledFontType fontType, Quad2D bounds, LineStyle defLineStyle, @Nullable GlyphStyle forceStyle){
         pages.clearCache();
         this.fontType = fontType;
         this.bounds = bounds;
         this.index = 0;
         this.currentLineStyle = defLineStyle;
+        this.forceStyle = forceStyle;
         this.currentPageBreak = false;
         this.styledTextPages = pages;
 
@@ -127,7 +132,7 @@ public class StyledTextWrapper {
     ///// raw metric building
 
     public void addGlyphToRawLine(Glyph glyph){
-        GlyphStyle style = glyph.getStyle();
+        GlyphStyle style = forceStyle != null ? forceStyle : glyph.getStyle();
         float renderWidth = glyph.getRenderWidth(fontType, style);
         float renderHeight = glyph.getRenderHeight(fontType, style);
         GlyphRenderInfo renderInfo = new GlyphRenderInfo(index, glyph, style, renderWidth, renderHeight);

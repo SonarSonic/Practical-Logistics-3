@@ -19,19 +19,20 @@ public class GSIWidget extends AbstractGui implements IFlexibleGuiEventListener,
     public Quad2D bounds;
     public GSI gsi;
 
-    public GSIWidget(Quad2D bounds){
-        this.bounds = bounds;
-        this.gsi = new GSI(bounds);
+    public GSIWidget(){
+        this.gsi = new GSI();
     }
 
-    public void build(){
-        gsi.build();
+    public void setBoundsAndRebuild(Quad2D bounds){
+        this.bounds = bounds;
+        this.gsi.setBoundsAndRebuild(new Quad2D(0, 0, bounds.width, bounds.height));
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         GSIRenderContext context = new GSIRenderContext(gsi, partialTicks, new MatrixStack());
         gsi.interactionHandler.updateMouseFromGui(mouseX - bounds.x, mouseY - bounds.y);
+
         RenderSystem.enableDepthTest();
         context.matrix.scale(1, 1, -1); //GUI'S are rendered back to front.
         context.matrix.translate(bounds.x, bounds.y, 0);

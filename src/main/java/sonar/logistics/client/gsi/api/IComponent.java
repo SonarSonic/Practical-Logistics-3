@@ -1,10 +1,12 @@
 package sonar.logistics.client.gsi.api;
 
 import sonar.logistics.client.gsi.GSI;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.properties.ComponentBounds;
 import sonar.logistics.client.gsi.properties.ComponentStyling;
 import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.vectors.Vector2D;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,11 +14,11 @@ import java.util.List;
 
 public interface IComponent {
 
-    /**the GSI this component is hosted by, used primarily with interactions*/
-    GSI getGSI();
+    /**the host of the component, in most cases this will be the gsi, used primarily with interactions*/
+    IComponentHost getHost();
 
-    /**should always be called before using the component, and is typically called when it is added to the GSI*/
-    void setGSI(GSI gsi);
+    /**should always be called before using the component, and is typically called when it is added to the host*/
+    void setHost(IComponentHost host);
 
     ///
 
@@ -45,6 +47,9 @@ public interface IComponent {
 
     ///
 
+    /**called every game tick, client side*/
+    default void tick(){}
+
     /**this is used if the component is itself a "host"
      * sub components should be rendered by component that declares them, not the declaring component's "host" */
     @Nullable
@@ -52,4 +57,33 @@ public interface IComponent {
          return null;
      }
 
+    /// helper methods
+
+    default GSI getGSI(){
+        return getHost().getGSI();
+    }
+
+    default GSIInteractionHandler getInteractionHandler(){
+        return getGSI().interactionHandler;
+    }
+
+    default Vector2D getMousePos(){
+        return getInteractionHandler().mousePos;
+    }
+
+    default Vector2D getRelativeMousePos(){
+        return getMousePos().copy().sub(getBounds().renderBounds().getAlignment());
+    }
+
+    default boolean isFocusedComponent(){
+        return getHost().getFocusedListener().filter(listener -> listener == this).isPresent();
+    }
+
+    default boolean isDraggedComponent(){
+        return isFocusedComponent() && getHost().isDragging();
+    }
+
+    default boolean isMoveable(){
+        return false;
+    }
 }

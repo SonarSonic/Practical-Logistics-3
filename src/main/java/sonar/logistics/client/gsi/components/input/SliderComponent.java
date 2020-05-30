@@ -2,30 +2,47 @@ package sonar.logistics.client.gsi.components.input;
 
 import sonar.logistics.client.gsi.components.AbstractComponent;
 import sonar.logistics.client.gsi.interactions.api.IInteractionComponent;
+import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
 
+import javax.annotation.Nullable;
+
 public class SliderComponent extends AbstractComponent implements IInteractionComponent {
 
     //between 0 & 1
     public double sliderValue;
     public boolean isVertical = false;
-    public boolean dragging = false;
+
+    public int handleColour = ScreenUtils.transparent_green_button.rgba;
+
+    @Nullable
+    public ITrigger<SliderComponent> trigger;
 
     public SliderComponent(double sliderValue){
         this.sliderValue = sliderValue;
     }
 
+    public SliderComponent setTrigger(@Nullable ITrigger<SliderComponent> trigger) {
+        this.trigger = trigger;
+        return this;
+    }
+
+    public SliderComponent setHandleColour(int handleColour) {
+        this.handleColour = handleColour;
+        return this;
+    }
+
+    public double getSliderValue() {
+        return sliderValue;
+    }
+
     @Override
     public void render(GSIRenderContext context) {
         super.render(context);
-        if(dragging){
-            updateSliderFromMouse();
-            checkSlider();
-        }
         Quad2D sliderHandle;
         if(!isVertical) {
             sliderHandle = new Quad2D(0, 0, getBounds().renderBounds().getWidth() / 16, getBounds().renderBounds().getHeight());
@@ -42,7 +59,7 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
 
     public void renderSliderHandle(GSIRenderContext context, Quad2D sliderHandle){
         GSIRenderHelper.pushLayerOffset(context, 1);
-        GSIRenderHelper.renderColouredRect(context, true, sliderHandle, ScreenUtils.transparent_activated_button.rgba);
+        GSIRenderHelper.renderColouredRect(context, true, sliderHandle, handleColour);
         GSIRenderHelper.popLayerOffset(context, 1);
     }
 
@@ -62,7 +79,7 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
         if(isMouseOver()){
             updateSliderFromMouse();
             checkSlider();
-            dragging = true;
+            onSliderChanged();
             return true;
         }
         return false;
@@ -73,9 +90,18 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
         if(isMouseOver()){
             sliderValue -= scroll/8;
             checkSlider();
+            onSliderChanged();
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean mouseDragged() {
+        updateSliderFromMouse();
+        checkSlider();
+        onSliderChanged();
+        return true;
     }
 
     public void checkSlider(){
@@ -88,17 +114,11 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
         }
     }
 
-    @Override
-    public boolean mouseReleased(int button) {
-        if(isMouseOver()) {
-            this.dragging = false;
-            return true;
-        }
-        return false;
-    }
+    ///
 
-    @Override
-    public boolean isDragging() {
-        return dragging;
+    public void onSliderChanged(){
+        if(trigger != null){
+            trigger.trigger(this, getInteractionHandler());
+        }
     }
 }

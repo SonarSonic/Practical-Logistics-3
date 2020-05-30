@@ -115,7 +115,7 @@ public class ScaleableWidget implements IGuiEventListener, IRenderable {
         }
         if(currentRescaleType != null){
             Quad2D rescaledWindow = currentRescaleType.rescaleWindow(window, bounds, snapToGrid(dragX, snapToPixels), snapToGrid(dragY, snapToPixels), isShifting);
-            ScreenUtils.fillDouble(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.transparent_activated_button.rgba);
+            ScreenUtils.fillDouble(rescaledWindow.x, rescaledWindow.y, rescaledWindow.x + rescaledWindow.width, rescaledWindow.y + rescaledWindow.height, ScreenUtils.transparent_green_button.rgba);
         }
     }
 

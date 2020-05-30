@@ -5,6 +5,7 @@ import sonar.logistics.client.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.gui.widgets.PL3TextWidget;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
+import sonar.logistics.client.vectors.Quad2D;
 
 public class GSIDesignScreen extends SimpleWidgetScreen {
 
@@ -17,6 +18,8 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
         this.displayGSI = displayGSI;
         this.displayGSI.interactionHandler.setInteractionType(GSIInteractionHandler.InteractionType.GUI_EDITING);
         GSIDesignSettings.setDesignScreen(this);
+        DesignInterfaces.initNormalTools(this);
+        DesignInterfaces.initTextTools(this);
     }
 
 
@@ -24,8 +27,11 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
     protected void init() {
         super.init();
 
-        addWidget(DesignInterfaces.initNormalTools(this));
-        addWidget(DesignInterfaces.initTextTools(this));
+        DesignInterfaces.normalToolsWidget.setBoundsAndRebuild(new Quad2D(guiLeft, guiTop, xSize, ySize));
+        addWidget(DesignInterfaces.normalToolsWidget);
+
+        DesignInterfaces.textToolsWidget.setBoundsAndRebuild(new Quad2D(guiLeft, guiTop, xSize, ySize));
+        addWidget(DesignInterfaces.textToolsWidget);
 
         //TODO CONVERT FONTHEIGHT TO PL3 COMPONENT
         fontHeight = PL3TextWidget.create("", font, guiLeft + 16*14, guiTop + 13, 32, 14).setOutlineColor(ScreenUtils.light_grey.rgba).setDigitsOnly();
@@ -86,7 +92,10 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
     public void tick() {
         super.tick();
         GSIDesignSettings.tickCursorCounter();
+        DesignInterfaces.tick();
     }
+
+
 
     @Override
     public boolean isPauseScreen() {

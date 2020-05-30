@@ -1,9 +1,9 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
+import sonar.logistics.client.gsi.api.IComponentHost;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
-import sonar.logistics.client.gsi.interactions.DraggingInteraction;
 import sonar.logistics.client.gsi.interactions.ResizingInteraction;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.api.IComponent;
@@ -12,24 +12,31 @@ import sonar.logistics.client.gsi.components.text.StyledTextString;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
-import sonar.logistics.client.gsi.interactions.api.INestedInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.properties.ScaleableBounds;
 import sonar.logistics.client.gui.GSIDesignScreen;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
-public class GSI implements INestedInteractionListener {
+public class GSI implements IComponentHost {
 
     public GSIInteractionHandler interactionHandler = new GSIInteractionHandler(this, Minecraft.getInstance().player);
     private List<IComponent> components = new ArrayList<>();
     private List<IInteractionListener> interactions = new ArrayList<>();
     private Quad2D bounds;
+
+    @Nullable //if the GSI is a GUI Interface only the display will be null.
+    public IDisplay display;
+
+    //set bounds and rebuild should be called
+    public GSI(){}
 
     public GSI(Quad2D bounds){
         this.bounds = bounds;
@@ -39,11 +46,24 @@ public class GSI implements INestedInteractionListener {
         return bounds;
     }
 
+    public void setBoundsAndRebuild(Quad2D bounds){
+        this.bounds = bounds;
+        build();
+    }
+
     public void build(){
         components.forEach(c -> c.build(bounds));
     }
 
+    public void tick(){
+        components.forEach(IComponent::tick);
+    }
+
     public void render(GSIRenderContext context){
+        if(isDragging()){
+            //dragging is performed by the GSI itself, this allows more consistency between World & Gui interactions and also smoother dragging.
+            mouseDragged();
+        }
         context.preRender();
         components.forEach(c -> c.render(context));
         renderInteraction(context);
@@ -51,7 +71,7 @@ public class GSI implements INestedInteractionListener {
     }
 
     public IComponent addComponent(IComponent component){
-        component.setGSI(this);
+        component.setHost(this);
         components.add(component);
         if(component instanceof  IInteractionListener){
             interactions.add((IInteractionListener)component);
@@ -60,7 +80,7 @@ public class GSI implements INestedInteractionListener {
     }
 
     public IComponent removeComponent(IComponent component){
-        component.setGSI(null);
+        component.setHost(null);
         components.remove(component);
         if(component instanceof  IInteractionListener){
             interactions.remove(component);
@@ -95,8 +115,11 @@ public class GSI implements INestedInteractionListener {
         switch (interactionHandler.getInteractionType()){
             case WORLD_INTERACTION:
                 if(interactionHandler.hasShiftDown()) {
+                    //TODO REPLACE ME!
                     Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this)));
-                    testStructure();
+                    if(components.isEmpty()) {
+                        testStructure();
+                    }
                     build();
                     return true;
                 }
@@ -105,21 +128,23 @@ public class GSI implements INestedInteractionListener {
             case GUI_EDITING:
                 break;
             case GUI_RESIZING:
-                if(focused instanceof ResizingInteraction && focused.mouseClicked(button)){
+                if(focused instanceof ResizingInteraction && focused.isMouseOver()){
+                    if(!isDragging()){
+                        tryStartDragging(button);
+                    }
                     return true;
                 }
                 IComponent hovered = getComponent(components, c -> c.getBounds().maxBounds().contains(interactionHandler.mousePos));
                 if(hovered != null) {
                     this.setFocused(new ResizingInteraction(hovered));
+                    tryStartDragging(button);
                     return true;
                 }
                 setFocused(null);
                 return false;
         }
-        return INestedInteractionListener.super.mouseClicked(button);
+        return IComponentHost.super.mouseClicked(button);
     }
-
-
 
 
     ///TODO REMOVE ME!
@@ -261,13 +286,31 @@ public class GSI implements INestedInteractionListener {
 
     @Nullable
     @Override
-    public IInteractionListener getFocused() {
-        return focused;
+    public Optional<IInteractionListener> getFocusedListener() {
+        return Optional.ofNullable(focused);
     }
 
 
     @Override
     public void setFocused(IInteractionListener listener) {
         this.focused = listener;
+    }
+
+    private boolean isDragging;
+
+    @Override
+    public boolean isDragging() {
+        return isDragging;
+    }
+
+    @Override
+    public void setDragging(boolean dragging) {
+        this.isDragging = dragging;
+    }
+
+
+    @Override
+    public GSI getGSI() {
+        return this;
     }
 }

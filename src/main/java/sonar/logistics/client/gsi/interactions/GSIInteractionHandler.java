@@ -108,7 +108,8 @@ public class GSIInteractionHandler implements IGuiEventListener {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        return gsi.mouseDragged(button);
+        //dragging is now performed by the GSI itself, this allows more consistency between World & Gui interactions.
+        return false; //return gsi.mouseDragged(button);
     }
 
     @Override

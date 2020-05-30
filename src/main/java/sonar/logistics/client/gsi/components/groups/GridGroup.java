@@ -1,20 +1,24 @@
-package sonar.logistics.client.gsi.components.containers;
+package sonar.logistics.client.gsi.components.groups;
 
-import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
 
-public class GridContainer extends AbstractContainer {
+public class GridGroup extends AbstractGroup {
 
     public int columns, rows;
     public boolean setCellSize;
 
     public Vector2D cellSize;
 
-    public GridContainer() {
+    public GridGroup() {
         super();
+    }
+
+    @Override
+    public boolean isMouseOver() {
+        return getBounds().maxBounds().contains(getInteractionHandler().mousePos);
     }
 
     public void setGridSize(int columns, int rows){

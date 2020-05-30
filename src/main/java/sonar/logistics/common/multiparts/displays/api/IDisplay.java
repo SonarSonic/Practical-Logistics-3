@@ -7,7 +7,7 @@ import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.api.IComponentHost;
 import sonar.logistics.client.vectors.VectorHelper;
 
-public interface IDisplay extends IComponentHost {
+public interface IDisplay {
 
     GSI getGSI();
 
@@ -36,7 +36,7 @@ public interface IDisplay extends IComponentHost {
 
     /**gets the transform required to start the rendering at the top left of the screen*/
     default Vec3d getRenderOffset(){
-        return new Vec3d(-getHostBounds().getWidth()/2, -getHostBounds().getHeight()/2, 0);
+        return new Vec3d(-getGSI().getGSIBounds().getWidth()/2, -getGSI().getGSIBounds().getHeight()/2, 0);
     }
 
     default void onGSIInvalidate(){}

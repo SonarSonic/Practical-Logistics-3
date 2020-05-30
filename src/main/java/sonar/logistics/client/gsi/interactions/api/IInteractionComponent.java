@@ -6,7 +6,7 @@ public interface IInteractionComponent extends IInteractionListener, IComponent 
 
     @Override
     default boolean isMouseOver() {
-        return getBounds().maxBounds().contains(getGSI().interactionHandler.mousePos);
+        return getBounds().maxBounds().contains(getMousePos());
     }
 
 }

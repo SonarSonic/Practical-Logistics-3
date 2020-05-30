@@ -368,7 +368,7 @@ public class VectorHelper {
                intersect = getIntersection(lookOrigin, playerV, distance);
                Vec3d[] vectors = getScreenVectors(to.getScreenRotation(), screenV);
                horizontal = vectors[0]; vertical = vectors[1];
-               return getClickedPosition(to.getHostBounds(), origin, intersect, horizontal, vertical, withinBounds);
+               return getClickedPosition(to.getGSI().getGSIBounds(), origin, intersect, horizontal, vertical, withinBounds);
             }
         }
         return null;
