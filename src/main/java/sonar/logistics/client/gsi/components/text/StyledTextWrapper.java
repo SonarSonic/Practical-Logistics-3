@@ -156,6 +156,12 @@ public class StyledTextWrapper {
     //add the finished glyph metric to the styled line, called by finishRawWord()
     public void addGlyphMetricToStyledLine(GlyphMetric metric){
 
+        //check the glyph is not big for the scaling!
+        if(!currentLineStyle.wrappingType.canRescale() && !bounds.canFit(metric.renderSize.width, metric.renderSize.height)) {
+            metric.glyphInfo.forEach(this::addGlyphInfoToStyledLine);
+            return;
+        }
+
         if(checkAdvance(metric.renderSize.width, line.renderSize.width)){
             ///first check the metric can fit on the current line, if it can no further action is needed
             line.addMetric(metric);

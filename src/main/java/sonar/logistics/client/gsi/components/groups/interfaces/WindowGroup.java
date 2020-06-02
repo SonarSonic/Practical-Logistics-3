@@ -18,6 +18,7 @@ public class WindowGroup extends BasicGroup {
         this.windowName = windowName;
         this.setBounds(bounds);
         this.init();
+        this.bounds.setZLayer(10);
     }
 
     public void init(){
@@ -56,6 +57,19 @@ public class WindowGroup extends BasicGroup {
     }
 
     @Override
+    public boolean isMouseOver() {
+        //windows always check their own bounds, to avoid people interacting with things beneath them.
+        return isVisible && (getBounds().maxBounds().contains(getInteractionHandler().mousePos) || super.isMouseOver());
+    }
+
+    @Override
+    public boolean mouseClicked(int button) {
+        //windows always return true, to avoid people interacting with things beneath them.
+        super.mouseClicked(button);
+        return true;
+    }
+
+    @Override
     public void onDragStarted(int button) {
         if(moveDrag) {
             AbsoluteBounds bounds = (AbsoluteBounds) getBounds();
@@ -82,7 +96,7 @@ public class WindowGroup extends BasicGroup {
         if(moveDrag) {
             AbsoluteBounds bounds = (AbsoluteBounds) getBounds();
             bounds.absoluteQuad.setAlignment(oldAlignment.x + getMousePos().x - dragStart.x, oldAlignment.y + getMousePos().y - dragStart.y);
-            getGSI().build();
+            rebuild();
             return true;
         }else{
             return super.mouseDragged();

@@ -24,6 +24,7 @@ public class ScreenUtils {
     public static ColourProperty red_button = new ColourProperty(255, 120, 120);
     public static ColourProperty green_button = new ColourProperty(120, 255, 120);
     public static ColourProperty blue_button = new ColourProperty(120, 120, 255);
+    public static ColourProperty button_border = new ColourProperty(52, 52, 52);
 
     public static ColourProperty light_grey = new ColourProperty(120, 120, 120);
     public static ColourProperty white = new ColourProperty(255, 255, 255);
@@ -33,6 +34,7 @@ public class ScreenUtils {
     public static ColourProperty display_black_border = new ColourProperty(34, 34, 34);
     public static ColourProperty display_blue_border = new ColourProperty(128, 190, 213);
     public static ColourProperty display_grey_bgd = new ColourProperty(68, 68, 68);
+
 
     // textures
     public static ResourceLocation BUTTONS_ALPHA = new ResourceLocation(PL3.MODID,"textures/gui/buttons_alpha_16x16.png" );

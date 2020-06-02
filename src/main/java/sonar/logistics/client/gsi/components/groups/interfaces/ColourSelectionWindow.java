@@ -1,5 +1,6 @@
 package sonar.logistics.client.gsi.components.groups.interfaces;
 
+import sonar.logistics.client.gsi.components.buttons.ColouredButtonComponent;
 import sonar.logistics.client.gsi.components.buttons.TextButtonComponent;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
@@ -47,12 +48,13 @@ public abstract class ColourSelectionWindow extends WindowGroup {
         redSlider.styling.bgdColour = ScreenUtils.transparent_red_button;
         greenSlider.styling.bgdColour = ScreenUtils.transparent_green_button;
         blueSlider.styling.bgdColour = ScreenUtils.transparent_blue_button;
+
     }
 
     @Override
     public void render(GSIRenderContext context) {
         if(isVisible) {
-            context.matrix.translate(0, 0, -1);
+            context.matrix.translate(0, 0, -10);
             super.render(context);
             context.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET*4);
             GSIRenderHelper.renderBasicString(context, "R: ", getBounds().renderBounds().x + 1, redSlider.getBounds().maxBounds().getCentreY() - 9D/2D, ScreenUtils.red_button.rgba, true);
@@ -66,18 +68,25 @@ public abstract class ColourSelectionWindow extends WindowGroup {
         super.onOpened();
         updateSliders();
         updateTextBoxes();
+        rebuild();
     }
 
     public void updateSliders(){
-        redSlider.sliderValue = GSIDesignSettings.glyphStyle.textColour.getRed() / 255D;
-        greenSlider.sliderValue = GSIDesignSettings.glyphStyle.textColour.getGreen() / 255D;
-        blueSlider.sliderValue = GSIDesignSettings.glyphStyle.textColour.getBlue() / 255D;
+        redSlider.sliderValue = GSIDesignSettings.selectedColour.getRed() / 255D;
+        greenSlider.sliderValue = GSIDesignSettings.selectedColour.getGreen() / 255D;
+        blueSlider.sliderValue = GSIDesignSettings.selectedColour.getBlue() / 255D;
     }
 
     public void updateTextBoxes(){
-        red.setText("" + GSIDesignSettings.glyphStyle.textColour.getRed());
-        green.setText("" + GSIDesignSettings.glyphStyle.textColour.getGreen());
-        blue.setText("" + GSIDesignSettings.glyphStyle.textColour.getBlue());
+        red.setText("" + GSIDesignSettings.selectedColour.getRed());
+        green.setText("" + GSIDesignSettings.selectedColour.getGreen());
+        blue.setText("" + GSIDesignSettings.selectedColour.getBlue());
+    }
+
+    public void updateColourFromButton(ColouredButtonComponent buttonComponent, GSIInteractionHandler handler){
+        setTextColour(new ColourProperty(buttonComponent.activatedColour));
+        updateSliders();
+        updateTextBoxes();
     }
 
     public void updateColourFromSlider(SliderComponent sliderComponent, GSIInteractionHandler handler){

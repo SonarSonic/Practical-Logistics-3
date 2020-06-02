@@ -2,17 +2,22 @@ package sonar.logistics.client.gui;
 
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gui.widgets.GSIViewportWidget;
-import sonar.logistics.client.gui.widgets.PL3TextWidget;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.vectors.Quad2D;
+
+//TODO ELEMENT ADVANCED SETTINGS EDITOR PANE - LIKE DA VINCI RESOLVE.
+// COMPONENTS CAN ADD CATEGORIES AND OPTIONS WIDGETS LIKE A CONFIG MENU.
+// CHECKBOXES.
+// DROPDOWNS (ENUMS typically)
+// SLIDERS (and stepped sliders too) - ranged sliders.
+// INPUT BOXES next to all sliders.
+// RESET ARROW FOR EVERY OPTION.
 
 public class GSIDesignScreen extends SimpleWidgetScreen {
 
     public final GSI displayGSI;
     public GSIViewportWidget gsiViewportWidget;
-
-    public PL3TextWidget fontHeight;
 
     public GSIDesignScreen(GSI displayGSI){
         this.displayGSI = displayGSI;
@@ -32,20 +37,6 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
 
         DesignInterfaces.textToolsWidget.setBoundsAndRebuild(new Quad2D(guiLeft, guiTop, xSize, ySize));
         addWidget(DesignInterfaces.textToolsWidget);
-
-        //TODO CONVERT FONTHEIGHT TO PL3 COMPONENT
-        fontHeight = PL3TextWidget.create("", font, guiLeft + 16*14, guiTop + 13, 32, 14).setOutlineColor(ScreenUtils.light_grey.rgba).setDigitsOnly();
-        fontHeight.setMaxStringLength(4);
-        fontHeight.setText(String.valueOf((int)(GSIDesignSettings.glyphStyle.fontHeight * 256F)));
-        fontHeight.setResponder(string -> {
-            if(fontHeight.isFocused()) {
-                int height = fontHeight.getIntegerFromText(false);
-                if (!fontHeight.getText().equals(String.valueOf(height))) {
-                    GSIDesignSettings.setFontHeight(height);
-                }
-            }
-        });
-        addWidget(fontHeight);
 
         addWidget(gsiViewportWidget = new GSIViewportWidget(displayGSI, this.guiLeft + 32, this.guiTop + 32, this.xSize - 64, this.ySize - 64));
     }
@@ -68,24 +59,19 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
 
 
         ////button dividers
-        fill(guiLeft + 16*8 + 7, guiTop + 12, guiLeft + 16*8 + 9, guiTop + 12 + 16, ScreenUtils.light_grey.rgba);
-        fill(guiLeft + 16*13 + 7, guiTop + 12, guiLeft + 16*13 + 9, guiTop + 12 + 16, ScreenUtils.light_grey.rgba);
+        fill(guiLeft + 16*8 + 7, guiTop + 8, guiLeft + 16*8 + 9, guiTop + 8 + 16, ScreenUtils.light_grey.rgba);
+        fill(guiLeft + 16*13 + 7, guiTop + 8, guiLeft + 16*13 + 9, guiTop + 8 + 16, ScreenUtils.light_grey.rgba);
 
     }
+
 
     public void onSettingChanged(Object setting, Object settingObj){
         displayGSI.onSettingChanged(setting, settingObj);
-        if(setting == GlyphStyleAttributes.FONT_HEIGHT){
-            String value = String.valueOf((int)((float)(settingObj) * 256F));
-            if(!fontHeight.getText().equals(value))
-                fontHeight.setText(value);
-        }
     }
 
     public void onCursorStyleChanged() {
-        String value = String.valueOf((int)(GSIDesignSettings.glyphStyle.fontHeight * 256F));
-        if(!fontHeight.getText().equals(value))
-            fontHeight.setText(value);
+        ///updates the font height - this should really be automatic, but this works for now.
+        displayGSI.onSettingChanged(GlyphStyleAttributes.FONT_HEIGHT, GSIDesignSettings.glyphStyle.fontHeight);
     }
 
     @Override
@@ -94,8 +80,6 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
         GSIDesignSettings.tickCursorCounter();
         DesignInterfaces.tick();
     }
-
-
 
     @Override
     public boolean isPauseScreen() {

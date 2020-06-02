@@ -97,7 +97,7 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     //the bounds of the gsi, including the fake screens borders
     public Quad2D getBoundsForFakeDisplay(){
-        return new Quad2D(getCentreOffsetX() - getGSIRenderWidth()/2, getCentreOffsetY() - getGSIRenderHeight()/2, getGSIRenderWidth(), getGSIRenderHeight());
+        return new Quad2D(getCentreOffsetX() - (getGSIRenderWidth()*scaling)/2, getCentreOffsetY() - (getGSIRenderHeight()*scaling)/2, getGSIRenderWidth()*scaling, getGSIRenderHeight()*scaling);
     }
 
     @Override
@@ -194,17 +194,15 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (isMouseOver(mouseX, mouseY)) {
-            if(isMouseOverGSI(mouseX, mouseY)){
-                return IFlexibleGuiEventListener.super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        if(isMouseOverGSI(mouseX, mouseY)){
+            return IFlexibleGuiEventListener.super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        }
+        if(!gsi.isDragging()) {
+            if (button == 0) {
+                centreX += dragX;
+                centreY += dragY;
+                return true;
             }
-            if(!gsi.isDragging() && !getBoundsForFakeDisplay().contains(mouseX, mouseY)) {
-                if (button == 0) {
-                    centreX += dragX;
-                    centreY += dragY;
-                }
-            }
-            return true;
         }
         return false;
     }

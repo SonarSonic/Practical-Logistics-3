@@ -1,7 +1,11 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
+import sonar.logistics.PL3;
+import sonar.logistics.client.gsi.api.EnumImageFillType;
 import sonar.logistics.client.gsi.api.IComponentHost;
+import sonar.logistics.client.gsi.components.image.SimpleImageComponent;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
 import sonar.logistics.client.gsi.interactions.ResizingInteraction;
@@ -21,6 +25,7 @@ import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -52,7 +57,12 @@ public class GSI implements IComponentHost {
     }
 
     public void build(){
+        //build the components
         components.forEach(c -> c.build(bounds));
+        //for rendering components we sort back to front - lowest z first
+        components.sort(Comparator.comparingInt(i -> i.getBounds().getZLayer()));
+        //for interactions we sort front to back - highest z first
+        interactions.sort(Comparator.comparingInt(i -> -((IComponent)i).getBounds().getZLayer()));
     }
 
     public void tick(){
@@ -61,7 +71,8 @@ public class GSI implements IComponentHost {
 
     public void render(GSIRenderContext context){
         if(isDragging()){
-            //dragging is performed by the GSI itself, this allows more consistency between World & Gui interactions and also smoother dragging.
+            //dragging is performed by the GSI itself, this allows more consistency between World & Gui interactions
+            // it also allows smoother dragging as positions are updated before rendering
             mouseDragged();
         }
         context.preRender();
@@ -83,7 +94,7 @@ public class GSI implements IComponentHost {
         component.setHost(null);
         components.remove(component);
         if(component instanceof  IInteractionListener){
-            interactions.remove(component);
+            interactions.remove((IInteractionListener)component);
         }
         return component;
     }
@@ -123,6 +134,7 @@ public class GSI implements IComponentHost {
                     build();
                     return true;
                 }
+                break;
             case GUI_INTERACTION:
                 break;
             case GUI_EDITING:
@@ -136,7 +148,7 @@ public class GSI implements IComponentHost {
                 }
                 IComponent hovered = getComponent(components, c -> c.getBounds().maxBounds().contains(interactionHandler.mousePos));
                 if(hovered != null) {
-                    this.setFocused(new ResizingInteraction(hovered));
+                    setFocused(new ResizingInteraction(hovered));
                     tryStartDragging(button);
                     return true;
                 }
@@ -180,16 +192,15 @@ public class GSI implements IComponentHost {
 
         addComponent(lines);
 
-        TextInputComponent textInput = new TextInputComponent();
-        textInput.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.2)));
-        textInput.maxInputLength = 3;
-        textInput.inputType = TextInputComponent.EnumTextInputType.DIGIT_ONLY;
-        addComponent(textInput);
-
-
         SliderComponent slider = new SliderComponent(0.5);
-        slider.setBounds(new ScaleableBounds(new Quad2D(0, 0.7, 1, 0.3)));
+        slider.isVertical = true;
+        slider.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.2)));
         addComponent(slider);
+
+
+        SimpleImageComponent imageComponent = new SimpleImageComponent(new ResourceLocation("minecraft", "textures/block/bedrock.png"), EnumImageFillType.IMAGE_FILL);
+        imageComponent.setBounds(new ScaleableBounds(new Quad2D(0, 0.7, 1, 0.3)));
+        addComponent(imageComponent);
 
         /*
         GridContainer grid = new GridContainer();

@@ -4,8 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
+import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.INestedInteractionListener;
 import sonar.logistics.client.gui.api.IInteractWidget;
 import sonar.logistics.client.gui.api.ISimpleWidget;
+import sonar.logistics.client.gui.widgets.GSIViewportWidget;
+import sonar.logistics.client.gui.widgets.GSIWidget;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -67,6 +71,28 @@ public class SimpleWidgetScreen extends Screen {
 
     public void drawForeground(int mouseX, int mouseY, float partialTicks){
 
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        //gsi interactions have their own drag control, so we end dragging manually.
+        interactWidgets.forEach(i ->
+            {
+                if(i instanceof GSIWidget){
+                    ((GSIWidget) i).gsi.tryEndDragging(button);
+                }
+
+                if(i instanceof GSIViewportWidget){
+                    ((GSIViewportWidget) i).gsi.tryEndDragging(button);
+                }
+            }
+       );
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Nonnull

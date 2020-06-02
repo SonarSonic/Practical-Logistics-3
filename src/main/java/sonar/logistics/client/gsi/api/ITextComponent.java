@@ -20,7 +20,9 @@ public interface ITextComponent extends IComponent {
         return true;
     }
 
+    /**triggers a rebuild if required and reformats text*/
     default void onTextChanged(){}
 
+    /**triggers a rebuild if required and reformats text*/
     default void onStylingChanged(){}
 }

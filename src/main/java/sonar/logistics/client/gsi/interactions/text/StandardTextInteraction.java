@@ -131,9 +131,8 @@ public class StandardTextInteraction<C extends ITextComponent> extends AbstractC
 
         int insert = getSafeGlyphInsertionIndex();
         pages.text.glyphs.add(insert, glyph);
-        getGSI().build();
-        moveCursorTo(cursor, insert, false);
         component.onTextChanged();
+        moveCursorTo(cursor, insert, false);
     }
 
     public void deleteGlyph(boolean previous){
@@ -145,10 +144,9 @@ public class StandardTextInteraction<C extends ITextComponent> extends AbstractC
             return;
         }
         pages.text.glyphs.remove(delete);
-        getGSI().build();
+        component.onTextChanged();
         cursor.setIndex(cursor.isLeading() ? delete : delete - 1);
         onCursorMoved();
-        component.onTextChanged();
     }
 
     public boolean deleteSelection(){
@@ -160,16 +158,15 @@ public class StandardTextInteraction<C extends ITextComponent> extends AbstractC
 
         clearSelection();
         if(pages.text.deleteGlyphs(startIndex, endIndex)){
-            getGSI().build();
-            selectionEnd = null;
             component.onTextChanged();
+            selectionEnd = null;
             return true;
         }
         return false;
     }
 
     public int getSelectionStartIndex(){
-        if(selectionEnd == null){
+        if(selectionEnd == null || cursor.getInsertionIndex() == selectionEnd.getInsertionIndex()){
             GlyphRenderInfo prev = pages.getPrevGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
             return prev == null ? 0 : prev.index; //note we set the style on the preceding line break glyph too!
         }
@@ -177,7 +174,7 @@ public class StandardTextInteraction<C extends ITextComponent> extends AbstractC
     }
 
     public int getSelectionEndIndex(){
-        if(selectionEnd == null){
+        if(selectionEnd == null || cursor.getInsertionIndex() == selectionEnd.getInsertionIndex()){
             GlyphRenderInfo next = pages.getNextGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
             return next == null ? pages.styledGlyphs.size() : next.index - 1;
         }

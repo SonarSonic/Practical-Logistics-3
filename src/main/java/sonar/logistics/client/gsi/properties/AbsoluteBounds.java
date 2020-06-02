@@ -21,6 +21,7 @@ public class AbsoluteBounds extends ComponentBounds {
 
     @Override
     public void build(Quad2D bounds, @Nullable ComponentStyling properties) {
+        super.build(bounds, properties);
         this.size = absoluteQuad.copy().translate(bounds.getX(), bounds.getY());
         this.renderSize = properties == null ? size.copy() : properties.getRenderSizing(size);
     }

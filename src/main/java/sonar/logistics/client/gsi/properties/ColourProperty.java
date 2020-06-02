@@ -51,6 +51,10 @@ public class ColourProperty {
         return (rgba >> 24) & 0xff;
     }
 
+    public ColourProperty copy(){
+        return new ColourProperty(rgba);
+    }
+
     @Override
     public int hashCode() {
         return rgba;

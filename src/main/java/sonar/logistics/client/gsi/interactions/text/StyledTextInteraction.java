@@ -40,14 +40,11 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
         if(glyphInfo != null){
             LineBreakGlyph glyph = (LineBreakGlyph) glyphInfo.glyph;
             pages.text.glyphs.set(glyphInfo.index, GSIDesignSettings.getLineBreakGlyph(glyph.pageBreak, glyph.lineStyle));
-            getGSI().build();
         }else{
             //if we didn't find a line break glyph anywhere then the text is all one line, so we can add one to the start
             pages.text.addGlyph(GSIDesignSettings.getLineBreakGlyph(false, new LineStyle()), 0);
-            getGSI().build();
             moveCursorRight(cursor);
         }
-
         component.onStylingChanged();
     }
 
@@ -57,14 +54,11 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
         if(glyphInfo != null){
             LineBreakGlyph glyph = (LineBreakGlyph) glyphInfo.glyph;
             glyph.lineStyle = style.copy();
-            getGSI().build();
         }else{
             //if we didn't find a line break glyph anywhere then the text is all one line, so we can add one to the start
             pages.text.addGlyph(GSIDesignSettings.getLineBreakGlyph(false, style.copy()), 0);
-            getGSI().build();
             moveCursorRight(cursor);
         }
-
         component.onStylingChanged();
     }
 
@@ -72,15 +66,11 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
         applyLineStyle(new LineStyle());
         pages.text.clearAttributes(getSelectionStartIndex(), getSelectionEndIndex());
         onCursorMoved();
-        getGSI().build();
-
         component.onStylingChanged();
     }
 
     public void applyAttribute(GlyphStyleAttributes attribute, Object attributeObj){
         pages.text.applyAttribute(attribute, attributeObj, getSelectionStartIndex(), getSelectionEndIndex());
-        getGSI().build();
-
         component.onStylingChanged();
     }
 

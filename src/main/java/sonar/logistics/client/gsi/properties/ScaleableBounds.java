@@ -27,6 +27,7 @@ public class ScaleableBounds extends ComponentBounds {
     }
 
     public void build(Quad2D bounds, @Nullable ComponentStyling properties){
+        super.build(bounds, properties);
         this.size = Quad2D.getQuadFromPercentage(bounds, percentages);
         this.renderSize = properties == null ? size.copy() : properties.getRenderSizing(size);
     }

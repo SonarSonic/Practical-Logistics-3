@@ -180,6 +180,10 @@ public class GSIDesignSettings {
     }
 
 
+    //// COLOUR SELECTIONS
+
+    public static ColourProperty selectedColour = ScreenUtils.white;
+
 
     //// CURSOR COUNTER
 

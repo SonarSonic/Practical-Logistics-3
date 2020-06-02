@@ -65,12 +65,21 @@ public abstract class AbstractComponent implements IComponent {
     }
 
     @Override
+    public void rebuild(){
+        if(getBounds().getHostBounds() != null) {
+            build(getBounds().getHostBounds());
+        }
+    }
+
+    @Override
     public void render(GSIRenderContext context) {
         GSIRenderHelper.renderColouredRect(context, true, bounds.maxBounds(), styling.bgdColour.rgba);
         GSIRenderHelper.pushLayerOffset(context, 1);
         GSIRenderHelper.renderBorders(context, bounds, styling);
-        GSIRenderHelper.pushLayerOffset(context, 1);
+        GSIRenderHelper.popLayerOffset(context, 1);
     }
+
+    ///
 
 
 }

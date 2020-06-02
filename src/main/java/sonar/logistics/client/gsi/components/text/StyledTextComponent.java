@@ -38,12 +38,32 @@ public class StyledTextComponent extends AbstractComponent implements ITextCompo
     }
 
     @Override
+    public void onTextChanged() {
+        rebuild();
+    }
+
+    @Override
+    public void onStylingChanged() {
+        rebuild();
+    }
+
+    @Override
     public StyledTextPages pages() {
         return pages;
     }
 
     @Override
     public IInteractionListener getInteractionListener() {
-        return textInteraction;
+        switch (getInteractionHandler().getInteractionType()){
+            case WORLD_INTERACTION:
+                break;
+            case GUI_INTERACTION:
+                break;
+            case GUI_EDITING:
+                return textInteraction;
+            case GUI_RESIZING:
+                break;
+        }
+        return null;
     }
 }

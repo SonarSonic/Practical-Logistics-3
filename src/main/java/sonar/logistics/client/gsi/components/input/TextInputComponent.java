@@ -61,10 +61,10 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
         return this;
     }
 
+    /**if this is called after the component has been built- rebuild should be called*/
     public TextInputComponent setText(String text){
         pages.text.glyphs.clear();
         pages.text.addString(text);
-        getGSI().build();
         return this;
     }
 
@@ -122,6 +122,12 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
     public void onTextChanged() {
         inputType.reformatText(this);
         textChanged = true;
+        rebuild();
+    }
+
+    @Override
+    public void onStylingChanged() {
+        rebuild();
     }
 
     @Override

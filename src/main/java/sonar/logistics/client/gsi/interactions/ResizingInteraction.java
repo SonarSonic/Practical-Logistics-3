@@ -63,15 +63,17 @@ public class ResizingInteraction extends AbstractComponentInteraction<IComponent
         double y = (componentBounds.y - gsiBounds.y) / gsiBounds.height;
         double width = componentBounds.width / gsiBounds.width;
         double height = componentBounds.height / gsiBounds.height;
+        Quad2D hostBounds = component.getBounds().getHostBounds();
         component.setBounds(new ScaleableBounds(new Quad2D(x, y, width, height)));
-        getGSI().build();
+        component.getBounds().setHostBounds(hostBounds);
+        component.rebuild();
         currentRescaleType = null;
         dragStart = null;
     }
 
     @Override
     public boolean isMouseOver() {
-        return getRescaleTypeFromMouse(component, getInteractionHandler()) != null && super.isMouseOver();
+        return getRescaleTypeFromMouse(component, getInteractionHandler()) != null;
     }
 
     public Quad2D getRescaledBounds(){

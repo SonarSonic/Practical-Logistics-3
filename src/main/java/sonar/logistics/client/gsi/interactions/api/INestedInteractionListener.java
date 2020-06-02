@@ -163,6 +163,6 @@ public interface INestedInteractionListener extends IInteractionListener {
 
     @Override
     default void onSettingChanged(Object setting, Object settingObj) {
-        getFocusedListener().ifPresent(listener -> listener.onSettingChanged(setting, settingObj));
+        getChildren().forEach(listener -> listener.onSettingChanged(setting, settingObj));
     }
 }

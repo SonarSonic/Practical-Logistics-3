@@ -29,7 +29,7 @@ public class GSIRenderHelper {
     public static final int FULL_LIGHT = 15728880;
 
     /// Z OFFSETS \\\
-    public static final float MIN_Z_OFFSET = -0.001F;
+    public static final float MIN_Z_OFFSET = -0.0001F;
     public static final float ITEM_OFFSET = -0.001F;
     public static final float ITEM_Z_SCALE = 0.01F;
 
@@ -104,20 +104,40 @@ public class GSIRenderHelper {
     ///// STYLES \\\\\
 
     public static void renderBorders(GSIRenderContext context, ComponentBounds alignment, ComponentStyling styling){
+        /*
         double marginWidth = styling.marginWidth.getRenderSize(alignment.maxBounds().getWidth());
         double marginHeight = styling.marginHeight.getRenderSize(alignment.maxBounds().getHeight());
 
         double endX = alignment.maxBounds().getWidth() - marginWidth;
         double endY = alignment.maxBounds().getHeight() - marginHeight;
 
-        double borderWidth = styling.borderSize.getRenderSize(alignment.maxBounds().getWidth());
-        double borderHeight = styling.borderSize.getRenderSize(alignment.maxBounds().getHeight());
+
 
         GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
         GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), endX-borderWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
 
         GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
         GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, endY - borderHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
+
+         */
+
+        double marginWidth = styling.marginWidth.getRenderSize(alignment.maxBounds().getWidth());
+        double marginHeight = styling.marginHeight.getRenderSize(alignment.maxBounds().getHeight());
+
+        double fullWidth = alignment.maxBounds().width - marginWidth*2;
+        double fullHeight = alignment.maxBounds().height - marginHeight*2;
+
+        double borderWidth = styling.borderSize.getRenderSize(alignment.maxBounds().getWidth());
+        double borderHeight = styling.borderSize.getRenderSize(alignment.maxBounds().getHeight());
+
+        //GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, fullWidth, fullHeight, styling.borderColour);
+        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, fullWidth, borderHeight, styling.borderColour);
+        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight + fullHeight - borderHeight, fullWidth, borderHeight, styling.borderColour);
+
+
+        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight + borderHeight, borderWidth, fullHeight - borderHeight*2, styling.borderColour);
+        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth + fullWidth - borderWidth, marginHeight + borderHeight, borderWidth, fullHeight - borderHeight*2, styling.borderColour);
+
     }
 
 

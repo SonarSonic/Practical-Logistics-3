@@ -16,6 +16,7 @@ public class FloatingBounds extends ScaleableBounds {
     }
 
     public void build(Quad2D bounds, @Nullable ComponentStyling properties){
+        super.build(bounds, properties);
         this.size = Quad2D.getQuadFromPercentage(bounds, percentages).setSizing(percentages.width, percentages.height);
         this.renderSize = properties == null ? size.copy() : properties.getRenderSizing(size);
     }

@@ -42,6 +42,10 @@ public interface IComponent {
      * this method should set the ComponentBounds, keeping the x, y alignment of the passed "host's" bounds*/
     void build(Quad2D bounds);
 
+    /**triggers a localised rebuild, used if the component is edited, it will rebuild with the last known host bounds, this will only perform a rebuild if the component has been built previously
+     * if z layer has also changed it is advisable to rebuild the entire GSI instead. */
+    void rebuild();
+
     /**this method will be called by the "host" and is used for rendering the component within the bounds setup*/
     void render(GSIRenderContext context);
 
