@@ -22,7 +22,7 @@ public class TextButtonComponent extends ColouredButtonComponent {
         context.matrix.translate(0,0, -0.0001F);
         int width = Minecraft.getInstance().fontRenderer.getStringWidth(text);
         int height = Minecraft.getInstance().fontRenderer.FONT_HEIGHT;
-        GSIRenderHelper.renderBasicString(context, text, getBounds().renderBounds().x + ComponentAlignment.CENTERED.align(width, getBounds().renderBounds().getWidth()), getBounds().renderBounds().y + ComponentAlignment.CENTERED.align(height, getBounds().renderBounds().getHeight()), -1, false);
+        GSIRenderHelper.renderBasicString(context, text, getBounds().innerSize().x + ComponentAlignment.CENTERED.align(width, getBounds().innerSize().getWidth()), getBounds().innerSize().y + ComponentAlignment.CENTERED.align(height, getBounds().innerSize().getHeight()), -1, false);
     }
 
 }

@@ -12,7 +12,7 @@ import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleHolder;
-import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
 
 import javax.annotation.Nonnull;
 import java.util.List;

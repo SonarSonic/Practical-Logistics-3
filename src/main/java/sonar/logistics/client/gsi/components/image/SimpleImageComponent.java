@@ -52,8 +52,8 @@ public class SimpleImageComponent extends AbstractComponent {
 
         switch (fillType){
             case IMAGE_FILL:
-                float widthRatio = (float)getBounds().renderBounds().width / nativeWidth;
-                float heightRatio = (float)getBounds().renderBounds().height / nativeHeight;
+                float widthRatio = (float)getBounds().innerSize().width / nativeWidth;
+                float heightRatio = (float)getBounds().innerSize().height / nativeHeight;
                 if(widthRatio < heightRatio){
                     float widthU = widthRatio / heightRatio;
                     minU = (1-widthU)/2;
@@ -63,14 +63,14 @@ public class SimpleImageComponent extends AbstractComponent {
                     minV = (1-heightV)/2;
                     maxV = minV + heightV;
                 }
-                imageQuad = getBounds().renderBounds();
+                imageQuad = getBounds().innerSize();
                 break;
             case IMAGE_FIT:
-                Vector2D sizing = Vector2D.getSizingFromRatio(getBounds().renderBounds().getSizing(), new Vector2D(nativeWidth, nativeHeight));
-                imageQuad = new Quad2D(0, 0, sizing.getX(), sizing.getY()).align(getBounds().renderBounds(), ComponentAlignment.CENTERED, ComponentAlignment.CENTERED);
+                Vector2D sizing = Vector2D.getSizingFromRatio(getBounds().innerSize().getSizing(), new Vector2D(nativeWidth, nativeHeight));
+                imageQuad = new Quad2D(0, 0, sizing.getX(), sizing.getY()).align(getBounds().innerSize(), ComponentAlignment.CENTERED, ComponentAlignment.CENTERED);
                 break;
             case IMAGE_STRETCH:
-                imageQuad = getBounds().renderBounds();
+                imageQuad = getBounds().innerSize();
                 break;
         }
     }
@@ -79,7 +79,6 @@ public class SimpleImageComponent extends AbstractComponent {
     public void render(GSIRenderContext context) {
         super.render(context);
         if(nativeWidth != -1 && nativeHeight != -1){
-            //texture.bindTexture();
             GSIRenderHelper.renderTexturedRect(context, RenderType.getEntitySolid(loc), false, imageQuad, ScreenUtils.white.rgba, minU, maxU, minV, maxV);
         }
     }

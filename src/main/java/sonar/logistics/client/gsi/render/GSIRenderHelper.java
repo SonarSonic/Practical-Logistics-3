@@ -10,10 +10,11 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.logistics.PL3;
+import sonar.logistics.client.gsi.style.ComponentBounds;
+import sonar.logistics.client.gsi.style.ComponentStyling;
+import sonar.logistics.client.gsi.style.StyleHelper;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.gsi.properties.ColourProperty;
-import sonar.logistics.client.gsi.properties.ComponentBounds;
-import sonar.logistics.client.gsi.properties.ComponentStyling;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.client.vectors.Quad2D;
 
 public class GSIRenderHelper {
@@ -57,6 +58,9 @@ public class GSIRenderHelper {
         renderColouredRect(context, batched, (float)bounds.getX(), (float)bounds.getY(), (float)bounds.getMaxX(), (float)bounds.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba));
     }
 
+    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2D bounds, ColourProperty colourProperty){
+        renderColouredRect(context, batched, (float)bounds.getX(), (float)bounds.getY(), (float)bounds.getMaxX(), (float)bounds.getMaxY(), colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
+    }
     public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2D bounds, double x, double y, double width, double height, ColourProperty colourProperty){
         renderColouredRect(context, batched, bounds, x, y, width, height, colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
     }
@@ -103,42 +107,43 @@ public class GSIRenderHelper {
 
     ///// STYLES \\\\\
 
-    public static void renderBorders(GSIRenderContext context, ComponentBounds alignment, ComponentStyling styling){
-        /*
-        double marginWidth = styling.marginWidth.getRenderSize(alignment.maxBounds().getWidth());
-        double marginHeight = styling.marginHeight.getRenderSize(alignment.maxBounds().getHeight());
+    public static void renderComponentBorder(GSIRenderContext context, ComponentBounds bounds, ComponentStyling styling){
 
-        double endX = alignment.maxBounds().getWidth() - marginWidth;
-        double endY = alignment.maxBounds().getHeight() - marginHeight;
+        double borderWidth = StyleHelper.getLengthSafe(styling.getBorderWidth(), bounds.outerSize().getWidth());
+        double borderHeight = StyleHelper.getLengthSafe(styling.getBorderHeight(), bounds.outerSize().getHeight());
 
+        if(borderWidth > 0 || borderHeight > 0) {
 
+            double marginWidth = StyleHelper.getLengthSafe(styling.getMarginWidth(), bounds.outerSize().getWidth());
+            double marginHeight = StyleHelper.getLengthSafe(styling.getMarginHeight(), bounds.outerSize().getHeight());
 
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), endX-borderWidth, marginHeight, borderWidth, endY - borderHeight*2, styling.borderColour);
+            double fullWidth = bounds.outerSize().width - marginWidth*2;
+            double fullHeight = bounds.outerSize().height - marginHeight*2;
 
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, endY - borderHeight, endX - borderWidth*2, borderHeight, styling.borderColour);
-
-         */
-
-        double marginWidth = styling.marginWidth.getRenderSize(alignment.maxBounds().getWidth());
-        double marginHeight = styling.marginHeight.getRenderSize(alignment.maxBounds().getHeight());
-
-        double fullWidth = alignment.maxBounds().width - marginWidth*2;
-        double fullHeight = alignment.maxBounds().height - marginHeight*2;
-
-        double borderWidth = styling.borderSize.getRenderSize(alignment.maxBounds().getWidth());
-        double borderHeight = styling.borderSize.getRenderSize(alignment.maxBounds().getHeight());
-
-        //GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, fullWidth, fullHeight, styling.borderColour);
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, fullWidth, borderHeight, styling.borderColour);
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight + fullHeight - borderHeight, fullWidth, borderHeight, styling.borderColour);
+            //GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight, fullWidth, fullHeight, styling.borderColour);
+            GSIRenderHelper.renderColouredRect(context, true, bounds.outerSize(), marginWidth, marginHeight, fullWidth, borderHeight, styling.getBorderColour());
+            GSIRenderHelper.renderColouredRect(context, true, bounds.outerSize(), marginWidth, marginHeight + fullHeight - borderHeight, fullWidth, borderHeight, styling.getBorderColour());
 
 
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth, marginHeight + borderHeight, borderWidth, fullHeight - borderHeight*2, styling.borderColour);
-        GSIRenderHelper.renderColouredRect(context, true, alignment.maxBounds(), marginWidth + fullWidth - borderWidth, marginHeight + borderHeight, borderWidth, fullHeight - borderHeight*2, styling.borderColour);
+            GSIRenderHelper.renderColouredRect(context, true, bounds.outerSize(), marginWidth, marginHeight + borderHeight, borderWidth, fullHeight - borderHeight * 2, styling.getBorderColour());
+            GSIRenderHelper.renderColouredRect(context, true, bounds.outerSize(), marginWidth + fullWidth - borderWidth, marginHeight + borderHeight, borderWidth, fullHeight - borderHeight * 2, styling.getBorderColour());
 
+            GSIRenderHelper.pushLayerOffset(context, 1);
+        }
     }
+
+    public static void renderComponentBackground(GSIRenderContext context, ComponentBounds bounds, ComponentStyling styling){
+        if(styling.getOuterBackgroundColour() != null) {
+            GSIRenderHelper.renderColouredRect(context, true, bounds.outerSize(), styling.getOuterBackgroundColour());
+            GSIRenderHelper.pushLayerOffset(context, 1);
+        }
+
+        if(styling.getInnerBackgroundColour() != null) {
+            GSIRenderHelper.renderColouredRect(context, true, bounds.innerSize(), styling.getInnerBackgroundColour());
+            GSIRenderHelper.pushLayerOffset(context, 1);
+        }
+    }
+
 
 
     public static void renderBasicString(GSIRenderContext context, String text, double x, double y, int rgba, boolean shadow){

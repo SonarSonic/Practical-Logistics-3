@@ -4,7 +4,7 @@ import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.util.MathUtils;
 
 public class GSIDesignSettings {

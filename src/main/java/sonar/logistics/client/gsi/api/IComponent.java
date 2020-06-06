@@ -2,9 +2,9 @@ package sonar.logistics.client.gsi.api;
 
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
+import sonar.logistics.client.gsi.style.ComponentStyling;
+import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.properties.ComponentBounds;
-import sonar.logistics.client.gsi.properties.ComponentStyling;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
 
@@ -76,7 +76,7 @@ public interface IComponent {
     }
 
     default Vector2D getRelativeMousePos(){
-        return getMousePos().copy().sub(getBounds().renderBounds().getAlignment());
+        return getMousePos().copy().sub(getBounds().innerSize().getAlignment());
     }
 
     default boolean isFocusedComponent(){

@@ -1,4 +1,4 @@
-package sonar.logistics.client.gsi.properties;
+package sonar.logistics.client.gsi.style.properties;
 
 public class ColourProperty {
 

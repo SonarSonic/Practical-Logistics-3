@@ -1,17 +1,13 @@
 package sonar.logistics.client.gsi.components.groups.interfaces;
 
 import sonar.logistics.client.gsi.components.buttons.ColouredButtonComponent;
-import sonar.logistics.client.gsi.components.buttons.TextButtonComponent;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
-import sonar.logistics.client.gsi.interactions.triggers.Trigger;
-import sonar.logistics.client.gsi.properties.AbsoluteBounds;
-import sonar.logistics.client.gsi.properties.ColourProperty;
-import sonar.logistics.client.gsi.properties.ComponentBounds;
-import sonar.logistics.client.gsi.properties.ScaleableBounds;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
+import sonar.logistics.client.gsi.style.properties.UnitType;
 import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
 
@@ -21,33 +17,33 @@ public abstract class ColourSelectionWindow extends WindowGroup {
     public TextInputComponent red, green, blue;
     public SliderComponent redSlider, greenSlider, blueSlider;
 
-    public ColourSelectionWindow(AbsoluteBounds bounds) {
-        super("Colour Picker", bounds);
+    public ColourSelectionWindow() {
+        super("Colour Picker");
     }
 
     @Override
     public void init() {
         super.init();
-        addComponent(red = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).setBounds(new ScaleableBounds(0.8, 1/12D, 0.2, 1/6D));
-        addComponent(green = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).setBounds(new ScaleableBounds(0.8, 5/12D, 0.2, 1/6D));
-        addComponent(blue = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).setBounds(new ScaleableBounds(0.8, 9/12D, 0.2, 1/6D));
+        addComponent(red = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 1/12D, 0.2, 1/6D, UnitType.PERCENT);
+        addComponent(green = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 5/12D, 0.2, 1/6D, UnitType.PERCENT);
+        addComponent(blue = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 9/12D, 0.2, 1/6D, UnitType.PERCENT);
 
         //set default gui font height
         red.inputGlyphStyle.fontHeight = 9;
         green.inputGlyphStyle.fontHeight = 9;
         blue.inputGlyphStyle.fontHeight = 9;
 
-        red.styling.bgdColour = ScreenUtils.transparent_disabled_button;
-        green.styling.bgdColour = ScreenUtils.transparent_disabled_button;
-        blue.styling.bgdColour = ScreenUtils.transparent_disabled_button;
+        red.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
+        green.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
+        blue.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
 
-        addComponent(redSlider = new SliderComponent(1).setHandleColour(ScreenUtils.red_button.rgba).setTrigger(this::updateColourFromSlider)).setBounds(new ScaleableBounds(0.1, 1/12D, 0.7, 1/6D));
-        addComponent(greenSlider = new SliderComponent(1).setHandleColour(ScreenUtils.green_button.rgba).setTrigger(this::updateColourFromSlider)).setBounds(new ScaleableBounds(0.1, 5/12D, 0.7, 1/6D));
-        addComponent(blueSlider = new SliderComponent(1).setHandleColour(ScreenUtils.blue_button.rgba).setTrigger(this::updateColourFromSlider)).setBounds(new ScaleableBounds(0.1, 9/12D, 0.7, 1/6D));
+        addComponent(redSlider = new SliderComponent().setHandleColour(ScreenUtils.red_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 1/12D, 0.7, 1/6D, UnitType.PERCENT);
+        addComponent(greenSlider = new SliderComponent().setHandleColour(ScreenUtils.green_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 5/12D, 0.7, 1/6D, UnitType.PERCENT);
+        addComponent(blueSlider = new SliderComponent().setHandleColour(ScreenUtils.blue_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 9/12D, 0.7, 1/6D, UnitType.PERCENT);
 
-        redSlider.styling.bgdColour = ScreenUtils.transparent_red_button;
-        greenSlider.styling.bgdColour = ScreenUtils.transparent_green_button;
-        blueSlider.styling.bgdColour = ScreenUtils.transparent_blue_button;
+        redSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
+        greenSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
+        blueSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
 
     }
 
@@ -57,9 +53,9 @@ public abstract class ColourSelectionWindow extends WindowGroup {
             context.matrix.translate(0, 0, -10);
             super.render(context);
             context.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET*4);
-            GSIRenderHelper.renderBasicString(context, "R: ", getBounds().renderBounds().x + 1, redSlider.getBounds().maxBounds().getCentreY() - 9D/2D, ScreenUtils.red_button.rgba, true);
-            GSIRenderHelper.renderBasicString(context,"G: ", getBounds().renderBounds().x + 1, greenSlider.getBounds().maxBounds().getCentreY() - 9D/2D, ScreenUtils.green_button.rgba, true);
-            GSIRenderHelper.renderBasicString(context,"B: ", getBounds().renderBounds().x + 1, blueSlider.getBounds().maxBounds().getCentreY() - 9D/2D, ScreenUtils.blue_button.rgba, true);
+            GSIRenderHelper.renderBasicString(context, "R: ", getBounds().innerSize().x + 1, redSlider.getBounds().outerSize().getCentreY() - 9D/2D, ScreenUtils.red_button.rgba, true);
+            GSIRenderHelper.renderBasicString(context,"G: ", getBounds().innerSize().x + 1, greenSlider.getBounds().outerSize().getCentreY() - 9D/2D, ScreenUtils.green_button.rgba, true);
+            GSIRenderHelper.renderBasicString(context,"B: ", getBounds().innerSize().x + 1, blueSlider.getBounds().outerSize().getCentreY() - 9D/2D, ScreenUtils.blue_button.rgba, true);
         }
     }
 

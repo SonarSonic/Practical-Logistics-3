@@ -41,7 +41,6 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
 
 
     {
-        styling.borderSize.getRenderSize(1);
         inputLineStyle.justifyType = LineStyle.JustifyType.JUSTIFY_CENTRE;
         inputLineStyle.wrappingType = LineStyle.WrappingType.WRAP_OFF;
     }
@@ -71,7 +70,7 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
     @Override
     public void build(Quad2D bounds) {
         super.build(bounds);
-        StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.renderBounds(), inputLineStyle, inputGlyphStyle);
+        StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.innerSize(), inputLineStyle, inputGlyphStyle);
         StyledTextWrapper.INSTANCE.alignPages(ComponentAlignment.CENTERED);
     }
 
@@ -91,7 +90,7 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
         super.render(context);
 
         context.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET);
-        GSIRenderHelper.renderColouredRect(context, true, bounds.renderBounds(), ScreenUtils.transparent_grey_bgd.rgba);
+        GSIRenderHelper.renderColouredRect(context, true, bounds.innerSize(), ScreenUtils.transparent_grey_bgd.rgba);
         context.matrix.push();
         context.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET*2);
         StyledTextRenderer.INSTANCE.renderCurrentPage(context, fontType, pages);
@@ -132,7 +131,7 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
 
     @Override
     public boolean isMouseOver() {
-        return getBounds().maxBounds().contains(getInteractionHandler().mousePos);
+        return getBounds().outerSize().contains(getInteractionHandler().mousePos);
     }
 
     @Override

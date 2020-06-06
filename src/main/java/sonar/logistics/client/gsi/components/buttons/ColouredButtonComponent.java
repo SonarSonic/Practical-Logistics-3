@@ -40,7 +40,7 @@ public class ColouredButtonComponent extends AbstractComponent implements IInter
         super.render(context);
         context.matrix.translate(0,0, -0.0001F);
         int rgba = trigger != null && trigger.isActive(this, getInteractionHandler()) ? activatedColour : isMouseOver() ? hoveredColour : disabledColour;
-        GSIRenderHelper.renderColouredRect(context, true, bounds.renderBounds(), rgba);
+        GSIRenderHelper.renderColouredRect(context, true, bounds.innerSize(), rgba);
     }
 
     @Override

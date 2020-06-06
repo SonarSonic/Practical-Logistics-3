@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.PL3;
-import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.client.vectors.Quad2D;
 
 public class ScreenUtils {

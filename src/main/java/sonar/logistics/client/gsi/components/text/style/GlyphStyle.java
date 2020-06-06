@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.components.text.style;
 
-import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
 
 public class GlyphStyle {
 

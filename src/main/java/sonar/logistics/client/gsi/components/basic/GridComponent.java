@@ -68,10 +68,10 @@ public class GridComponent extends AbstractComponent implements IComponent {
         super.build(bounds);
 
         if(setCellSize) {
-            this.rows = (int)Math.floor(this.bounds.renderBounds().getHeight()/ cellSize.getY());
-            this.columns = (int)Math.floor(this.bounds.renderBounds().getWidth()/ cellSize.getX());
+            this.rows = (int)Math.floor(this.bounds.innerSize().getHeight()/ cellSize.getY());
+            this.columns = (int)Math.floor(this.bounds.innerSize().getWidth()/ cellSize.getX());
         }else {
-            this.cellSize = this.bounds.renderBounds().getSizing().mul(1D / columns, 1D / rows);
+            this.cellSize = this.bounds.innerSize().getSizing().mul(1D / columns, 1D / rows);
         }
 
         double uniformScale = Math.min(cellSize.x, cellSize.y);

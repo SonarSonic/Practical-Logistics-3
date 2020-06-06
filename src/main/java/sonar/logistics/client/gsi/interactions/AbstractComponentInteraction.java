@@ -16,7 +16,7 @@ public class AbstractComponentInteraction<C extends IComponent> implements IInte
 
     @Override
     public boolean isMouseOver() {
-        return component.getBounds().maxBounds().contains(getMousePos());
+        return component.getBounds().outerSize().contains(getMousePos());
     }
 
     ///

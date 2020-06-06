@@ -19,7 +19,7 @@ public class IconButtonComponent extends ColouredButtonComponent {
     public void render(GSIRenderContext context) {
         super.render(context);
         context.matrix.translate(0,0, -0.0001F);
-        GSIRenderHelper.renderTexturedRect(context, GSIRenderHelper.BUTTON_RENDER_TYPE, false, bounds.renderBounds(), ScreenUtils.white.rgba, icon.getUVLeft() / 256F, (icon.getUVLeft() + icon.getWidth()) / 256F, icon.getUVTop() / 256F, (icon.getUVTop() + icon.getHeight()) / 256F);
+        GSIRenderHelper.renderTexturedRect(context, GSIRenderHelper.BUTTON_RENDER_TYPE, false, bounds.innerSize(), ScreenUtils.white.rgba, icon.getUVLeft() / 256F, (icon.getUVLeft() + icon.getWidth()) / 256F, icon.getUVTop() / 256F, (icon.getUVTop() + icon.getHeight()) / 256F);
     }
 
 }

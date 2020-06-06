@@ -18,17 +18,19 @@ public class GridGroup extends AbstractGroup {
 
     @Override
     public boolean isMouseOver() {
-        return getBounds().maxBounds().contains(getInteractionHandler().mousePos);
+        return getBounds().outerSize().contains(getInteractionHandler().mousePos);
     }
 
-    public void setGridSize(int columns, int rows){
+    public GridGroup setGridSize(int columns, int rows){
         this.columns = columns;
         this.rows = rows;
+        return this;
     }
 
-    public void setCellSize(Vector2D cellSize){
+    public GridGroup setCellSize(Vector2D cellSize){
         this.cellSize = cellSize;
         this.setCellSize = true;
+        return this;
     }
 
     @Override
@@ -51,10 +53,10 @@ public class GridGroup extends AbstractGroup {
     public void build(Quad2D bounds) {
         super.build(bounds);
         if(setCellSize) {
-            this.rows = (int)Math.floor(this.bounds.renderBounds().getHeight()/ cellSize.getY());
-            this.columns = (int)Math.floor(this.bounds.renderBounds().getWidth()/ cellSize.getX());
+            this.rows = (int)Math.floor(this.bounds.innerSize().getHeight()/ cellSize.getY());
+            this.columns = (int)Math.floor(this.bounds.innerSize().getWidth()/ cellSize.getX());
         }else {
-            this.cellSize = this.bounds.renderBounds().getSizing().mul(1D / columns, 1D / rows);
+            this.cellSize = this.bounds.innerSize().getSizing().mul(1D / columns, 1D / rows);
         }
 
         /////set the sizing for each component.
@@ -63,7 +65,7 @@ public class GridGroup extends AbstractGroup {
                 int pos = (r*columns) + c;
                 IComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
                 if(component != null){
-                    Vector2D componentAlignment = this.bounds.renderBounds().getAlignment().add(c * cellSize.getX(), r * cellSize.getY());
+                    Vector2D componentAlignment = this.bounds.innerSize().getAlignment().add(c * cellSize.getX(), r * cellSize.getY());
                     component.build(new Quad2D(componentAlignment, cellSize));
                 }
             }

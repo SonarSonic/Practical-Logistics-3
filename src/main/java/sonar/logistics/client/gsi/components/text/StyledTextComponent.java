@@ -25,7 +25,7 @@ public class StyledTextComponent extends AbstractComponent implements ITextCompo
     @Override
     public void build(Quad2D bounds) {
         super.build(bounds);
-        StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.renderBounds(), new LineStyle(), null);
+        StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.innerSize(), new LineStyle(), null);
     }
 
     @Override

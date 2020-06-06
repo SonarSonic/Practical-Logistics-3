@@ -3,7 +3,7 @@ package sonar.logistics.client.gsi.components.text.render;
 import net.minecraft.client.gui.fonts.Font;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.properties.ColourProperty;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
 
 public class GlyphRenderContext {
 

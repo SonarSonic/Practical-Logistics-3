@@ -2,12 +2,10 @@ package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import sonar.logistics.PL3;
 import sonar.logistics.client.gsi.api.EnumImageFillType;
 import sonar.logistics.client.gsi.api.IComponentHost;
 import sonar.logistics.client.gsi.components.image.SimpleImageComponent;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
-import sonar.logistics.client.gsi.components.input.TextInputComponent;
 import sonar.logistics.client.gsi.interactions.ResizingInteraction;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.api.IComponent;
@@ -17,7 +15,8 @@ import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.properties.ScaleableBounds;
+import sonar.logistics.client.gsi.style.properties.UnitLength;
+import sonar.logistics.client.gsi.style.properties.UnitType;
 import sonar.logistics.client.gui.GSIDesignScreen;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
@@ -60,9 +59,9 @@ public class GSI implements IComponentHost {
         //build the components
         components.forEach(c -> c.build(bounds));
         //for rendering components we sort back to front - lowest z first
-        components.sort(Comparator.comparingInt(i -> i.getBounds().getZLayer()));
+        components.sort(Comparator.comparingInt(i -> i.getStyling().getZLayer()));
         //for interactions we sort front to back - highest z first
-        interactions.sort(Comparator.comparingInt(i -> -((IComponent)i).getBounds().getZLayer()));
+        interactions.sort(Comparator.comparingInt(i -> -((IComponent)i).getStyling().getZLayer()));
     }
 
     public void tick(){
@@ -100,7 +99,7 @@ public class GSI implements IComponentHost {
     }
 
     public IComponent getComponentAt(Vector2D mouseHit) {
-        return getComponent(components, component -> component.getBounds().maxBounds().contains(mouseHit));
+        return getComponent(components, component -> component.getBounds().outerSize().contains(mouseHit));
     }
 
     @Nullable
@@ -146,7 +145,7 @@ public class GSI implements IComponentHost {
                     }
                     return true;
                 }
-                IComponent hovered = getComponent(components, c -> c.getBounds().maxBounds().contains(interactionHandler.mousePos));
+                IComponent hovered = getComponent(components, c -> c.getBounds().outerSize().contains(interactionHandler.mousePos));
                 if(hovered != null) {
                     setFocused(new ResizingInteraction(hovered));
                     tryStartDragging(button);
@@ -172,13 +171,11 @@ public class GSI implements IComponentHost {
 
 
         StyledTextComponent lines = new StyledTextComponent();
-        lines.setBounds(new ScaleableBounds(new Quad2D(0, 0, 1, 0.5)));
+        lines.getStyling().setSizing(0, 0, 1, 0.5, UnitType.PERCENT);
 
-        lines.styling.marginWidth.value = 0.0625F/2;
-        lines.styling.marginHeight.value = 0.0625F/2;
+        lines.getStyling().setBorderWidth(new UnitLength(UnitType.PIXEL, 0.0625/4));
+        lines.getStyling().setBorderHeight(new UnitLength(UnitType.PIXEL, 0.0625/4));
 
-        lines.styling.borderSize.value = 0.0625F/4;
-        lines.styling.borderPadding.value = 0.0625F/4;
         StyledTextString element = new StyledTextString();
 
         LineStyle lineStyle = new LineStyle();
@@ -192,14 +189,13 @@ public class GSI implements IComponentHost {
 
         addComponent(lines);
 
-        SliderComponent slider = new SliderComponent(0.5);
-        slider.isVertical = true;
-        slider.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.2)));
+        SliderComponent slider = new SliderComponent();
+        slider.getStyling().setSizing(0, 0.5, 1, 0.2, UnitType.PERCENT);
         addComponent(slider);
 
 
         SimpleImageComponent imageComponent = new SimpleImageComponent(new ResourceLocation("minecraft", "textures/block/bedrock.png"), EnumImageFillType.IMAGE_FILL);
-        imageComponent.setBounds(new ScaleableBounds(new Quad2D(0, 0.7, 1, 0.3)));
+        imageComponent.getStyling().setSizing(0, 0.7, 1, 0.3, UnitType.PERCENT);
         addComponent(imageComponent);
 
         /*

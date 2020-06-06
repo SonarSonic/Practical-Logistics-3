@@ -15,6 +15,6 @@ public class RectangleComponent extends AbstractComponent {
     @Override
     public void render(GSIRenderContext context) {
         super.render(context);
-        GSIRenderHelper.renderColouredRect(context, true, bounds.renderBounds(), rgba);
+        GSIRenderHelper.renderColouredRect(context, true, bounds.innerSize(), rgba);
     }
 }

@@ -12,6 +12,6 @@ public class RenderSpeedTest extends AbstractComponent implements IComponent {
     public void render(GSIRenderContext context) {
         super.render(context);
         ItemStack stack = new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK);
-        context.itemStackRenderer.addBatchedItemStack(stack, bounds.renderBounds());
+        context.itemStackRenderer.addBatchedItemStack(stack, bounds.innerSize());
     }
 }

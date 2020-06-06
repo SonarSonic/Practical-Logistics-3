@@ -21,7 +21,7 @@ public class ElementComponent extends AbstractComponent implements IComponent {
             return;
         }
         context.matrix.push();
-        element.render(context, bounds.renderBounds());
+        element.render(context, bounds.innerSize());
         context.matrix.pop();
     }
 

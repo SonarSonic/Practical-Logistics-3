@@ -19,7 +19,6 @@ public class PrimitiveDataTypes {
             return newData.booleanValue() != currentData.booleanValue();
         }
 
-
     }
 
     public static class BooleanDataFactory implements IDataFactory<BooleanData> {

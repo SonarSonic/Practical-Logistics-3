@@ -8,13 +8,15 @@ import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.vectors.Quad2D;
 import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.MathUtils;
 
 import javax.annotation.Nullable;
 
 public class SliderComponent extends AbstractComponent implements IInteractionComponent {
 
-    //between 0 & 1
-    public double sliderValue;
+    public double sliderValue = 0;
+    public double stepSize = Double.MIN_VALUE;
+
     public boolean isVertical = false;
 
     public int handleColour = ScreenUtils.transparent_green_button.rgba;
@@ -22,9 +24,7 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
     @Nullable
     public ITrigger<SliderComponent> trigger;
 
-    public SliderComponent(double sliderValue){
-        this.sliderValue = sliderValue;
-    }
+    public SliderComponent(){}
 
     public SliderComponent setTrigger(@Nullable ITrigger<SliderComponent> trigger) {
         this.trigger = trigger;
@@ -45,13 +45,13 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
         super.render(context);
         Quad2D sliderHandle;
         if(!isVertical) {
-            sliderHandle = new Quad2D(0, 0, getBounds().renderBounds().getWidth() / 16, getBounds().renderBounds().getHeight());
-            sliderHandle.x = getBounds().renderBounds().getX() + ((getBounds().renderBounds().width - sliderHandle.width) * sliderValue);
-            sliderHandle.y = getBounds().renderBounds().getY();
+            sliderHandle = new Quad2D(0, 0, getBounds().innerSize().getWidth() / 16, getBounds().innerSize().getHeight());
+            sliderHandle.x = getBounds().innerSize().getX() + ((getBounds().innerSize().width - sliderHandle.width) * sliderValue);
+            sliderHandle.y = getBounds().innerSize().getY();
         }else{
-            sliderHandle = new Quad2D(0, 0, getBounds().renderBounds().getWidth(), getBounds().renderBounds().getHeight() / 16);
-            sliderHandle.x = getBounds().renderBounds().getX();
-            sliderHandle.y = getBounds().renderBounds().getY() + ((getBounds().renderBounds().height - sliderHandle.height) * sliderValue);
+            sliderHandle = new Quad2D(0, 0, getBounds().innerSize().getWidth(), getBounds().innerSize().getHeight() / 16);
+            sliderHandle.x = getBounds().innerSize().getX();
+            sliderHandle.y = getBounds().innerSize().getY() + ((getBounds().innerSize().height - sliderHandle.height) * sliderValue);
         }
         renderSliderHandle(context, sliderHandle);
 
@@ -68,9 +68,9 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
     public void updateSliderFromMouse(){
         Vector2D relativeMouse = getRelativeMousePos();
         if(!isVertical) {
-            sliderValue = relativeMouse.x / getBounds().renderBounds().width;
+            sliderValue = relativeMouse.x / getBounds().innerSize().width;
         }else{
-            sliderValue = relativeMouse.y / getBounds().renderBounds().height;
+            sliderValue = relativeMouse.y / getBounds().innerSize().height;
         }
     }
 
@@ -105,6 +105,8 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
     }
 
     public void checkSlider(){
+        sliderValue = MathUtils.roundTo(sliderValue, stepSize);
+
         if (this.sliderValue < 0.0F){
             this.sliderValue = 0.0F;
         }
@@ -114,6 +116,14 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
         }
     }
 
+    public double getRangedValue(double minValue, double maxValue){
+        return this.sliderValue * (maxValue - minValue) + minValue;
+    }
+
+    public void setRangedValue(double value, double minValue, double maxValue){
+        this.sliderValue = (value - minValue) / (maxValue - minValue);
+    }
+
     ///
 
     public void onSliderChanged(){
@@ -121,4 +131,5 @@ public class SliderComponent extends AbstractComponent implements IInteractionCo
             trigger.trigger(this, getInteractionHandler());
         }
     }
+
 }

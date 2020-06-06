@@ -38,7 +38,7 @@ public abstract class AbstractGroup extends AbstractComponent implements ICompon
     }
 
 
-    public IComponent addComponent(IComponent component){
+    public <C extends IComponent> C addComponent(C component){
         component.setHost(this);
         subComponents.add(component);
         if(component instanceof  IInteractionListener){
@@ -47,10 +47,10 @@ public abstract class AbstractGroup extends AbstractComponent implements ICompon
         return component;
     }
 
-    public IComponent removeComponent(IComponent component){
+    public <C extends IComponent> C removeComponent(C component){
         component.setHost(null);
         subComponents.remove(component);
-        if(component instanceof  IInteractionListener){
+        if(component instanceof IInteractionListener){
             interactions.remove(component);
         }
         return component;

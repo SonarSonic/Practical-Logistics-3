@@ -91,6 +91,29 @@ public class Quad2D {
 
     /////
 
+    public Quad2D setX(double x) {
+        this.x = x;
+        return this;
+    }
+
+    public Quad2D setY(double y) {
+        this.y = y;
+        return this;
+    }
+
+    public Quad2D setWidth(double width) {
+        this.width = width;
+        return this;
+    }
+
+    public Quad2D setHeight(double height) {
+        this.height = height;
+        return this;
+    }
+
+
+    /////
+
     public Quad2D setAlignment(double x, double y){
         this.x = x;
         this.y = y;
@@ -239,6 +262,14 @@ public class Quad2D {
     /**this method multiplies the given quad's width / height to obtain the translation and size*/
     public static Quad2D getQuadFromPercentage(Quad2D quad2D, Quad2D percentages){
         return new Quad2D(quad2D.getX() + (quad2D.width * percentages.x), quad2D.getY() + (quad2D.height * percentages.y), quad2D.width * percentages.width, quad2D.height * percentages.height);
+    }
+
+    public static Quad2D getQuadFromAbsolutes(Quad2D quad2D, Quad2D scaleables, boolean[] absolutes){
+        return new Quad2D (
+                absolutes[0] ? quad2D.getX() + scaleables.getX() : quad2D.getX() + (quad2D.width * scaleables.x),
+                absolutes[1] ? quad2D.getY() + scaleables.getY() : quad2D.getY() + (quad2D.height * scaleables.y),
+                absolutes[2] ? scaleables.getWidth() : quad2D.width * scaleables.width,
+                absolutes[3] ? scaleables.getHeight() : quad2D.height * scaleables.height);
     }
 
     /**aligns the quad within the given alignments, the adjusts the quad it is called on.*/
