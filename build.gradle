@@ -8,6 +8,7 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
@@ -85,17 +86,31 @@ minecraft {
     }
 }
 
+configurations {
+    embed
+    compile.extendsFrom(embed)
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.15.2-31.2.0'
 
-    compile group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true
-    runtime group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-windows'
-    runtime group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-linux'
-    runtime group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-macos'
-    compileClasspath()
+
+    embed group: "org.joml", name: "joml", version: "1.9.25", changing: true
+
+    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true
+    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-windows'
+    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-linux'
+    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-macos'
+
+
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"
@@ -129,10 +144,7 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-        configurations.compile.coll
-    }
+    from configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
 // Example configuration to allow publishing using the maven-publish task

@@ -6,4 +6,12 @@ public enum UnitType {
     PIXEL,
     PERCENT;
 
+    public boolean isAuto(){
+        return this == AUTO;
+    }
+
+    public boolean isDefinite(){
+        return this != AUTO;
+    }
+
 }

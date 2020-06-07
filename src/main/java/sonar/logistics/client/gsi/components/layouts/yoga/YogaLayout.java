@@ -1,10 +1,8 @@
-package sonar.logistics.client.gsi.components.layouts;
+package sonar.logistics.client.gsi.components.layouts.yoga;
 
 import org.lwjgl.util.yoga.Yoga;
 import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.components.layouts.yoga.YogaStylingDefault;
-import sonar.logistics.client.gsi.components.shapes.YogaRectTest;
-import sonar.logistics.client.gsi.components.layouts.yoga.YogaStylingBase;
+import sonar.logistics.client.gsi.components.layouts.Layout;
 import sonar.logistics.client.vectors.Quad2D;
 
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ public class YogaLayout extends Layout {
         List<Long> childNodes = new ArrayList<>();
         for(IComponent component : components){
             long childNode = YGNodeNew();
-            prepareNodeFromStyle(((YogaRectTest)component).yogaStyling, childNode);
+            prepareNodeFromStyle(((YogaRectTest)component).flex, childNode);
             YGNodeInsertChild(rootNode, childNode, childNodes.size());
             childNodes.add(childNode);
         }

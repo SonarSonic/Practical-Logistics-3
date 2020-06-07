@@ -11,6 +11,10 @@ public class StyleHelper {
         return length == null ? 0 : length.getValue(maxValue);
     }
 
+    public static float getLengthSafeF(Length length, double maxValue) {
+        return (float)getLengthSafe(length, maxValue);
+    }
+
     /*returns the maximum outer size for the component*/
     public static Quad2D getComponentOuterSize(Quad2D bounds, ComponentStyling style){
         Quad2D outerSize = new Quad2D(

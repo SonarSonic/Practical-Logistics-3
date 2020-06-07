@@ -1,4 +1,4 @@
-package sonar.logistics.client.gsi.components.layouts;
+package sonar.logistics.client.gsi.components.layouts.yoga;
 
 import org.lwjgl.util.yoga.Yoga;
 import sonar.logistics.PL3;
