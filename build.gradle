@@ -103,12 +103,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.2.0'
 
 
-    embed group: "org.joml", name: "joml", version: "1.9.25", changing: true
-
-    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true
-    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-windows'
-    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-linux'
-    embed group: 'org.lwjgl', name: 'lwjgl-yoga', version: lwjgl_version, changing: true, classifier: 'natives-macos'
+    //embed group: "org.joml", name: "joml", version: "1.9.25", changing: true
 
 
     // You may put jars on which you depend on in ./libs or you may define them like so..

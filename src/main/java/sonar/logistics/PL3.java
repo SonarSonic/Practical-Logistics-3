@@ -36,38 +36,6 @@ public class PL3 {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-
-        System.out.println(System.setProperty("org.lwjgl.librarypath", "C:\\Users\\Ollie\\AppData\\Local\\Temp\\lwjglOllie\\3.2.2-build-10"));
-
-        Class JOML = null;
-        try {
-            JOML = Class.forName("org.joml.Vector3d");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-
-        }finally{
-            if(JOML == null){
-                LOGGER.error("Couldn't find JOML!");
-            }else {
-                LOGGER.error("WE FOUND JOML");
-            }
-        }
-
-
-        Class yoga = null;
-        try {
-            yoga = Class.forName("org.lwjgl.util.yoga.Yoga");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-
-        }finally{
-            if(yoga == null){
-                LOGGER.error("Couldn't find YOGA!");
-            }else {
-                LOGGER.error("WE FOUND YOGA");
-            }
-        }
-
         LOGGER.info("Initialising Proxy");
         proxy.init();
         LOGGER.info("Registering Sapphire Ore Gen");

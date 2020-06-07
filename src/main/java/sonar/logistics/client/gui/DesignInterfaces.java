@@ -3,11 +3,8 @@ package sonar.logistics.client.gui;
 import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.components.buttons.ColouredButtonComponent;
 import sonar.logistics.client.gsi.components.groups.HeaderGroup;
-import sonar.logistics.client.gsi.components.groups.LayoutGroup;
 import sonar.logistics.client.gsi.components.groups.interfaces.*;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
-import sonar.logistics.client.gsi.components.layouts.yoga.YogaLayout;
-import sonar.logistics.client.gsi.components.layouts.yoga.YogaRectTest;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
@@ -136,24 +133,6 @@ public class DesignInterfaces {
 
         textToolsWidget.gsi.addComponent(colourSelectionWindow).getStyling().setSizing(100, 100, 160, 80, UnitType.PIXEL);
         textToolsWidget.gsi.addComponent(selectedColourButton.setTrigger(new Trigger<>((b, h) -> colourSelectionWindow.toggleVisibility(), (b, h) -> true)).setColours(GSIDesignSettings.selectedColour.rgba, -1, -1)).getStyling().setSizing(16*21, 8, 16, 16, UnitType.PIXEL);
-
-        LayoutGroup yogaLayoutTest = new LayoutGroup().setLayout(YogaLayout.INSTANCE);
-        yogaLayoutTest.getStyling().setSizing(0, 0, 200, 100, UnitType.PIXEL);
-
-        yogaLayoutTest.addComponent(new YogaRectTest(ScreenUtils.red_button.rgba));
-        yogaLayoutTest.addComponent(new YogaRectTest(ScreenUtils.blue_button.rgba));
-
-        /*
-        subYogaLayoutTest.addComponent(new YogaRectTest(ScreenUtils.blue_button.rgba));
-        subYogaLayoutTest.addComponent(new YogaRectTest(ScreenUtils.green_button.rgba));
-
-        yogaLayoutTest.addComponent(subYogaLayoutTest);
-         */
-
-
-        textToolsWidget.gsi.addComponent(yogaLayoutTest);
-
-
 
         /*
         LayoutGroup optionsList = new LayoutGroup();
