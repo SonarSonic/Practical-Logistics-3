@@ -25,8 +25,6 @@ public class MultipartEntry {
 
         this.tile = hasMultipartTile() ? multipart.createMultipartTile(this) : null;
         this.renderer = PL3.proxy.getMultipartRenderer(tile);
-
-
     }
 
     public void updateRenderState(){

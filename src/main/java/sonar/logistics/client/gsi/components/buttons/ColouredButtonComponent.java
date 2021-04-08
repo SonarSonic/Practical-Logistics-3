@@ -1,11 +1,12 @@
 package sonar.logistics.client.gsi.components.buttons;
 
 import sonar.logistics.client.gsi.interactions.api.IInteractionComponent;
-import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.components.AbstractComponent;
 import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
+import sonar.logistics.client.gsi.style.properties.ColourProperty;
+import sonar.logistics.client.gui.ScreenUtils;
 
 import javax.annotation.Nullable;
 
@@ -13,9 +14,6 @@ public class ColouredButtonComponent extends AbstractComponent implements IInter
 
     @Nullable
     public ITrigger<ColouredButtonComponent> trigger;
-    public int activatedColour = ScreenUtils.transparent_green_button.rgba;
-    public int disabledColour = ScreenUtils.transparent_disabled_button.rgba;
-    public int hoveredColour = ScreenUtils.transparent_hovered_button.rgba;
 
     public ColouredButtonComponent(){}
 
@@ -28,10 +26,10 @@ public class ColouredButtonComponent extends AbstractComponent implements IInter
         return this;
     }
 
-    public ColouredButtonComponent setColours(int activated, int disabled, int hovered){
-        activatedColour = activated;
-        disabledColour = disabled;
-        hoveredColour = hovered;
+    public ColouredButtonComponent setColours(int enabled, int disabled, int hovered){
+        styling.setEnabledTextColour(new ColourProperty(enabled));
+        styling.setDisabledTextColour(new ColourProperty(disabled));
+        styling.setHoveredTextColour(new ColourProperty(hovered));
         return this;
     }
 
@@ -39,7 +37,10 @@ public class ColouredButtonComponent extends AbstractComponent implements IInter
     public void render(GSIRenderContext context) {
         super.render(context);
         context.matrix.translate(0,0, -0.0001F);
-        int rgba = trigger != null && trigger.isActive(this, getInteractionHandler()) ? activatedColour : isMouseOver() ? hoveredColour : disabledColour;
+
+        boolean isEnabled = trigger != null && trigger.isActive(this, getInteractionHandler());
+        ColourProperty rgba = (isEnabled ? styling.getEnabledTextColour() : isMouseOver() ? styling.getHoveredTextColour() : styling.getDisabledTextColour());
+        rgba = rgba != null ? rgba : (isEnabled ? ScreenUtils.transparent_green_button : isMouseOver() ? ScreenUtils.transparent_hovered_button : ScreenUtils.transparent_disabled_button);
         GSIRenderHelper.renderColouredRect(context, true, bounds.innerSize(), rgba);
     }
 

@@ -41,7 +41,7 @@ public class LargeDisplayScreenBlock extends AbstractScreenBlock implements IMul
 
     @Override
     public ActionResultType onMultipartActivated(MultipartEntry entry, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        /*
+        /*TODO REMOVE ME
         if(!world.isRemote){
             if(player.isSneaking()) {
                 WorldCableData worldData = GlobalCableData.getWorldData(world);//TESTING

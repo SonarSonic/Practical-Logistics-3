@@ -1,7 +1,10 @@
 package sonar.logistics.client.gsi.components.text;
 
 import sonar.logistics.client.gsi.api.ComponentAlignment;
+import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.api.IComponentHost;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
+import sonar.logistics.client.gsi.components.text.glyph.ComponentGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.GlyphMetric;
@@ -136,6 +139,7 @@ public class StyledTextWrapper {
         float renderWidth = glyph.getRenderWidth(fontType, style);
         float renderHeight = glyph.getRenderHeight(fontType, style);
         GlyphRenderInfo renderInfo = new GlyphRenderInfo(index, glyph, style, renderWidth, renderHeight);
+
         styledTextPages.styledGlyphs.add(renderInfo);
 
         if(currentLineStyle.breakPreference.isWordBreaker(glyph)){
@@ -283,6 +287,16 @@ public class StyledTextWrapper {
                 for(GlyphRenderInfo glyph : line.glyphInfo){
                     glyph.quad.translate(0, offsetY);
                 }
+            }
+        }
+    }
+
+    public void buildSubComponents(IComponentHost host){
+        for(GlyphRenderInfo glyphInfo : styledTextPages.styledGlyphs){
+            if(glyphInfo.glyph instanceof ComponentGlyph){
+                IComponent component = ((ComponentGlyph) glyphInfo.glyph).component;
+                component.setHost(host);
+                component.build(glyphInfo.quad);
             }
         }
     }

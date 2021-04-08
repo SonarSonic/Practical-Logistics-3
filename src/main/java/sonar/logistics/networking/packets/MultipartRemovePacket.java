@@ -19,7 +19,7 @@ public class MultipartRemovePacket extends MultipartAbstractPacket {
 
     @Override
     public void handle(MultipartHostTile host, MultipartEntry entry, NetworkEvent.Context ctx) {
-        //CAN PLAYER REMOVE ?
+        //TODO CAN PLAYER REMOVE ?
         host.doRemoveMultipart(entry);
         //TODO do multipart drops.
     }

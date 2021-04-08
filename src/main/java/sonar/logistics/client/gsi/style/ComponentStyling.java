@@ -22,12 +22,7 @@ public class ComponentStyling {
 
     ////sizing
     protected Length width;
-    protected Length minWidth;
-    protected Length maxWidth;
-
     protected Length height;
-    protected Length minHeight;
-    protected Length maxHeight;
 
     ///offsets
     protected Length marginWidth;
@@ -43,7 +38,7 @@ public class ComponentStyling {
     protected ColourProperty borderColour;
 
     ///text colours
-    protected ColourProperty normalTextColour;
+    protected ColourProperty enabledTextColour;
     protected ColourProperty hoveredTextColour;
     protected ColourProperty disabledTextColour;
 
@@ -214,12 +209,12 @@ public class ComponentStyling {
     ///
 
     @Nullable
-    public ColourProperty getNormalTextColour() {
-        return normalTextColour == null ? DefaultStyling.INSTANCE.getNormalTextColour() : normalTextColour;
+    public ColourProperty getEnabledTextColour() {
+        return enabledTextColour == null ? DefaultStyling.INSTANCE.getEnabledTextColour() : enabledTextColour;
     }
 
-    public void setNormalTextColour(@Nullable ColourProperty normalTextColour) {
-        this.normalTextColour = normalTextColour;
+    public void setEnabledTextColour(@Nullable ColourProperty enabledTextColour) {
+        this.enabledTextColour = enabledTextColour;
     }
 
     @Nullable

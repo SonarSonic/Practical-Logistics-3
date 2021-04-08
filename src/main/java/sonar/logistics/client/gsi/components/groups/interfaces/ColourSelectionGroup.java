@@ -1,6 +1,7 @@
 package sonar.logistics.client.gsi.components.groups.interfaces;
 
 import sonar.logistics.client.gsi.components.buttons.ColouredButtonComponent;
+import sonar.logistics.client.gsi.components.groups.AbstractGroup;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
@@ -10,20 +11,19 @@ import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.properties.UnitType;
 import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
+import sonar.logistics.client.vectors.Quad2D;
 
 //TODO Z DEPTH FOR WINDOWS
-public abstract class ColourSelectionWindow extends WindowGroup {
+public abstract class ColourSelectionGroup extends AbstractGroup {
 
     public TextInputComponent red, green, blue;
     public SliderComponent redSlider, greenSlider, blueSlider;
 
-    public ColourSelectionWindow() {
-        super("Colour Picker");
+    public ColourSelectionGroup() {
+        init();
     }
 
-    @Override
     public void init() {
-        super.init();
         addComponent(red = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 1/12D, 0.2, 1/6D, UnitType.PERCENT);
         addComponent(green = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 5/12D, 0.2, 1/6D, UnitType.PERCENT);
         addComponent(blue = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 9/12D, 0.2, 1/6D, UnitType.PERCENT);
@@ -45,17 +45,31 @@ public abstract class ColourSelectionWindow extends WindowGroup {
         greenSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
         blueSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
 
+
+        updateSliders();
+        updateTextBoxes();
+    }
+
+    @Override
+    public void build(Quad2D bounds) {
+        super.build(bounds);
+        subComponents.forEach(c -> c.build(getBounds().innerSize()));
     }
 
     @Override
     public void render(GSIRenderContext context) {
-        if(isVisible) {
+        if(isVisible){
             context.matrix.translate(0, 0, -10);
-            super.render(context);
+            GSIRenderHelper.renderComponentBackground(context, bounds, styling);
+            GSIRenderHelper.renderComponentBorder(context, bounds, styling);
+            subComponents.forEach(component -> component.render(context));
+
             context.matrix.translate(0, 0, GSIRenderHelper.MIN_Z_OFFSET*4);
+
             GSIRenderHelper.renderBasicString(context, "R: ", getBounds().innerSize().x + 1, redSlider.getBounds().outerSize().getCentreY() - 9D/2D, ScreenUtils.red_button.rgba, true);
             GSIRenderHelper.renderBasicString(context,"G: ", getBounds().innerSize().x + 1, greenSlider.getBounds().outerSize().getCentreY() - 9D/2D, ScreenUtils.green_button.rgba, true);
             GSIRenderHelper.renderBasicString(context,"B: ", getBounds().innerSize().x + 1, blueSlider.getBounds().outerSize().getCentreY() - 9D/2D, ScreenUtils.blue_button.rgba, true);
+
         }
     }
 
@@ -74,13 +88,13 @@ public abstract class ColourSelectionWindow extends WindowGroup {
     }
 
     public void updateTextBoxes(){
-        red.setText("" + GSIDesignSettings.selectedColour.getRed());
-        green.setText("" + GSIDesignSettings.selectedColour.getGreen());
-        blue.setText("" + GSIDesignSettings.selectedColour.getBlue());
+        red.setTextAndRebuild("" + GSIDesignSettings.selectedColour.getRed());
+        green.setTextAndRebuild("" + GSIDesignSettings.selectedColour.getGreen());
+        blue.setTextAndRebuild("" + GSIDesignSettings.selectedColour.getBlue());
     }
 
     public void updateColourFromButton(ColouredButtonComponent buttonComponent, GSIInteractionHandler handler){
-        setTextColour(new ColourProperty(buttonComponent.activatedColour));
+        setTextColour(buttonComponent.styling.getEnabledTextColour());
         updateSliders();
         updateTextBoxes();
     }

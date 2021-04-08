@@ -22,6 +22,8 @@ public class MultipartTile implements ICapabilityProvider, ISyncable {
         this.entry = entry;
     }
 
+
+
     //// KEY METHODS \\\\
 
     public void tick(){}
@@ -45,7 +47,6 @@ public class MultipartTile implements ICapabilityProvider, ISyncable {
     public final void queueSyncPacket() {
         entry.getHost().queueSyncPacket();
     }
-
 
 
 

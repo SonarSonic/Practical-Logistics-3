@@ -3,8 +3,11 @@ package sonar.logistics.client.gui;
 import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.components.buttons.ColouredButtonComponent;
 import sonar.logistics.client.gsi.components.groups.HeaderGroup;
+import sonar.logistics.client.gsi.components.groups.LayoutGroup;
 import sonar.logistics.client.gsi.components.groups.interfaces.*;
 import sonar.logistics.client.gsi.components.input.TextInputComponent;
+import sonar.logistics.client.gsi.components.layouts.ListLayout;
+import sonar.logistics.client.gsi.components.text.StyledTextComponent;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
@@ -122,7 +125,7 @@ public class DesignInterfaces {
                 styling.setBorderColour(ScreenUtils.button_border);
             }
         };
-        ColourSelectionWindow colourSelectionWindow = new ColourSelectionWindow(){
+        ColourSelectionGroup colourSelectionWindow = new ColourSelectionGroup(){
 
             @Override
             public void setTextColour(ColourProperty property) {
@@ -130,28 +133,49 @@ public class DesignInterfaces {
                 selectedColourButton.setColours(property.rgba, -1, -1);
             }
         };
+        applyWindowStyling(colourSelectionWindow);
 
-        textToolsWidget.gsi.addComponent(colourSelectionWindow).getStyling().setSizing(100, 100, 160, 80, UnitType.PIXEL);
-        textToolsWidget.gsi.addComponent(selectedColourButton.setTrigger(new Trigger<>((b, h) -> colourSelectionWindow.toggleVisibility(), (b, h) -> true)).setColours(GSIDesignSettings.selectedColour.rgba, -1, -1)).getStyling().setSizing(16*21, 8, 16, 16, UnitType.PIXEL);
+        HeaderGroup headerGroup = createHeader(colourSelectionWindow, "Colour Picker", false);
 
-        /*
-        LayoutGroup optionsList = new LayoutGroup();
+        textToolsWidget.gsi.addComponent(headerGroup).getStyling().setSizing(100, 100, 160, 80, UnitType.PIXEL);
+        textToolsWidget.gsi.addComponent(selectedColourButton.setTrigger(new Trigger<>((b, h) -> headerGroup.toggleVisibility(), (b, h) -> true)).setColours(GSIDesignSettings.selectedColour.rgba, -1, -1)).getStyling().setSizing(16*21, 8, 16, 16, UnitType.PIXEL);
+        headerGroup.isVisible = false;
+
+
+        LayoutGroup optionsList = new LayoutGroup().setLayout(ListLayout.INSTANCE);
         applyWindowStyling(optionsList);
 
-        BasicList sizeOptionsList = new BasicList();
+        LayoutGroup sizeOptionsList = new LayoutGroup().setLayout(ListLayout.INSTANCE);
         sizeOptionsList.addComponent(new SliderOptionGroup.RangedInteger("Border Size", 0, 0, 10)).getStyling().setSizing(0, 0, 160, 20, UnitType.PIXEL);
         sizeOptionsList.addComponent(new SliderOptionGroup.RangedInteger("Text", 0, 0, 2)).getStyling().setSizing(0, 0, 160, 20, UnitType.PIXEL);
         sizeOptionsList.addComponent(new SliderOptionGroup.RangedInteger("Image Size", 3, 0, 10000)).getStyling().setSizing(0, 0, 160, 60, UnitType.PIXEL);
         optionsList.addComponent(createHeader(sizeOptionsList, "Size Options", true));
 
-        textToolsWidget.gsi.addComponent(createHeader(optionsList, "Component Options", false)).getStyling().setSizing(100, 100, 160, 80, UnitType.PIXEL);
+        HeaderGroup componentOptionsHeader = createHeader(optionsList, "Component Options", false);
+        textToolsWidget.gsi.addComponent(componentOptionsHeader).getStyling().setSizing(100, 100, 160, 0, UnitType.PIXEL).setHeight(UnitLength.AUTO);
+        componentOptionsHeader.isVisible = false;
+        /*
+        StyledTextComponent textMadness = new StyledTextComponent();
+        applyWindowStyling(textMadness);
+
+        IComponent sliderBorderSize =new SliderOptionGroup.RangedInteger("Border Size", 0, 0, 10);
+        sliderBorderSize.getStyling().setSizing(0, 0, 40, 20, UnitType.PIXEL);
+        textMadness.text().addComponent(sliderBorderSize);
+
+        IComponent button = new IconButtonComponent(EnumButtonIcons.DECREASE_FONT_SIZE, new Trigger<>((b, h) -> GSIDesignSettings.decreaseFontHeight(), (b, h) -> false));
+        button.getStyling().setSizing(16*16, 8, 16, 16, UnitType.PIXEL);
+        textMadness.text().addComponent(button);
+
+
+
+        textToolsWidget.gsi.addComponent(createHeader(textMadness, "Text Madness", false)).getStyling().setSizing(100, 100, 160, Float.MAX_VALUE, UnitType.PIXEL);
         */
         ///
 
         return textToolsWidget;
     }
 
-    public static IComponent createHeader(IComponent component, String headerName, boolean isDropdown){
+    public static HeaderGroup createHeader(IComponent component, String headerName, boolean isDropdown){
         WindowHeaderGroup header = new WindowHeaderGroup(headerName, isDropdown);
         return new HeaderGroup().setHeader(header).setInternal(component);
     }

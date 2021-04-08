@@ -27,13 +27,19 @@ public class WindowHeaderGroup extends LayoutGroup {
         this.styling.setHeight(new UnitLength(UnitType.PIXEL, headerSize));
 
         addComponent(windowBar = new ColouredButtonComponent((source, handler) -> moveWindow()).setColours(ScreenUtils.display_black_border.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.dark_grey.rgba));
-        addComponent(headerButton = new TextButtonComponent(isDropdown ? "\u2630":  "\u2715", new Trigger<>((b, h) -> {
-            if(isDropdown){
-                dropdownWindow();
-            }else{
-                closeWindow();
-            }
-        }, (b, h) -> false))).setColours(ScreenUtils.red_button.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.red_button.rgba);
+        if(isDropdown){
+
+            addComponent(headerButton = new TextButtonComponent("\u2630", new Trigger<>((b, h) -> dropdownWindow(), (b, h) -> false))).setColours(ScreenUtils.red_button.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.red_button.rgba);
+
+        }else{
+            addComponent(headerButton = new TextButtonComponent(isDropdown ? "\u2630":  "\u2715", new Trigger<>((b, h) -> {
+                if(isDropdown){
+                    dropdownWindow();
+                }else{
+                    closeWindow();
+                }
+            }, (b, h) -> false))).setColours(ScreenUtils.red_button.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.red_button.rgba);
+        }
     }
 
     @Override
@@ -48,7 +54,7 @@ public class WindowHeaderGroup extends LayoutGroup {
     public void render(GSIRenderContext context) {
         super.render(context);
         if(isVisible){
-            GSIRenderHelper.renderBasicString(context, windowName, getBounds().innerSize().getX() + 2, getBounds().innerSize().getY(), -1, false);
+            GSIRenderHelper.renderBasicString(context, windowName, getBounds().innerSize().getX() + 2, getBounds().innerSize().getY() + 2, -1, false);
         }
     }
 
@@ -65,7 +71,9 @@ public class WindowHeaderGroup extends LayoutGroup {
     }
 
     public void moveWindow(){
-        ///TODO
+        if(this.getHost() instanceof HeaderGroup){
+            ((HeaderGroup) this.getHost()).startDrag();
+        }
     }
 
 }

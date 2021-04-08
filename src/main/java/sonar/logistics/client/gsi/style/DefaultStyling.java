@@ -39,7 +39,7 @@ public final class DefaultStyling extends ComponentStyling {
         borderColour = new ColourProperty(255, 255, 255, 255);
 
         ///text colours
-        normalTextColour = null;
+        enabledTextColour = null;
         hoveredTextColour = null;
         disabledTextColour = null;
     }
@@ -136,8 +136,8 @@ public final class DefaultStyling extends ComponentStyling {
 
     @Nullable
     @Override
-    public ColourProperty getNormalTextColour() {
-        return normalTextColour;
+    public ColourProperty getEnabledTextColour() {
+        return enabledTextColour;
     }
 
     @Nullable
@@ -198,7 +198,7 @@ public final class DefaultStyling extends ComponentStyling {
     public void setBorderColour(@Nonnull ColourProperty borderColour) {}
 
     @Override
-    public void setNormalTextColour(@Nullable ColourProperty normalTextColour) {}
+    public void setEnabledTextColour(@Nullable ColourProperty enabledTextColour) {}
 
     @Override
     public void setHoveredTextColour(@Nullable ColourProperty hoveredTextColour) {}

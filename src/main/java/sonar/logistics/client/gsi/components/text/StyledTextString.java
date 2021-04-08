@@ -1,5 +1,6 @@
 package sonar.logistics.client.gsi.components.text;
 
+import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.components.text.glyph.*;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
@@ -52,6 +53,18 @@ public class StyledTextString {
     public void addElement(IRenderableElement element, int index){
         glyphs.add(index, new ElementGlyph(element));
     }
+
+
+    /////
+
+    public void addComponent(IComponent component){
+        addComponent(component, glyphs.size());
+    }
+
+    public void addComponent(IComponent component, int index){
+        glyphs.add(index, new ComponentGlyph(component));
+    }
+
 
     /////
 

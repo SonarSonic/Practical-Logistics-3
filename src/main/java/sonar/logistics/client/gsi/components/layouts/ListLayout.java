@@ -7,7 +7,7 @@ public class ListLayout extends Layout {
     public static ListLayout INSTANCE = new ListLayout();
 
     @Override
-    public Quad2D getNextQuad(Quad2D previous, Quad2D bounds) {
-        return new Quad2D(bounds.getX(), previous.getY(), bounds.getWidth(), bounds.getHeight() - previous.getY());
+    public Quad2D getAvailableSize(Quad2D previous, Quad2D bounds) {
+        return new Quad2D(bounds.getX(), previous.getMaxY(), bounds.getWidth(), bounds.getHeight() - (previous.getMaxY() - bounds.getY()));
     }
 }

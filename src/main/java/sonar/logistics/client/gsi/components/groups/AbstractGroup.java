@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class AbstractGroup extends AbstractComponent implements IComponent, IComponentHost, INestedInteractionListener {
+///a group without build or render defined
+public class AbstractGroup extends AbstractComponent implements IComponent, IComponentHost, INestedInteractionListener {
 
     protected List<IComponent> subComponents = Lists.newArrayList();
     protected List<IInteractionListener> interactions = new ArrayList<>();
@@ -23,7 +24,9 @@ public abstract class AbstractGroup extends AbstractComponent implements ICompon
     public AbstractGroup() {}
 
     @Override
-    public abstract boolean isMouseOver();
+    public boolean isMouseOver(){
+        return isVisible && interactions.stream().anyMatch(IInteractionListener::isMouseOver);
+    }
 
     @Override
     public void setHost(IComponentHost host) {

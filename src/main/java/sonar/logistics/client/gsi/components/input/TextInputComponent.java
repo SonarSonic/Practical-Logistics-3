@@ -67,11 +67,19 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
         return this;
     }
 
+    /**if this is called after the component has been built- rebuild should be called*/
+    public TextInputComponent setTextAndRebuild(String text){
+        setText(text);
+        rebuild();
+        return this;
+    }
+
     @Override
     public void build(Quad2D bounds) {
         super.build(bounds);
         StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.innerSize(), inputLineStyle, inputGlyphStyle);
         StyledTextWrapper.INSTANCE.alignPages(ComponentAlignment.CENTERED);
+        StyledTextWrapper.INSTANCE.buildSubComponents(host);
     }
 
     @Override

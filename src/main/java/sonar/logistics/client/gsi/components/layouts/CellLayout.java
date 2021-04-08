@@ -11,7 +11,7 @@ public class CellLayout extends Layout {
     }
 
     @Override
-    public Quad2D getNextQuad(Quad2D previous, Quad2D bounds) {
+    public Quad2D getAvailableSize(Quad2D previous, Quad2D bounds) {
         if(bounds.canFit(previous.getMaxX() - bounds.getX() + cellSize.getWidth(), previous.getMaxY() - bounds.getY() + cellSize.getWidth())){
             return cellSize.copy().translate(previous.getMaxX(), previous.getY());
         }

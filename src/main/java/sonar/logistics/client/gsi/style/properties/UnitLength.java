@@ -20,7 +20,7 @@ public class UnitLength extends Length {
     public double getValue(double maxValue){
         switch (unitType){
             case AUTO:
-                return maxValue;
+                return Float.MAX_VALUE;
             case PERCENT:
                 return maxValue * value;
             default:

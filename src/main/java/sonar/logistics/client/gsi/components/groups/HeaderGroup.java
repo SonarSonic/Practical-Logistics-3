@@ -2,8 +2,10 @@ package sonar.logistics.client.gsi.components.groups;
 
 import com.google.common.collect.Lists;
 import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.components.layouts.ListLayout;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.style.StyleHelper;
 import sonar.logistics.client.gsi.style.properties.UnitLength;
@@ -13,12 +15,16 @@ import sonar.logistics.client.vectors.Vector2D;
 
 import java.util.List;
 
-public class HeaderGroup extends AbstractGroup {
+public class HeaderGroup extends LayoutGroup {
 
     public IComponent header;
     public IComponent internal;
 
     public boolean isInternalVisible = true;
+
+    public HeaderGroup(){
+        this.setLayout(ListLayout.INSTANCE);
+    }
 
     public HeaderGroup setHeader(IComponent header){
         this.header = header;
@@ -33,23 +39,12 @@ public class HeaderGroup extends AbstractGroup {
     }
 
     @Override
-    public void build(Quad2D bounds) {
-        super.build(bounds);
-        Quad2D offsetBounds = getBounds().innerSize().copy().setHeight(Double.MAX_VALUE); //TODO get max size..?
-        subComponents.forEach(c -> {c.build(offsetBounds.copy()); offsetBounds.translate(0, c.getBounds().outerSize().height);});
-
-        ///manually resize the element by the height of the last bounds TODO make this automatic, flexible container?
-        getBounds().outerSize().height = offsetBounds.getY() - getBounds().innerSize().y + StyleHelper.getHeightOffset(getBounds().outerSize(), styling);
-        getBounds().innerSize = StyleHelper.getComponentInnerSize(getBounds().outerSize(), styling);
-
-    }
-
-    @Override
     public void render(GSIRenderContext context) {
         if(isVisible){
-            super.render(context);
-            header.render(context);
+            GSIRenderHelper.renderComponentBackground(context, bounds, styling);
+            GSIRenderHelper.renderComponentBorder(context, bounds, styling);
 
+            header.render(context);
             if(isInternalVisible) {
                 internal.render(context);
             }
