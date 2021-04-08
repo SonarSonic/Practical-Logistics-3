@@ -6,7 +6,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class PL3Shapes {
 

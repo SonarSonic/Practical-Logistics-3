@@ -1,7 +1,7 @@
 package sonar.logistics.client.gsi.components.text.render;
 
 import sonar.logistics.client.gsi.components.text.StyledTextString;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.vectors.Vector2D;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

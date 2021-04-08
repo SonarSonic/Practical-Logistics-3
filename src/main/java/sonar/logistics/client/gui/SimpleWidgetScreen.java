@@ -4,10 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
-import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionListener;
-import sonar.logistics.client.gsi.interactions.api.INestedInteractionListener;
-import sonar.logistics.client.gui.api.IInteractWidget;
-import sonar.logistics.client.gui.api.ISimpleWidget;
+import sonar.logistics.client.gui.widgets.AbstractWidget;
 import sonar.logistics.client.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.gui.widgets.GSIWidget;
 
@@ -17,8 +14,7 @@ import java.util.List;
 
 public class SimpleWidgetScreen extends Screen {
 
-    public List<ISimpleWidget> simpleWidgets = new ArrayList<>();
-    public List<IInteractWidget> interactWidgets = new ArrayList<>();
+    public List<AbstractWidget> widgets = new ArrayList<>();
 
     public int guiLeft;
     public int guiTop;
@@ -34,15 +30,11 @@ public class SimpleWidgetScreen extends Screen {
         super.init();
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
-        simpleWidgets.clear();
-        interactWidgets.clear();
+        widgets.clear();
     }
 
-    public void addWidget(ISimpleWidget widget){
-        simpleWidgets.add(widget);
-        if(widget instanceof IInteractWidget){
-            interactWidgets.add((IInteractWidget) widget);
-        }
+    public void addWidget(AbstractWidget widget){
+        widgets.add(widget);
     }
 
     @Override
@@ -60,23 +52,19 @@ public class SimpleWidgetScreen extends Screen {
         drawForeground(mouseX, mouseY, partialTicks);
     }
 
-    public void drawBackground(int mouseX, int mouseY, float partialTicks){
-
-    }
+    public void drawBackground(int mouseX, int mouseY, float partialTicks){}
 
     public void drawWidgets(int mouseX, int mouseY, float partialTicks){
-        simpleWidgets.forEach(w -> w.render(mouseX, mouseY, partialTicks));
+        widgets.forEach(w -> w.render(mouseX, mouseY, partialTicks));
     }
 
 
-    public void drawForeground(int mouseX, int mouseY, float partialTicks){
-
-    }
+    public void drawForeground(int mouseX, int mouseY, float partialTicks){}
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         //gsi interactions have their own drag control, so we end dragging manually.
-        interactWidgets.forEach(i ->
+        widgets.forEach(i ->
             {
                 if(i instanceof GSIWidget){
                     ((GSIWidget) i).gsi.tryEndDragging(button);
@@ -98,6 +86,6 @@ public class SimpleWidgetScreen extends Screen {
     @Nonnull
     @Override
     public List<? extends IGuiEventListener> children() {
-        return interactWidgets;
+        return widgets;
     }
 }

@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.common.multiparts.base.MultipartTile;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;

@@ -1,23 +1,24 @@
-package sonar.logistics.client.gsi.interactions;
+package sonar.logistics.client.gsi.interactions.resize;
 
-import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.components.Component;
+import sonar.logistics.client.gsi.interactions.AbstractComponentInteraction;
+import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.client.gsi.style.properties.UnitType;
+import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.gui.api.EnumRescaleType;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Vector2D;
 
-public class ResizingInteraction extends AbstractComponentInteraction<IComponent> {
+public class ResizingInteraction extends AbstractComponentInteraction<Component> {
 
     private Vector2D dragStart;
 
     EnumRescaleType currentRescaleType = null;
     float clickBoxSize = 0.0625F/2;
 
-    public ResizingInteraction(IComponent component) {
+    public ResizingInteraction(Component component) {
         super(component);
     }
 
@@ -63,7 +64,7 @@ public class ResizingInteraction extends AbstractComponentInteraction<IComponent
         double y = (componentBounds.y - gsiBounds.y) / gsiBounds.height;
         double width = componentBounds.width / gsiBounds.width;
         double height = componentBounds.height / gsiBounds.height;
-        component.getStyling().setSizing(x, y, width, height, UnitType.PERCENT);
+        component.getStyling().setSizing(x, y, width, height, Unit.PERCENT);
         component.rebuild();
         currentRescaleType = null;
         dragStart = null;
@@ -78,7 +79,7 @@ public class ResizingInteraction extends AbstractComponentInteraction<IComponent
         return currentRescaleType == null ? component.getBounds().outerSize() : currentRescaleType.rescaleWindow(component.getBounds().outerSize(), getGSI().getGSIBounds(), GSIDesignSettings.snapToNormalGrid(getMousePos().x - dragStart.x), GSIDesignSettings.snapToNormalGrid(getMousePos().y - dragStart.y), getInteractionHandler().hasShiftDown());
     }
 
-    public EnumRescaleType getRescaleTypeFromMouse(IComponent component, GSIInteractionHandler handler) {
+    public EnumRescaleType getRescaleTypeFromMouse(Component component, GSIInteractionHandler handler) {
         return EnumRescaleType.getRescaleTypeFromMouse(component.getBounds().outerSize(), handler.mousePos.x, handler.mousePos.y, clickBoxSize);
     }
 }

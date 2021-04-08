@@ -1,7 +1,6 @@
 package sonar.logistics.client.gsi.components.text.glyph;
 
-import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.api.IRenderableElement;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
@@ -9,9 +8,9 @@ import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 
 public class ComponentGlyph extends Glyph {
 
-    public IComponent component;
+    public Component component;
 
-    public ComponentGlyph(IComponent component){
+    public ComponentGlyph(Component component){
         this.component = component;
     }
 

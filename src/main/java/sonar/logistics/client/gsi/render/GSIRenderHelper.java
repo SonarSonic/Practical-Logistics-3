@@ -12,10 +12,10 @@ import net.minecraftforge.fluids.FluidStack;
 import sonar.logistics.PL3;
 import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.style.ComponentStyling;
-import sonar.logistics.client.gsi.style.StyleHelper;
+import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class GSIRenderHelper {
 
@@ -109,13 +109,13 @@ public class GSIRenderHelper {
 
     public static void renderComponentBorder(GSIRenderContext context, ComponentBounds bounds, ComponentStyling styling){
 
-        double borderWidth = StyleHelper.getLengthSafe(styling.getBorderWidth(), bounds.outerSize().getWidth());
-        double borderHeight = StyleHelper.getLengthSafe(styling.getBorderHeight(), bounds.outerSize().getHeight());
+        double borderWidth = LengthProperty.getLengthSafe(styling.getBorderWidth(), bounds.outerSize().getWidth());
+        double borderHeight = LengthProperty.getLengthSafe(styling.getBorderHeight(), bounds.outerSize().getHeight());
 
         if(borderWidth > 0 || borderHeight > 0) {
 
-            double marginWidth = StyleHelper.getLengthSafe(styling.getMarginWidth(), bounds.outerSize().getWidth());
-            double marginHeight = StyleHelper.getLengthSafe(styling.getMarginHeight(), bounds.outerSize().getHeight());
+            double marginWidth = LengthProperty.getLengthSafe(styling.getMarginWidth(), bounds.outerSize().getWidth());
+            double marginHeight = LengthProperty.getLengthSafe(styling.getMarginHeight(), bounds.outerSize().getHeight());
 
             double fullWidth = bounds.outerSize().width - marginWidth*2;
             double fullHeight = bounds.outerSize().height - marginHeight*2;

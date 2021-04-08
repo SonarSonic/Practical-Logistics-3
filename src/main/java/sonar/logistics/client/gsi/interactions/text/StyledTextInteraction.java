@@ -1,17 +1,17 @@
 package sonar.logistics.client.gsi.interactions.text;
 
-import sonar.logistics.client.gsi.api.ITextComponent;
+import sonar.logistics.client.gsi.components.text.AbstractTextComponent;
 import sonar.logistics.client.gsi.components.text.render.IGlyphRenderer;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.render.*;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gui.EnumLineBreakGlyph;
+import sonar.logistics.client.gui.EnumLineBreakGlyphTypes;
 import sonar.logistics.client.gui.EnumLineStyling;
 import sonar.logistics.client.gui.GSIDesignSettings;
 
-public class StyledTextInteraction<C extends ITextComponent> extends StandardTextInteraction<C> implements IGlyphRenderer {
+public class StyledTextInteraction<C extends AbstractTextComponent> extends StandardTextInteraction<C> implements IGlyphRenderer {
 
     public StyledTextInteraction(C component) {
         super(component);
@@ -30,12 +30,12 @@ public class StyledTextInteraction<C extends ITextComponent> extends StandardTex
         if(setting instanceof EnumLineStyling){
             applyLineStyle((LineStyle) settingObj);
         }
-        if(setting instanceof EnumLineBreakGlyph){
-            applyLineBreakGlyph((EnumLineBreakGlyph) setting);
+        if(setting instanceof EnumLineBreakGlyphTypes){
+            applyLineBreakGlyph((EnumLineBreakGlyphTypes) setting);
         }
     }
 
-    public void applyLineBreakGlyph(EnumLineBreakGlyph settings){
+    public void applyLineBreakGlyph(EnumLineBreakGlyphTypes settings){
         GlyphRenderInfo glyphInfo = pages.text.glyphs.isEmpty() ? null : pages.getPrevGlyphInfo(cursor.getInsertionIndex(), glyphRenderInfo -> glyphRenderInfo.glyph instanceof LineBreakGlyph);
         if(glyphInfo != null){
             LineBreakGlyph glyph = (LineBreakGlyph) glyphInfo.glyph;

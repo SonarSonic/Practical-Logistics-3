@@ -1,6 +1,5 @@
 package sonar.logistics.client.gsi.components.buttons;
 
-import sonar.logistics.client.gsi.api.EnumButtonIcons;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;

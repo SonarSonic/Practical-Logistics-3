@@ -2,7 +2,7 @@ package sonar.logistics.client.gsi.components.text.render;
 
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class GlyphRenderInfo {
 

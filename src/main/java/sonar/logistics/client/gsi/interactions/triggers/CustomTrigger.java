@@ -5,12 +5,13 @@ import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class Trigger<O extends Object> implements ITrigger<O> {
+
+public class CustomTrigger<O extends Object> implements ITrigger<O> {
 
     public BiConsumer<O, GSIInteractionHandler> trigger;
     public BiFunction<O, GSIInteractionHandler, Boolean> isActive;
 
-    public Trigger(BiConsumer<O, GSIInteractionHandler> trigger, BiFunction<O, GSIInteractionHandler, Boolean> isActive){
+    public CustomTrigger(BiConsumer<O, GSIInteractionHandler> trigger, BiFunction<O, GSIInteractionHandler, Boolean> isActive){
         this.trigger = trigger;
         this.isActive = isActive;
     }

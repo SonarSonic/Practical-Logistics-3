@@ -1,16 +1,15 @@
 package sonar.logistics.client.gsi.components.basic;
 
-import sonar.logistics.client.gsi.api.IRenderableElement;
-import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.elements.IRenderableElement;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.components.AbstractComponent;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
-import sonar.logistics.client.gsi.api.ComponentAlignment;
+import sonar.logistics.client.gsi.components.Component;
+import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.client.gsi.style.ComponentAlignment;
 
 import java.util.List;
 
-public class GridComponent extends AbstractComponent implements IComponent {
+public class GridComponent extends Component {
 
     public List<IRenderableElement> renderableElements;
 

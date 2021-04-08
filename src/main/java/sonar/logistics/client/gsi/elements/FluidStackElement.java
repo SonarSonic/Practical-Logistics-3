@@ -1,10 +1,9 @@
 package sonar.logistics.client.gsi.elements;
 
 import net.minecraftforge.fluids.FluidStack;
-import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class FluidStackElement implements IRenderableElement {
 

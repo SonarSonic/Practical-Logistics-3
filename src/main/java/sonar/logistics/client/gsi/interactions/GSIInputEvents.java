@@ -1,17 +1,12 @@
-package sonar.logistics.client.gsi;
+package sonar.logistics.client.gsi.interactions;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.common.blocks.host.MultipartHostBlock;
 import sonar.logistics.common.blocks.host.MultipartHostHelper;
 import sonar.logistics.common.multiparts.base.MultipartEntry;

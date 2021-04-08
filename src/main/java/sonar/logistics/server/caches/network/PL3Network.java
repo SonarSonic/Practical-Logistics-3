@@ -21,10 +21,10 @@ public class PL3Network implements ICableCache<PL3Network> {
     private int globalNetworkID;
     private final EnumCableTypes cableType;
 
-    private List<NetworkedHostTile> loadedHosts = new ArrayList<>();
-    private List<IDataSource> localSources = new ArrayList<>();
-    private Map<PL3NetworkCaches<?>, List<INetworkedTile>> localCaches = PL3NetworkCaches.newCachesMap();
-    private boolean[] networkUpdates = new boolean[EnumNetworkUpdate.values().length];
+    private final List<NetworkedHostTile> loadedHosts = new ArrayList<>();
+    private final List<IDataSource> localSources = new ArrayList<>();
+    private final Map<PL3NetworkCaches<?>, List<INetworkedTile>> localCaches = PL3NetworkCaches.newCachesMap();
+    private final boolean[] networkUpdates = new boolean[EnumNetworkUpdate.values().length];
 
     public PL3Network(World world, int globalNetworkID, EnumCableTypes cableType){
         this.world = world;

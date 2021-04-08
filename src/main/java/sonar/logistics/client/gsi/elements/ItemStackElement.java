@@ -2,9 +2,8 @@ package sonar.logistics.client.gsi.elements;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
-import sonar.logistics.client.gsi.api.IRenderableElement;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class ItemStackElement implements IRenderableElement {
 

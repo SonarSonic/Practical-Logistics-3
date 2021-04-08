@@ -6,7 +6,7 @@ import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
 import java.util.function.BiFunction;
 
-public enum EnumLineBreakGlyph {
+public enum EnumLineBreakGlyphTypes {
 
     DEFAULT_BREAK(LineBreakGlyph::new),
     ROUND_BULLET_POINT((pageBreak, lineStyle) -> new BulletPointGlyph(pageBreak, lineStyle, '\u2219')),
@@ -16,7 +16,7 @@ public enum EnumLineBreakGlyph {
 
     private BiFunction<Boolean, LineStyle, LineBreakGlyph> create;
 
-    EnumLineBreakGlyph(BiFunction<Boolean, LineStyle, LineBreakGlyph> create){
+    EnumLineBreakGlyphTypes(BiFunction<Boolean, LineStyle, LineBreakGlyph> create){
         this.create = create;
     }
 

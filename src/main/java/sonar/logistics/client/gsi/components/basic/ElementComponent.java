@@ -1,11 +1,10 @@
 package sonar.logistics.client.gsi.components.basic;
 
-import sonar.logistics.client.gsi.api.IRenderableElement;
-import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.elements.IRenderableElement;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.components.AbstractComponent;
+import sonar.logistics.client.gsi.components.Component;
 
-public class ElementComponent extends AbstractComponent implements IComponent {
+public class ElementComponent extends Component {
 
     public IRenderableElement element;
 

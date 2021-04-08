@@ -1,4 +1,4 @@
-package sonar.logistics.client.gui.api;
+package sonar.logistics.client.gui.widgets;
 
 import net.minecraft.client.gui.IGuiEventListener;
 

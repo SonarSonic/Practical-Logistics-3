@@ -1,7 +1,7 @@
 package sonar.logistics.common.multiparts.displays;
 
 import net.minecraft.nbt.CompoundNBT;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.server.caches.displays.ConnectedDisplay;
 import sonar.logistics.server.caches.displays.ConnectedDisplayManager;

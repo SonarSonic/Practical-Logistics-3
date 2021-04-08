@@ -1,18 +1,18 @@
 package sonar.logistics.client.gsi.components.input;
 
-import sonar.logistics.client.gsi.components.AbstractComponent;
-import sonar.logistics.client.gsi.interactions.api.IInteractionComponent;
+import sonar.logistics.client.gsi.components.Component;
+import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Vector2D;
 import sonar.logistics.util.MathUtils;
 
 import javax.annotation.Nullable;
 
-public class SliderComponent extends AbstractComponent implements IInteractionComponent {
+public class SliderComponent extends Component implements IInteractionListener {
 
     public double sliderValue = 0;
     public double stepSize = Double.MIN_VALUE;

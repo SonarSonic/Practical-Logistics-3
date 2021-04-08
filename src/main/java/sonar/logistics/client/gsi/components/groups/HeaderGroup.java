@@ -1,24 +1,25 @@
 package sonar.logistics.client.gsi.components.groups;
 
 import com.google.common.collect.Lists;
-import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.layouts.ListLayout;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.ComponentBounds;
-import sonar.logistics.client.gsi.style.StyleHelper;
-import sonar.logistics.client.gsi.style.properties.UnitLength;
-import sonar.logistics.client.gsi.style.properties.UnitType;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.client.gsi.style.properties.LengthProperty;
+import sonar.logistics.client.gsi.style.properties.Unit;
+import sonar.logistics.util.vectors.Vector2D;
 
 import java.util.List;
 
+/**
+ * TODO make this useable as a dropdown button.
+ */
 public class HeaderGroup extends LayoutGroup {
 
-    public IComponent header;
-    public IComponent internal;
+    public Component header;
+    public Component internal;
 
     public boolean isInternalVisible = true;
 
@@ -26,13 +27,13 @@ public class HeaderGroup extends LayoutGroup {
         this.setLayout(ListLayout.INSTANCE);
     }
 
-    public HeaderGroup setHeader(IComponent header){
+    public HeaderGroup setHeader(Component header){
         this.header = header;
         addComponent(header);
         return this;
     }
 
-    public HeaderGroup setInternal(IComponent internal){
+    public HeaderGroup setInternal(Component internal){
         this.internal = internal;
         addComponent(internal);
         return this;
@@ -112,7 +113,7 @@ public class HeaderGroup extends LayoutGroup {
     @Override
     public boolean mouseDragged() {
         if(moveDrag) {
-            styling.setSizing(new UnitLength(UnitType.PIXEL, oldAlignment.x + getMousePos().x - dragStart.x), new UnitLength(UnitType.PIXEL, oldAlignment.y + getMousePos().y - dragStart.y), styling.getWidth(), styling.getHeight());
+            styling.setSizing(new LengthProperty(Unit.PIXEL, oldAlignment.x + getMousePos().x - dragStart.x), new LengthProperty(Unit.PIXEL, oldAlignment.y + getMousePos().y - dragStart.y), styling.getWidth(), styling.getHeight());
             rebuild();
             return true;
         }else{

@@ -2,19 +2,13 @@ package sonar.logistics.client.gui.widgets;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IGuiEventListener;
-import sonar.logistics.client.gui.api.IFlexibleGuiEventListener;
-import sonar.logistics.client.gui.api.IInteractWidget;
-import sonar.logistics.client.gui.api.ISimpleWidget;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 //used for rendering a GSI within a GUI - this default implementation has no scaling / scissoring.
-public class GSIWidget extends AbstractGui implements IFlexibleGuiEventListener, ISimpleWidget, IInteractWidget {
+public class GSIWidget extends AbstractWidget implements IFlexibleGuiEventListener {
 
     public Quad2D bounds;
     public GSI gsi;
@@ -48,7 +42,7 @@ public class GSIWidget extends AbstractGui implements IFlexibleGuiEventListener,
     }
 
     @Override
-    public Quad2D getQuad() {
+    public Quad2D getBounds() {
         return bounds;
     }
 }

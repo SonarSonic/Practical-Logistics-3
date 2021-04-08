@@ -1,19 +1,10 @@
 package sonar.logistics.client.gsi.style;
 
-import sonar.logistics.client.gsi.api.ComponentAlignment;
-import sonar.logistics.client.gsi.style.properties.Length;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.client.gsi.style.properties.LengthProperty;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class StyleHelper {
 
-
-    public static double getLengthSafe(Length length, double maxValue) {
-        return length == null ? 0 : length.getValue(maxValue);
-    }
-
-    public static float getLengthSafeF(Length length, double maxValue) {
-        return (float)getLengthSafe(length, maxValue);
-    }
 
     /*returns the maximum outer size for the component*/
     public static Quad2D getComponentOuterSize(Quad2D bounds, ComponentStyling style){
@@ -43,17 +34,17 @@ public class StyleHelper {
 
     public static double getWidthOffset(Quad2D outerSize, ComponentStyling style){
         double width = 0;
-        width += getLengthSafe(style.getMarginWidth(), outerSize.getWidth())*2;
-        width += getLengthSafe(style.getPaddingWidth(), outerSize.getWidth())*2;
-        width += getLengthSafe(style.getBorderWidth(), outerSize.getWidth())*2;
+        width += LengthProperty.getLengthSafe(style.getMarginWidth(), outerSize.getWidth())*2;
+        width += LengthProperty.getLengthSafe(style.getPaddingWidth(), outerSize.getWidth())*2;
+        width += LengthProperty.getLengthSafe(style.getBorderWidth(), outerSize.getWidth())*2;
         return width;
     }
 
     public static double getHeightOffset(Quad2D outerSize, ComponentStyling style){
         double height = 0;
-        height += getLengthSafe(style.getMarginHeight(), outerSize.getHeight())*2;
-        height += getLengthSafe(style.getPaddingHeight(), outerSize.getHeight())*2;
-        height += getLengthSafe(style.getBorderHeight(), outerSize.getHeight())*2;
+        height += LengthProperty.getLengthSafe(style.getMarginHeight(), outerSize.getHeight())*2;
+        height += LengthProperty.getLengthSafe(style.getPaddingHeight(), outerSize.getHeight())*2;
+        height += LengthProperty.getLengthSafe(style.getBorderHeight(), outerSize.getHeight())*2;
         return height;
     }
 

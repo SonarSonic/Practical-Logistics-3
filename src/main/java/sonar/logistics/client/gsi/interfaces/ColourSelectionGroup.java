@@ -1,4 +1,4 @@
-package sonar.logistics.client.gsi.components.groups.interfaces;
+package sonar.logistics.client.gsi.interfaces;
 
 import sonar.logistics.client.gsi.components.buttons.ColouredButtonComponent;
 import sonar.logistics.client.gsi.components.groups.AbstractGroup;
@@ -8,10 +8,10 @@ import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.client.gsi.style.properties.UnitType;
+import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 //TODO Z DEPTH FOR WINDOWS
 public abstract class ColourSelectionGroup extends AbstractGroup {
@@ -24,9 +24,9 @@ public abstract class ColourSelectionGroup extends AbstractGroup {
     }
 
     public void init() {
-        addComponent(red = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 1/12D, 0.2, 1/6D, UnitType.PERCENT);
-        addComponent(green = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 5/12D, 0.2, 1/6D, UnitType.PERCENT);
-        addComponent(blue = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 9/12D, 0.2, 1/6D, UnitType.PERCENT);
+        addComponent(red = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 1/12D, 0.2, 1/6D, Unit.PERCENT);
+        addComponent(green = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 5/12D, 0.2, 1/6D, Unit.PERCENT);
+        addComponent(blue = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 9/12D, 0.2, 1/6D, Unit.PERCENT);
 
         //set default gui font height
         red.inputGlyphStyle.fontHeight = 9;
@@ -37,9 +37,9 @@ public abstract class ColourSelectionGroup extends AbstractGroup {
         green.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
         blue.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
 
-        addComponent(redSlider = new SliderComponent().setHandleColour(ScreenUtils.red_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 1/12D, 0.7, 1/6D, UnitType.PERCENT);
-        addComponent(greenSlider = new SliderComponent().setHandleColour(ScreenUtils.green_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 5/12D, 0.7, 1/6D, UnitType.PERCENT);
-        addComponent(blueSlider = new SliderComponent().setHandleColour(ScreenUtils.blue_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 9/12D, 0.7, 1/6D, UnitType.PERCENT);
+        addComponent(redSlider = new SliderComponent().setHandleColour(ScreenUtils.red_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 1/12D, 0.7, 1/6D, Unit.PERCENT);
+        addComponent(greenSlider = new SliderComponent().setHandleColour(ScreenUtils.green_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 5/12D, 0.7, 1/6D, Unit.PERCENT);
+        addComponent(blueSlider = new SliderComponent().setHandleColour(ScreenUtils.blue_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 9/12D, 0.7, 1/6D, Unit.PERCENT);
 
         redSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
         greenSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);

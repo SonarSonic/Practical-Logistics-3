@@ -4,15 +4,7 @@ import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
-import sonar.logistics.client.vectors.Quad2D;
-
-//TODO ELEMENT ADVANCED SETTINGS EDITOR PANE - LIKE DA VINCI RESOLVE.
-// COMPONENTS CAN ADD CATEGORIES AND OPTIONS WIDGETS LIKE A CONFIG MENU.
-// CHECKBOXES.
-// DROPDOWNS (ENUMS typically)
-// SLIDERS (and stepped sliders too) - ranged sliders.
-// INPUT BOXES next to all sliders.
-// RESET ARROW FOR EVERY OPTION.
+import sonar.logistics.util.vectors.Quad2D;
 
 public class GSIDesignScreen extends SimpleWidgetScreen {
 
@@ -26,7 +18,6 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
         DesignInterfaces.initNormalTools(this);
         DesignInterfaces.initTextTools(this);
     }
-
 
     @Override
     protected void init() {

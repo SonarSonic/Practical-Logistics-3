@@ -8,14 +8,17 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.item.ItemStack;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
-import sonar.logistics.client.gsi.api.ComponentAlignment;
+import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.client.gsi.style.ComponentAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//batches itemstack rendering, there is about a 30% performance increase by not changing the GL settings for every item
+/**
+ * Batches ItemStack rendering, there is about a 30% performance increase by not changing the GL settings for every item
+ * A {@link sonar.logistics.client.gsi.api.IComponent}
+ */
 public class BatchedItemRenderer {
 
     public static ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();

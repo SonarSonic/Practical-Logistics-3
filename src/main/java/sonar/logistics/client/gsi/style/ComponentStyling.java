@@ -1,9 +1,8 @@
 package sonar.logistics.client.gsi.style;
 
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
-import sonar.logistics.client.gsi.style.properties.Length;
-import sonar.logistics.client.gsi.style.properties.UnitLength;
-import sonar.logistics.client.gsi.style.properties.UnitType;
+import sonar.logistics.client.gsi.style.properties.LengthProperty;
+import sonar.logistics.client.gsi.style.properties.Unit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,20 +16,20 @@ public class ComponentStyling {
 
     ///positioning
     protected Integer zLayer;
-    protected Length xPos;
-    protected Length yPos;
+    protected LengthProperty xPos;
+    protected LengthProperty yPos;
 
     ////sizing
-    protected Length width;
-    protected Length height;
+    protected LengthProperty width;
+    protected LengthProperty height;
 
     ///offsets
-    protected Length marginWidth;
-    protected Length marginHeight;
-    protected Length paddingWidth;
-    protected Length paddingHeight;
-    protected Length borderWidth;
-    protected Length borderHeight;
+    protected LengthProperty marginWidth;
+    protected LengthProperty marginHeight;
+    protected LengthProperty paddingWidth;
+    protected LengthProperty paddingHeight;
+    protected LengthProperty borderWidth;
+    protected LengthProperty borderHeight;
 
     ///component colours
     protected ColourProperty outerBackgroundColour;
@@ -49,11 +48,11 @@ public class ComponentStyling {
         return this;
     }
 
-    public ComponentStyling setSizing(double xPos, double yPos, double width, double height, UnitType type){
-        return setSizing(new UnitLength(type, xPos), new UnitLength(type, yPos), new UnitLength(type, width), new UnitLength(type, height));
+    public ComponentStyling setSizing(double xPos, double yPos, double width, double height, Unit type){
+        return setSizing(new LengthProperty(type, xPos), new LengthProperty(type, yPos), new LengthProperty(type, width), new LengthProperty(type, height));
     }
 
-    public ComponentStyling setSizing(Length xPos, Length yPos, Length width, Length height){
+    public ComponentStyling setSizing(LengthProperty xPos, LengthProperty yPos, LengthProperty width, LengthProperty height){
         setXPos(xPos);
         setYPos(yPos);
         setWidth(width);
@@ -84,96 +83,96 @@ public class ComponentStyling {
     ///
 
     @Nonnull
-    public Length getXPos() {
+    public LengthProperty getXPos() {
         return xPos == null ? DefaultStyling.INSTANCE.getXPos() : xPos;
     }
 
-    public void setXPos(@Nonnull Length xPos) {
+    public void setXPos(@Nonnull LengthProperty xPos) {
         this.xPos = xPos;
     }
 
     @Nonnull
-    public Length getYPos() {
+    public LengthProperty getYPos() {
         return yPos == null ? DefaultStyling.INSTANCE.getYPos() : yPos;
     }
 
-    public void setYPos(@Nonnull Length yPos) {
+    public void setYPos(@Nonnull LengthProperty yPos) {
         this.yPos = yPos;
     }
 
     ///
 
     @Nonnull
-    public Length getWidth() {
+    public LengthProperty getWidth() {
         return width == null ? DefaultStyling.INSTANCE.getWidth() : width;
     }
 
-    public void setWidth(@Nonnull Length width) {
+    public void setWidth(@Nonnull LengthProperty width) {
         this.width = width;
     }
 
     @Nonnull
-    public Length getHeight() {
+    public LengthProperty getHeight() {
         return height == null ? DefaultStyling.INSTANCE.getHeight() : height;
     }
 
-    public void setHeight(@Nonnull Length height) {
+    public void setHeight(@Nonnull LengthProperty height) {
         this.height = height;
     }
 
     ///
 
     @Nullable
-    public Length getMarginWidth() {
+    public LengthProperty getMarginWidth() {
         return marginWidth == null ? DefaultStyling.INSTANCE.getMarginWidth() : marginWidth;
     }
 
-    public void setMarginWidth(@Nullable Length marginWidth) {
+    public void setMarginWidth(@Nullable LengthProperty marginWidth) {
         this.marginWidth = marginWidth;
     }
 
     @Nullable
-    public Length getMarginHeight() {
+    public LengthProperty getMarginHeight() {
         return marginHeight == null ? DefaultStyling.INSTANCE.getMarginHeight() : marginHeight;
     }
 
-    public void setMarginHeight(@Nullable Length marginHeight) {
+    public void setMarginHeight(@Nullable LengthProperty marginHeight) {
         this.marginHeight = marginHeight;
     }
 
     @Nullable
-    public Length getPaddingWidth() {
+    public LengthProperty getPaddingWidth() {
         return paddingWidth == null ? DefaultStyling.INSTANCE.getPaddingWidth() : paddingWidth;
     }
 
-    public void setPaddingWidth(@Nullable Length paddingWidth) {
+    public void setPaddingWidth(@Nullable LengthProperty paddingWidth) {
         this.paddingWidth = paddingWidth;
     }
 
     @Nullable
-    public Length getPaddingHeight() {
+    public LengthProperty getPaddingHeight() {
         return paddingHeight == null ? DefaultStyling.INSTANCE.getPaddingHeight() : paddingHeight;
     }
 
-    public void setPaddingHeight(@Nullable Length paddingHeight) {
+    public void setPaddingHeight(@Nullable LengthProperty paddingHeight) {
         this.paddingHeight = paddingHeight;
     }
 
     @Nullable
-    public Length getBorderWidth() {
+    public LengthProperty getBorderWidth() {
         return borderWidth == null ? DefaultStyling.INSTANCE.getBorderWidth() : borderWidth;
     }
 
-    public void setBorderWidth(@Nullable Length borderWidth) {
+    public void setBorderWidth(@Nullable LengthProperty borderWidth) {
         this.borderWidth = borderWidth;
     }
 
     @Nullable
-    public Length getBorderHeight() {
+    public LengthProperty getBorderHeight() {
         return borderHeight == null ? DefaultStyling.INSTANCE.getBorderHeight() : borderHeight;
     }
 
-    public void setBorderHeight(@Nullable Length borderHeight) {
+    public void setBorderHeight(@Nullable LengthProperty borderHeight) {
         this.borderHeight = borderHeight;
     }
 

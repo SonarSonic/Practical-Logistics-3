@@ -1,16 +1,16 @@
 package sonar.logistics.client.gsi.components.buttons;
 
-import sonar.logistics.client.gsi.interactions.api.IInteractionComponent;
+import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.client.gsi.components.AbstractComponent;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.client.gui.ScreenUtils;
 
 import javax.annotation.Nullable;
 
-public class ColouredButtonComponent extends AbstractComponent implements IInteractionComponent {
+public class ColouredButtonComponent extends Component implements IInteractionListener {
 
     @Nullable
     public ITrigger<ColouredButtonComponent> trigger;

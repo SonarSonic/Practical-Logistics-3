@@ -2,9 +2,8 @@ package sonar.logistics.client.gsi.components.groups;
 
 import com.google.common.collect.Lists;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.api.IComponentHost;
-import sonar.logistics.client.gsi.components.AbstractComponent;
+import sonar.logistics.client.gsi.components.text.IComponentHost;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.interactions.api.INestedInteractionListener;
 
@@ -14,9 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 ///a group without build or render defined
-public class AbstractGroup extends AbstractComponent implements IComponent, IComponentHost, INestedInteractionListener {
+public class AbstractGroup extends Component implements IComponentHost, INestedInteractionListener {
 
-    protected List<IComponent> subComponents = Lists.newArrayList();
+    protected List<Component> subComponents = Lists.newArrayList();
     protected List<IInteractionListener> interactions = new ArrayList<>();
 
     public boolean isVisible = true;
@@ -36,12 +35,12 @@ public class AbstractGroup extends AbstractComponent implements IComponent, ICom
 
     @Nullable
     @Override
-    public List<IComponent> getSubComponents() {
+    public List<Component> getSubComponents() {
         return subComponents;
     }
 
 
-    public <C extends IComponent> C addComponent(C component){
+    public <C extends Component> C addComponent(C component){
         component.setHost(this);
         subComponents.add(component);
         if(component instanceof  IInteractionListener){
@@ -50,7 +49,7 @@ public class AbstractGroup extends AbstractComponent implements IComponent, ICom
         return component;
     }
 
-    public <C extends IComponent> C removeComponent(C component){
+    public <C extends Component> C removeComponent(C component){
         component.setHost(null);
         subComponents.remove(component);
         if(component instanceof IInteractionListener){
@@ -79,7 +78,7 @@ public class AbstractGroup extends AbstractComponent implements IComponent, ICom
     @Override
     public void tick() {
         super.tick();
-        subComponents.forEach(IComponent::tick);
+        subComponents.forEach(Component::tick);
     }
 
     ///

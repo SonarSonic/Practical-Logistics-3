@@ -1,7 +1,8 @@
 package sonar.logistics.client.gsi.interactions.text;
 
 import net.minecraft.client.gui.screen.Screen;
-import sonar.logistics.client.gsi.api.ITextComponent;
+import net.minecraft.util.text.ITextComponent;
+import sonar.logistics.client.gsi.components.text.AbstractTextComponent;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gui.GSIDesignSettings;
 
@@ -74,7 +75,7 @@ public enum TextHotKeyFunctions {
 	@FunctionalInterface
 	public interface ITextFunction {
 
-		void trigger(StandardTextInteraction<ITextComponent> textInteraction);
+		void trigger(StandardTextInteraction<AbstractTextComponent> textInteraction);
 
 	}
 }

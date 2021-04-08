@@ -1,8 +1,7 @@
 package sonar.logistics.client.gsi.components.text;
 
-import sonar.logistics.client.gsi.api.ComponentAlignment;
-import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.api.IComponentHost;
+import sonar.logistics.client.gsi.style.ComponentAlignment;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.ComponentGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
@@ -13,13 +12,13 @@ import sonar.logistics.client.gsi.components.text.render.StyledTextLine;
 import sonar.logistics.client.gsi.components.text.render.StyledTextPages;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**used for wrapping styled strings within a specified bounds, it also will break strings into seperate pages*/
+/**used for wrapping styled strings within a specified bounds, it also will break strings into separate pages*/
 public class StyledTextWrapper {
 
     public static StyledTextWrapper INSTANCE = new StyledTextWrapper();
@@ -294,7 +293,7 @@ public class StyledTextWrapper {
     public void buildSubComponents(IComponentHost host){
         for(GlyphRenderInfo glyphInfo : styledTextPages.styledGlyphs){
             if(glyphInfo.glyph instanceof ComponentGlyph){
-                IComponent component = ((ComponentGlyph) glyphInfo.glyph).component;
+                Component component = ((ComponentGlyph) glyphInfo.glyph).component;
                 component.setHost(host);
                 component.build(glyphInfo.quad);
             }

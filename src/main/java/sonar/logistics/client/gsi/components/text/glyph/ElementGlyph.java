@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.components.text.glyph;
 
-import sonar.logistics.client.gsi.api.IRenderableElement;
+import sonar.logistics.client.gsi.elements.IRenderableElement;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderContext;
 import sonar.logistics.client.gsi.components.text.render.GlyphRenderInfo;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;

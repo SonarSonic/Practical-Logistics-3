@@ -1,8 +1,6 @@
 package sonar.logistics.client.gsi.style;
 
-import sonar.logistics.client.vectors.Quad2D;
-
-import javax.annotation.Nullable;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class ComponentBounds {
 

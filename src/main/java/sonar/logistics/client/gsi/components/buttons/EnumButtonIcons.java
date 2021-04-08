@@ -1,4 +1,4 @@
-package sonar.logistics.client.gsi.api;
+package sonar.logistics.client.gsi.components.buttons;
 
 public enum EnumButtonIcons {
 

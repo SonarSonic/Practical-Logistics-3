@@ -4,8 +4,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.api.IComponentHost;
-import sonar.logistics.client.vectors.VectorHelper;
+import sonar.logistics.util.vectors.VectorHelper;
 
 public interface IDisplay {
 

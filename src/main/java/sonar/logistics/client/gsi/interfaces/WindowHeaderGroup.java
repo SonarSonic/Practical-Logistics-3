@@ -1,16 +1,16 @@
-package sonar.logistics.client.gsi.components.groups.interfaces;
+package sonar.logistics.client.gsi.interfaces;
 
 import sonar.logistics.client.gsi.components.buttons.ColouredButtonComponent;
 import sonar.logistics.client.gsi.components.buttons.TextButtonComponent;
 import sonar.logistics.client.gsi.components.groups.HeaderGroup;
 import sonar.logistics.client.gsi.components.groups.LayoutGroup;
-import sonar.logistics.client.gsi.interactions.triggers.Trigger;
+import sonar.logistics.client.gsi.interactions.triggers.CustomTrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.client.gsi.style.properties.UnitLength;
-import sonar.logistics.client.gsi.style.properties.UnitType;
+import sonar.logistics.client.gsi.style.properties.LengthProperty;
+import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class WindowHeaderGroup extends LayoutGroup {
 
@@ -24,15 +24,15 @@ public class WindowHeaderGroup extends LayoutGroup {
     public WindowHeaderGroup(String windowName, boolean isDropdown){
         this.windowName = windowName;
         this.isDropdown = isDropdown;
-        this.styling.setHeight(new UnitLength(UnitType.PIXEL, headerSize));
+        this.styling.setHeight(new LengthProperty(Unit.PIXEL, headerSize));
 
         addComponent(windowBar = new ColouredButtonComponent((source, handler) -> moveWindow()).setColours(ScreenUtils.display_black_border.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.dark_grey.rgba));
         if(isDropdown){
 
-            addComponent(headerButton = new TextButtonComponent("\u2630", new Trigger<>((b, h) -> dropdownWindow(), (b, h) -> false))).setColours(ScreenUtils.red_button.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.red_button.rgba);
+            addComponent(headerButton = new TextButtonComponent("\u2630", new CustomTrigger<>((b, h) -> dropdownWindow(), (b, h) -> false))).setColours(ScreenUtils.red_button.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.red_button.rgba);
 
         }else{
-            addComponent(headerButton = new TextButtonComponent(isDropdown ? "\u2630":  "\u2715", new Trigger<>((b, h) -> {
+            addComponent(headerButton = new TextButtonComponent(isDropdown ? "\u2630":  "\u2715", new CustomTrigger<>((b, h) -> {
                 if(isDropdown){
                     dropdownWindow();
                 }else{
@@ -45,8 +45,8 @@ public class WindowHeaderGroup extends LayoutGroup {
     @Override
     public void build(Quad2D bounds) {
         this.bounds.build(bounds, styling);
-        windowBar.getStyling().setSizing(0, 0, getBounds().innerSize().width - headerSize, headerSize, UnitType.PIXEL);
-        headerButton.getStyling().setSizing(getBounds().innerSize().width - headerSize, 0, headerSize, headerSize, UnitType.PIXEL);
+        windowBar.getStyling().setSizing(0, 0, getBounds().innerSize().width - headerSize, headerSize, Unit.PIXEL);
+        headerButton.getStyling().setSizing(getBounds().innerSize().width - headerSize, 0, headerSize, headerSize, Unit.PIXEL);
         subComponents.forEach(c -> c.build(getBounds().innerSize()));
     }
 

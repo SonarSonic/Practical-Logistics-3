@@ -1,9 +1,8 @@
 package sonar.logistics.client.gsi.style;
 
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
-import sonar.logistics.client.gsi.style.properties.Length;
-import sonar.logistics.client.gsi.style.properties.UnitLength;
-import sonar.logistics.client.gsi.style.properties.UnitType;
+import sonar.logistics.client.gsi.style.properties.LengthProperty;
+import sonar.logistics.client.gsi.style.properties.Unit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,16 +17,16 @@ public final class DefaultStyling extends ComponentStyling {
         zLayer = 0;
 
         ///positioning
-        xPos = new UnitLength(UnitType.PERCENT, 0);
-        yPos = new UnitLength(UnitType.PERCENT, 0);
+        xPos = new LengthProperty(Unit.PERCENT, 0);
+        yPos = new LengthProperty(Unit.PERCENT, 0);
 
         ////sizing
-        width = new UnitLength(UnitType.PERCENT, 1);
-        height = new UnitLength(UnitType.PERCENT, 1);
+        width = new LengthProperty(Unit.PERCENT, 1);
+        height = new LengthProperty(Unit.PERCENT, 1);
 
         ///offsets
-        marginWidth = new UnitLength(UnitType.PIXEL, 0.0625/2);
-        marginHeight = new UnitLength(UnitType.PIXEL, 0.0625/2);
+        marginWidth = new LengthProperty(Unit.PIXEL, 0.0625/2);
+        marginHeight = new LengthProperty(Unit.PIXEL, 0.0625/2);
         paddingWidth = null;
         paddingHeight = null;
         borderWidth = null;
@@ -58,61 +57,61 @@ public final class DefaultStyling extends ComponentStyling {
 
     @Nonnull
     @Override
-    public Length getXPos() {
+    public LengthProperty getXPos() {
         return xPos;
     }
 
     @Nonnull
     @Override
-    public Length getYPos() {
+    public LengthProperty getYPos() {
         return yPos;
     }
 
     @Nonnull
     @Override
-    public Length getWidth() {
+    public LengthProperty getWidth() {
         return width;
     }
 
     @Nonnull
     @Override
-    public Length getHeight() {
+    public LengthProperty getHeight() {
         return height;
     }
 
     @Nullable
     @Override
-    public Length getMarginWidth() {
+    public LengthProperty getMarginWidth() {
         return marginWidth;
     }
 
     @Nullable
     @Override
-    public Length getMarginHeight() {
+    public LengthProperty getMarginHeight() {
         return marginHeight;
     }
 
     @Nullable
     @Override
-    public Length getPaddingWidth() {
+    public LengthProperty getPaddingWidth() {
         return paddingWidth;
     }
 
     @Nullable
     @Override
-    public Length getPaddingHeight() {
+    public LengthProperty getPaddingHeight() {
         return paddingHeight;
     }
 
     @Nullable
     @Override
-    public Length getBorderWidth() {
+    public LengthProperty getBorderWidth() {
         return borderWidth;
     }
 
     @Nullable
     @Override
-    public Length getBorderHeight() {
+    public LengthProperty getBorderHeight() {
         return borderHeight;
     }
 
@@ -159,34 +158,34 @@ public final class DefaultStyling extends ComponentStyling {
     public void setZLayer(Integer zLayer) {}
 
     @Override
-    public void setXPos(@Nonnull Length xPos) {}
+    public void setXPos(@Nonnull LengthProperty xPos) {}
 
     @Override
-    public void setYPos(@Nonnull Length yPos) {}
+    public void setYPos(@Nonnull LengthProperty yPos) {}
 
     @Override
-    public void setWidth(@Nonnull Length width) {}
+    public void setWidth(@Nonnull LengthProperty width) {}
 
     @Override
-    public void setHeight(@Nonnull Length height) {}
+    public void setHeight(@Nonnull LengthProperty height) {}
 
     @Override
-    public void setMarginWidth(@Nullable Length marginWidth) {}
+    public void setMarginWidth(@Nullable LengthProperty marginWidth) {}
 
     @Override
-    public void setMarginHeight(@Nullable Length marginHeight) {}
+    public void setMarginHeight(@Nullable LengthProperty marginHeight) {}
 
     @Override
-    public void setPaddingWidth(@Nullable Length paddingWidth) {}
+    public void setPaddingWidth(@Nullable LengthProperty paddingWidth) {}
 
     @Override
-    public void setPaddingHeight(@Nullable Length paddingHeight) {}
+    public void setPaddingHeight(@Nullable LengthProperty paddingHeight) {}
 
     @Override
-    public void setBorderWidth(@Nullable Length borderWidth) {}
+    public void setBorderWidth(@Nullable LengthProperty borderWidth) {}
 
     @Override
-    public void setBorderHeight(@Nullable Length borderHeight) {}
+    public void setBorderHeight(@Nullable LengthProperty borderHeight) {}
 
     @Override
     public void setOuterBackgroundColour(@Nullable ColourProperty outerBackgroundColour) {}

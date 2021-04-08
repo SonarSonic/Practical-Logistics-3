@@ -1,8 +1,6 @@
 package sonar.logistics.common.multiparts.displays;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Quaternion;
@@ -10,10 +8,9 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import org.lwjgl.opengl.GL11;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.vectors.VectorHelper;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.VectorHelper;
+import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.common.multiparts.base.IMultipartRenderer;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 

@@ -1,12 +1,12 @@
 package sonar.logistics.client.gsi.interactions;
 
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.api.IComponentHost;
+import sonar.logistics.client.gsi.components.text.IComponentHost;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.vectors.Vector2D;
 
-public class AbstractComponentInteraction<C extends IComponent> implements IInteractionListener {
+public class AbstractComponentInteraction<C extends Component> implements IInteractionListener {
 
     public C component;
 

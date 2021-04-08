@@ -39,6 +39,7 @@ public abstract class ScaledFontType {
     };
 
     public static ScaledFontType RALEWAY = new ScaledFontType(new ResourceLocation(PL3.MODID, "ralewayregular")) {
+
         RenderType type = RenderType.getText(new ResourceLocation(PL3.MODID, "ralewayregular" + "/" + 1));
 
         @Override
@@ -65,6 +66,7 @@ public abstract class ScaledFontType {
         public int getElementScaling() {
             return (int)(getFontScaling() * (8F/9F));
         }
+
     };
 
     Font font;

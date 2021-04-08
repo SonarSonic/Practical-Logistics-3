@@ -4,18 +4,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.util.ResourceLocation;
-import sonar.logistics.client.gsi.api.ComponentAlignment;
-import sonar.logistics.client.gsi.api.EnumImageFillType;
-import sonar.logistics.client.gsi.components.AbstractComponent;
+import sonar.logistics.client.gsi.style.ComponentAlignment;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Vector2D;
 
 import java.io.IOException;
 
-public class SimpleImageComponent extends AbstractComponent {
+public class SimpleImageComponent extends Component {
 
     public ResourceLocation loc;
     private SimpleTexture texture;

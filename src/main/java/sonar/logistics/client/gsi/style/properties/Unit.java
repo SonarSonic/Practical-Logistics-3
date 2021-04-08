@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.style.properties;
 
-public enum UnitType {
+public enum Unit {
 
     AUTO,
     PIXEL,

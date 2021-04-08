@@ -7,6 +7,9 @@ import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.util.MathUtils;
 
+/**
+ * The current settings for the GSI Design Settings
+ */
 public class GSIDesignSettings {
 
     public static GSIDesignScreen screen;
@@ -150,11 +153,11 @@ public class GSIDesignSettings {
 
     //// LINE BREAK GLYPH TYPES
 
-    public static EnumLineBreakGlyph currentLineBreakStyle = EnumLineBreakGlyph.DEFAULT_BREAK;
-    public static EnumLineBreakGlyph selectedLineBreakStyle = EnumLineBreakGlyph.ROUND_BULLET_POINT;
+    public static EnumLineBreakGlyphTypes currentLineBreakStyle = EnumLineBreakGlyphTypes.DEFAULT_BREAK;
+    public static EnumLineBreakGlyphTypes selectedLineBreakStyle = EnumLineBreakGlyphTypes.ROUND_BULLET_POINT;
 
     public static void toggleLineBreakStyle(){
-        currentLineBreakStyle = currentLineBreakStyle == selectedLineBreakStyle ? EnumLineBreakGlyph.DEFAULT_BREAK : selectedLineBreakStyle;
+        currentLineBreakStyle = currentLineBreakStyle == selectedLineBreakStyle ? EnumLineBreakGlyphTypes.DEFAULT_BREAK : selectedLineBreakStyle;
         onSettingChanged(currentLineBreakStyle, null);
     }
 

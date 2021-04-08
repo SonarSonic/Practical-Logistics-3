@@ -1,9 +1,9 @@
 package sonar.logistics.client.gsi.components.groups;
 
-import sonar.logistics.client.gsi.api.IComponent;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Vector2D;
 
 public class GridGroup extends AbstractGroup {
 
@@ -39,7 +39,7 @@ public class GridGroup extends AbstractGroup {
         for(int r = 0; r < rows; r ++) {
             for(int c = 0; c < columns; c ++) {
                 int pos = (r*columns) + c;
-                IComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
+                Component component = subComponents.size() > pos ? subComponents.get(pos) : null;
                 if(component != null){
                     context.matrix.push();
                     component.render(context);
@@ -63,7 +63,7 @@ public class GridGroup extends AbstractGroup {
         for(int r = 0; r < rows; r ++) {
             for (int c = 0; c < columns; c++) {
                 int pos = (r*columns) + c;
-                IComponent component = subComponents.size() > pos ? subComponents.get(pos) : null;
+                Component component = subComponents.size() > pos ? subComponents.get(pos) : null;
                 if(component != null){
                     Vector2D componentAlignment = this.bounds.innerSize().getAlignment().add(c * cellSize.getX(), r * cellSize.getY());
                     component.build(new Quad2D(componentAlignment, cellSize));

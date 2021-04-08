@@ -1,4 +1,4 @@
-package sonar.logistics.client.vectors;
+package sonar.logistics.util.vectors;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
@@ -15,7 +15,6 @@ import java.util.function.Function;
  * SIZING VECTOR = WIDTH = X, HEIGHT = Y, DEPTH = Z
  * TRANSLATION VECTOR = X-Translate = X, Y-Translate = Z, X-Translate = Z
  * SCALING VECTOR = X-Scale = X, Y-Scale = Z, X-Scale = Z */
-//TODO SWITCH TO MUTABLE VECTORS?
 public class VectorHelper {
 
     public static final Vec3d X_VEC = new Vec3d(1, 0, 0);

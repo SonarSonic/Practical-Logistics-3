@@ -3,7 +3,7 @@ package sonar.logistics.client.gsi.components.groups;
 import sonar.logistics.client.gsi.components.layouts.Layout;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class LayoutGroup extends AbstractGroup {
 

@@ -5,8 +5,8 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.vectors.Vector2D;
-import sonar.logistics.client.vectors.VectorHelper;
+import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.VectorHelper;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;

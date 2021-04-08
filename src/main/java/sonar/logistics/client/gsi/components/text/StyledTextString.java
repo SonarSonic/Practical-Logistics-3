@@ -1,17 +1,13 @@
 package sonar.logistics.client.gsi.components.text;
 
-import sonar.logistics.client.gsi.api.IComponent;
-import sonar.logistics.client.gsi.api.IRenderableElement;
+import sonar.logistics.client.gsi.elements.IRenderableElement;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.text.glyph.*;
-import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleHolder;
-import sonar.logistics.client.gsi.components.text.style.LineStyle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class StyledTextString {
 
@@ -57,11 +53,11 @@ public class StyledTextString {
 
     /////
 
-    public void addComponent(IComponent component){
+    public void addComponent(Component component){
         addComponent(component, glyphs.size());
     }
 
-    public void addComponent(IComponent component, int index){
+    public void addComponent(Component component, int index){
         glyphs.add(index, new ComponentGlyph(component));
     }
 

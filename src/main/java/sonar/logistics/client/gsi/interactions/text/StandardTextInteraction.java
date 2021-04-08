@@ -2,7 +2,7 @@ package sonar.logistics.client.gsi.interactions.text;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
-import sonar.logistics.client.gsi.api.ITextComponent;
+import sonar.logistics.client.gsi.components.text.AbstractTextComponent;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.interactions.AbstractComponentInteraction;
 import sonar.logistics.client.gui.GSIDesignSettings;
@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
-public class StandardTextInteraction<C extends ITextComponent> extends AbstractComponentInteraction<C> implements IGlyphRenderer {
+public class StandardTextInteraction<C extends AbstractTextComponent> extends AbstractComponentInteraction<C> implements IGlyphRenderer {
 
     @Nonnull
     public CursorPoint cursor;
@@ -42,7 +42,7 @@ public class StandardTextInteraction<C extends ITextComponent> extends AbstractC
 
     @Override
     public void renderGlyph(GlyphRenderContext context, GlyphRenderInfo glyphInfo) {
-        glyphInfo.glyph.render(context, glyphInfo);
+        StyledTextRenderer.INSTANCE.renderGlyph(context, glyphInfo);
     }
 
     @Override

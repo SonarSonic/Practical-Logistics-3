@@ -1,7 +1,7 @@
 package sonar.logistics.client.gsi.components.buttons;
 
 import net.minecraft.client.Minecraft;
-import sonar.logistics.client.gsi.api.ComponentAlignment;
+import sonar.logistics.client.gsi.style.ComponentAlignment;
 import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;

@@ -1,6 +1,6 @@
-package sonar.logistics.client.vectors;
+package sonar.logistics.util.vectors;
 
-import sonar.logistics.client.gsi.api.ComponentAlignment;
+import sonar.logistics.client.gsi.style.ComponentAlignment;
 
 public class Quad2D {
 

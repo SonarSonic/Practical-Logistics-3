@@ -2,16 +2,13 @@ package sonar.logistics.client.gsi.components.input;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import sonar.logistics.client.gsi.api.ComponentAlignment;
-import sonar.logistics.client.gsi.api.ITextComponent;
-import sonar.logistics.client.gsi.components.AbstractComponent;
-import sonar.logistics.client.gsi.components.text.StyledTextString;
+import sonar.logistics.client.gsi.style.ComponentAlignment;
 import sonar.logistics.client.gsi.components.text.StyledTextWrapper;
+import sonar.logistics.client.gsi.components.text.AbstractTextComponent;
 import sonar.logistics.client.gsi.components.text.fonts.ScaledFontType;
 import sonar.logistics.client.gsi.components.text.glyph.CharGlyph;
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
-import sonar.logistics.client.gsi.components.text.render.StyledTextPages;
 import sonar.logistics.client.gsi.components.text.render.StyledTextRenderer;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
@@ -22,15 +19,14 @@ import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
-public class TextInputComponent extends AbstractComponent implements ITextComponent, IFlexibleInteractionListener {
+public class TextInputComponent extends AbstractTextComponent implements IFlexibleInteractionListener {
 
     @OnlyIn(Dist.CLIENT)
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
-    public StyledTextPages pages = new StyledTextPages(new StyledTextString());
     public EnumTextInputType inputType = EnumTextInputType.STRING;
-    public StandardTextInteraction<ITextComponent> textInteraction = new StandardTextInteraction<>(this);
+    public StandardTextInteraction<TextInputComponent> textInteraction = new StandardTextInteraction<>(this);
     public int maxInputLength = -1;
 
     public ITrigger<TextInputComponent> trigger = null;
@@ -38,7 +34,6 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
 
     public LineStyle inputLineStyle = new LineStyle();
     public GlyphStyle inputGlyphStyle = new GlyphStyle();
-
 
     {
         inputLineStyle.justifyType = LineStyle.JustifyType.JUSTIFY_CENTRE;
@@ -152,11 +147,6 @@ public class TextInputComponent extends AbstractComponent implements ITextCompon
                 return textInteraction;
         }
         return null;
-    }
-
-    @Override
-    public StyledTextPages pages() {
-        return pages;
     }
 
     public enum EnumTextInputType{

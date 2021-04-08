@@ -5,25 +5,20 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.IRenderable;
 import org.lwjgl.opengl.GL11;
-import sonar.logistics.client.gui.api.IFlexibleGuiEventListener;
-import sonar.logistics.client.gui.api.IInteractWidget;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 import java.text.DecimalFormat;
 
 //TODO REPLACE WITH COMPONENT? would this be a massive pain with scissoring though?
-public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener, IInteractWidget {
+public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEventListener {
 
     public GSI gsi;
 
-    public IComponent selectedComponent;
     public Quad2D bounds;
 
     public double centreX, centreY;
@@ -152,7 +147,7 @@ public class GSIViewportWidget implements IRenderable, IFlexibleGuiEventListener
     }
 
     @Override
-    public Quad2D getQuad() {
+    public Quad2D getBounds() {
         return bounds;
     }
 

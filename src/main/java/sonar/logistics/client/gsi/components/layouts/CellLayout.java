@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.components.layouts;
 
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 public class CellLayout extends Layout {
 

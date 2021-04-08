@@ -1,6 +1,6 @@
-package sonar.logistics.client.gui.api;
+package sonar.logistics.client.gsi.interactions.resize;
 
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 import javax.annotation.Nullable;
 

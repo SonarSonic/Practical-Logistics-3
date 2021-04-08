@@ -2,24 +2,24 @@ package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import sonar.logistics.client.gsi.api.EnumImageFillType;
-import sonar.logistics.client.gsi.api.IComponentHost;
+import sonar.logistics.client.gsi.components.image.EnumImageFillType;
+import sonar.logistics.client.gsi.components.text.IComponentHost;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.image.SimpleImageComponent;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
-import sonar.logistics.client.gsi.interactions.ResizingInteraction;
+import sonar.logistics.client.gsi.interactions.resize.ResizingInteraction;
 import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
-import sonar.logistics.client.gsi.api.IComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextString;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.gsi.style.properties.UnitLength;
-import sonar.logistics.client.gsi.style.properties.UnitType;
+import sonar.logistics.client.gsi.style.properties.LengthProperty;
+import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.GSIDesignScreen;
-import sonar.logistics.client.vectors.Quad2D;
-import sonar.logistics.client.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Vector2D;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
@@ -32,7 +32,7 @@ import java.util.function.Function;
 public class GSI implements IComponentHost {
 
     public GSIInteractionHandler interactionHandler = new GSIInteractionHandler(this, Minecraft.getInstance().player);
-    private List<IComponent> components = new ArrayList<>();
+    private List<Component> components = new ArrayList<>();
     private List<IInteractionListener> interactions = new ArrayList<>();
     private Quad2D bounds;
 
@@ -61,11 +61,11 @@ public class GSI implements IComponentHost {
         //for rendering components we sort back to front - lowest z first
         components.sort(Comparator.comparingInt(i -> i.getStyling().getZLayer()));
         //for interactions we sort front to back - highest z first
-        interactions.sort(Comparator.comparingInt(i -> -((IComponent)i).getStyling().getZLayer()));
+        interactions.sort(Comparator.comparingInt(i -> -((Component)i).getStyling().getZLayer()));
     }
 
     public void tick(){
-        components.forEach(IComponent::tick);
+        components.forEach(Component::tick);
     }
 
     public void render(GSIRenderContext context){
@@ -80,7 +80,7 @@ public class GSI implements IComponentHost {
         context.postRender();
     }
 
-    public IComponent addComponent(IComponent component){
+    public Component addComponent(Component component){
         component.setHost(this);
         components.add(component);
         if(component instanceof  IInteractionListener){
@@ -89,7 +89,7 @@ public class GSI implements IComponentHost {
         return component;
     }
 
-    public IComponent removeComponent(IComponent component){
+    public Component removeComponent(Component component){
         component.setHost(null);
         components.remove(component);
         if(component instanceof  IInteractionListener){
@@ -98,17 +98,17 @@ public class GSI implements IComponentHost {
         return component;
     }
 
-    public IComponent getComponentAt(Vector2D mouseHit) {
+    public Component getComponentAt(Vector2D mouseHit) {
         return getComponent(components, component -> component.getBounds().outerSize().contains(mouseHit));
     }
 
     @Nullable
-    public IComponent getComponent(List<IComponent> components, Function<IComponent, Boolean> filter){
-        for (IComponent component : components) {
+    public Component getComponent(List<Component> components, Function<Component, Boolean> filter){
+        for (Component component : components) {
             if (filter.apply(component)) {
-                List<IComponent> subComponents = component.getSubComponents();
+                List<Component> subComponents = component.getSubComponents();
                 if (subComponents != null) {
-                    IComponent result = getComponent(subComponents, filter);
+                    Component result = getComponent(subComponents, filter);
                     if (result != null) {
                         return result;
                     }
@@ -145,7 +145,7 @@ public class GSI implements IComponentHost {
                     }
                     return true;
                 }
-                IComponent hovered = getComponent(components, c -> c.getBounds().outerSize().contains(interactionHandler.mousePos));
+                Component hovered = getComponent(components, c -> c.getBounds().outerSize().contains(interactionHandler.mousePos));
                 if(hovered != null) {
                     setFocused(new ResizingInteraction(hovered));
                     tryStartDragging(button);
@@ -171,10 +171,10 @@ public class GSI implements IComponentHost {
 
 
         StyledTextComponent lines = new StyledTextComponent();
-        lines.getStyling().setSizing(0, 0, 1, 0.5, UnitType.PERCENT);
+        lines.getStyling().setSizing(0, 0, 1, 0.5, Unit.PERCENT);
 
-        lines.getStyling().setBorderWidth(new UnitLength(UnitType.PIXEL, 0.0625/4));
-        lines.getStyling().setBorderHeight(new UnitLength(UnitType.PIXEL, 0.0625/4));
+        lines.getStyling().setBorderWidth(new LengthProperty(Unit.PIXEL, 0.0625/4));
+        lines.getStyling().setBorderHeight(new LengthProperty(Unit.PIXEL, 0.0625/4));
 
         StyledTextString element = new StyledTextString();
 
@@ -190,12 +190,12 @@ public class GSI implements IComponentHost {
         addComponent(lines);
 
         SliderComponent slider = new SliderComponent();
-        slider.getStyling().setSizing(0, 0.5, 1, 0.2, UnitType.PERCENT);
+        slider.getStyling().setSizing(0, 0.5, 1, 0.2, Unit.PERCENT);
         addComponent(slider);
 
 
         SimpleImageComponent imageComponent = new SimpleImageComponent(new ResourceLocation("minecraft", "textures/block/bedrock.png"), EnumImageFillType.IMAGE_FILL);
-        imageComponent.getStyling().setSizing(0, 0.7, 1, 0.3, UnitType.PERCENT);
+        imageComponent.getStyling().setSizing(0, 0.7, 1, 0.3, Unit.PERCENT);
         addComponent(imageComponent);
 
         /*

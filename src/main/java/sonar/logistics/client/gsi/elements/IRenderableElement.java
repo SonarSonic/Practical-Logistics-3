@@ -1,8 +1,8 @@
-package sonar.logistics.client.gsi.api;
+package sonar.logistics.client.gsi.elements;
 
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.client.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2D;
 
 import javax.annotation.Nullable;
 
