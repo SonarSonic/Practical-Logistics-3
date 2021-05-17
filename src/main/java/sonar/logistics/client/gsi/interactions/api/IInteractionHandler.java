@@ -3,11 +3,15 @@ package sonar.logistics.client.gsi.interactions.api;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 
 /**implemented on components which can handle gui style interactions in a gui setting but also in the world*/
-public interface IInteractionListener {
+public interface IInteractionHandler {
 
     default void renderInteraction(GSIRenderContext context){}
 
     ///
+
+    default boolean canInteract(){
+        return true;
+    }
 
     /** only called if the component is "focused" */
     default void mouseMoved() {}
@@ -59,7 +63,7 @@ public interface IInteractionListener {
     /// special dragging methods
 
     default boolean isDragButton(int button){
-        return button == 0 || button == 1;
+        return button == 0 || button == 1 || button == 2;
     }
 
     default boolean canStartDrag(int button){

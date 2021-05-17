@@ -18,8 +18,6 @@ public interface IProxy {
 
     PlayerEntity getClientPlayer();
 
-    DataManager getDataManager();
-
     @Nullable
     <T extends MultipartTile> IMultipartRenderer<T> getMultipartRenderer(T tile);
 

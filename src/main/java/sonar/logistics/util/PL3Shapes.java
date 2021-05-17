@@ -16,6 +16,13 @@ public class PL3Shapes {
     public static final AxisAlignedBB DATA_CABLE_CONNECTOR_BB_SHAPE = getBBFromPixels(7, 0, 7, 9, 7, 9);
     public static final VoxelShape[] DATA_CABLE_CONNECTOR_ROTATED_VOXELS = getRotatedVoxels(DATA_CABLE_CONNECTOR_BB_SHAPE, Direction.values());
 
+    public static final AxisAlignedBB DATA_CABLE_CONNECTOR_BB_SHAPE_SHORT = getBBFromPixels(7, 1, 7, 9, 7, 9);
+    public static final VoxelShape[] DATA_CABLE_CONNECTOR_ROTATED_VOXELS_SHORT = getRotatedVoxels(DATA_CABLE_CONNECTOR_BB_SHAPE_SHORT, Direction.values());
+
+    //// READER
+    public static final AxisAlignedBB READER_BB_SHAPE = getBBFromPixels(4, 0, 4, 12, 1, 12);
+    public static final VoxelShape[] READER_ROTATED_VOXELS = getRotatedVoxels(READER_BB_SHAPE, Direction.values());
+
     //// MINI DISPLAY SCREEN
     public static final AxisAlignedBB MINI_DISPLAY_BB_SHAPE = getBBFromPixels(4, 0, 4, 12, 1, 12);
     public static final VoxelShape[] MINI_DISPLAY_ROTATED_VOXELS = getRotatedVoxels(MINI_DISPLAY_BB_SHAPE, Direction.values());

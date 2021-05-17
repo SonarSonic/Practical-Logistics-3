@@ -102,7 +102,7 @@ public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEve
         MainWindow mainWindow = Minecraft.getInstance().getMainWindow();
         double scale = mainWindow.getGuiScaleFactor();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor((int) (bounds.x * scale), (int) (mainWindow.getHeight() - ((bounds.y + bounds.height) * scale)), (int) (bounds.width * scale), (int) (bounds.height * scale));
+        GL11.glScissor((int) ((bounds.x + 1) * scale), (int) (mainWindow.getHeight() - ((bounds.y + bounds.height -1) * scale)), (int) ((bounds.width - 2) * scale), (int) ((bounds.height -2) * scale));
 
 
         //gsi rendering - context / interaction handler update
@@ -163,7 +163,7 @@ public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEve
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isMouseOver(mouseX, mouseY)) {
-            if(IFlexibleGuiEventListener.super.mouseClicked(mouseX, mouseY, button)){
+            if(button != 2 && IFlexibleGuiEventListener.super.mouseClicked(mouseX, mouseY, button)){
                 return true;
             }
             if(button == 1) {
@@ -181,7 +181,7 @@ public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEve
             return true;
         }
         if(isMouseOver(mouseX, mouseY)){
-            scaling += scroll;
+            scaling += scroll*10;
             return true;
         }
         return false;
@@ -189,11 +189,11 @@ public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEve
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if(isMouseOverGSI(mouseX, mouseY)){
-            return IFlexibleGuiEventListener.super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        if(button != 2 && isMouseOverGSI(mouseX, mouseY) && IFlexibleGuiEventListener.super.mouseDragged(mouseX, mouseY, button, dragX, dragY)){
+            return true;
         }
         if(!gsi.isDragging()) {
-            if (button == 0) {
+            if (button == 0 || button == 2) {
                 centreX += dragX;
                 centreY += dragY;
                 return true;

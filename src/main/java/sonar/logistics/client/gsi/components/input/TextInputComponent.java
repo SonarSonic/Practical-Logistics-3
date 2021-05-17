@@ -13,15 +13,15 @@ import sonar.logistics.client.gsi.components.text.render.StyledTextRenderer;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.interactions.text.StandardTextInteraction;
-import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionListener;
-import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionHandler;
+import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.util.vectors.Quad2D;
 
-public class TextInputComponent extends AbstractTextComponent implements IFlexibleInteractionListener {
+public class TextInputComponent extends AbstractTextComponent implements IFlexibleInteractionHandler {
 
     @OnlyIn(Dist.CLIENT)
     public ScaledFontType fontType = ScaledFontType.DEFAULT_MINECRAFT;
@@ -138,7 +138,7 @@ public class TextInputComponent extends AbstractTextComponent implements IFlexib
     }
 
     @Override
-    public IInteractionListener getInteractionListener() {
+    public IInteractionHandler getInteractionListener() {
         switch (getInteractionHandler().getInteractionType()){
             case WORLD_INTERACTION:
                 break;

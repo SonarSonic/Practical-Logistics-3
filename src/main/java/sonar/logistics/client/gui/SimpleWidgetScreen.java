@@ -80,7 +80,7 @@ public class SimpleWidgetScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return this.getFocused() != null && this.isDragging() && (button == 0 || button == 2) && this.getFocused().mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Nonnull

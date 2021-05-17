@@ -47,13 +47,11 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
         matrix.translate(-sizing.getWidth()/2, -sizing.getHeight()/2, -0.5); ///// SCREEN OFFSET
 
 
-
         ///// START GSI RENDERING \\\\\
 
         GSIRenderContext renderContext = new GSIRenderContext(tile.getGSI(), partialTicks, matrix, renderer, light, overlayLight, worldMatrix, dir, false);
         tile.getGSI().render(renderContext);
         ///// END GSI RENDERING \\\\\
-
 
         matrix.pop();
 

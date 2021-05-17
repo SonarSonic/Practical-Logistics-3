@@ -1,6 +1,6 @@
 package sonar.logistics.client.gsi.components.buttons;
 
-import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.components.Component;
@@ -10,7 +10,7 @@ import sonar.logistics.client.gui.ScreenUtils;
 
 import javax.annotation.Nullable;
 
-public class ColouredButtonComponent extends Component implements IInteractionListener {
+public class ColouredButtonComponent extends Component implements IInteractionHandler {
 
     @Nullable
     public ITrigger<ColouredButtonComponent> trigger;
@@ -39,8 +39,8 @@ public class ColouredButtonComponent extends Component implements IInteractionLi
         context.matrix.translate(0,0, -0.0001F);
 
         boolean isEnabled = trigger != null && trigger.isActive(this, getInteractionHandler());
-        ColourProperty rgba = (isEnabled ? styling.getEnabledTextColour() : isMouseOver() ? styling.getHoveredTextColour() : styling.getDisabledTextColour());
-        rgba = rgba != null ? rgba : (isEnabled ? ScreenUtils.transparent_green_button : isMouseOver() ? ScreenUtils.transparent_hovered_button : ScreenUtils.transparent_disabled_button);
+        ColourProperty rgba = (isEnabled ? styling.getEnabledTextColour() : isHoveredComponent() ? styling.getHoveredTextColour() : styling.getDisabledTextColour());
+        rgba = rgba != null ? rgba : (isEnabled ? ScreenUtils.transparent_green_button : isHoveredComponent() ? ScreenUtils.transparent_hovered_button : ScreenUtils.transparent_disabled_button);
         GSIRenderHelper.renderColouredRect(context, true, bounds.innerSize(), rgba);
     }
 

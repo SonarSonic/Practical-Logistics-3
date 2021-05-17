@@ -5,11 +5,11 @@ import sonar.logistics.client.gsi.render.GSIRenderContext;
 import javax.annotation.Nullable;
 
 /**implemented on components which use more advanced interactions and so switch the interaction used based on the mouse pos or context (e.g. gui/world)*/
-public interface IFlexibleInteractionListener extends IInteractionListener {
+public interface IFlexibleInteractionHandler extends IInteractionHandler {
 
     /**this shouldn't never return itself*/
     @Nullable
-    IInteractionListener getInteractionListener();
+    IInteractionHandler getInteractionListener();
 
     @Override
     default void renderInteraction(GSIRenderContext context) {

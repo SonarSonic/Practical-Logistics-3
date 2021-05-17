@@ -2,6 +2,7 @@ package sonar.logistics.client.gsi.components.groups;
 
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.util.vectors.Vector2D;
 
@@ -42,7 +43,7 @@ public class GridGroup extends AbstractGroup {
                 Component component = subComponents.size() > pos ? subComponents.get(pos) : null;
                 if(component != null){
                     context.matrix.push();
-                    component.render(context);
+                    GSIRenderHelper.renderComponent(context, component);
                     context.matrix.pop();
                 }
             }

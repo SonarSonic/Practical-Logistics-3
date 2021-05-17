@@ -12,28 +12,17 @@ import javax.annotation.Nonnull;
 @Nonnull
 public class DataUUID implements ISyncable {
 
+    public static final DataUUID EMPTY = new DataUUID(-1, -1);
+    public static final DataUUID INVALID = new DataUUID(-2, -2);
+
     public int source;
     public int method;
 
     public DataUUID() {}
 
-    /*
-    public DataUUID(INetworkTile tile, int channelID) {
-        this.source = tile.getIdentity();
-        this.method = channelID;
-    }
-    */
-    public DataUUID(int identity, int channelID) {
-        this.source = identity;
-        this.method = channelID;
-    }
-
-    public static DataUUID newEmpty() {
-        return new DataUUID(-1, -1);
-    }
-
-    public static DataUUID newInvalid() {
-        return new DataUUID(-2, -2);
+    public DataUUID(int source, int method) {
+        this.source = source;
+        this.method = method;
     }
 
     public int getSource() {

@@ -2,6 +2,7 @@ package sonar.logistics.server.data.methods;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.CropsBlock;
+import net.minecraft.block.IBucketPickupHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -80,25 +81,27 @@ public class VanillaMethods {
         BLOCK_POS_Y = MethodRegistry.registerMethodBlock(DataCategories.BLOCKS,"getY", Integer.class, Block.class, (E, B) -> E.pos().getY());
         BLOCK_POS_Z = MethodRegistry.registerMethodBlock(DataCategories.BLOCKS,"getZ", Integer.class, Block.class, (E, B) -> E.pos().getZ());
         BLOCK_FACE = MethodRegistry.registerMethodBlock(DataCategories.BLOCKS,"getFace", String.class, Block.class, (E, B) -> E.face().name());
-        BLOCK_HARDNESS = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"getBlockHardness", Float.class, Block.class, (E, B) -> B.getBlockHardness(E.state(), E.world(), E.pos()));
+        BLOCK_HARDNESS = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"getBlockHardness", Float.class, Block.class, (E, B) -> E.state().getBlockHardness(E.world(), E.pos()));
         BLOCK_HARVEST_LEVEL = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"getHarvestLevel", Integer.class, Block.class, (E, B) -> B.getHarvestLevel(E.state()));
         BLOCK_IS_FOLIAGE = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"isFoliage", Boolean.class, Block.class, (E, B) -> B.isFoliage(E.state(), E.world(), E.pos()));
         //BLOCK_IS_WOOD = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"isWood", Boolean.class, Block.class, (E, B) -> B.isWood(E.state(), E.world(), E.pos()));
         //BLOCK_CAN_SUSTAIN_LEAVES = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"canSustainLeaves", Boolean.class, Block.class, (E, B) -> B.canSustainLeaves(E.state(), E.world(), E.pos()));
-        BLOCK_WEAK_POWER = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"getWeakPower", Integer.class, Block.class, (E, B) -> B.getWeakPower(E.state(), E.world(), E.pos(), E.face()));
-        BLOCK_STRONG_POWER = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"getStrongPower", Integer.class, Block.class, (E, B) -> B.getStrongPower(E.state(), E.world(), E.pos(), E.face()));
+        BLOCK_WEAK_POWER = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"getWeakPower", Integer.class, Block.class, (E, B) -> E.state().getWeakPower(E.world(), E.pos(), E.face()));
+        BLOCK_STRONG_POWER = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"getStrongPower", Integer.class, Block.class, (E, B) -> E.state().getStrongPower(E.world(), E.pos(), E.face()));
         //BLOCK_INDIRECTLY_POWERED = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"isBlockIndirectlyGettingPowered", Integer.class, Block.class, (E, B) -> E.world().isBlockIndirectlyGettingPowered(E.pos()));
         //BLOCK_IS_SIDE_SOLID = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"isSideSolid", Boolean.class, Block.class, (E, B) -> B.isSideSolid(E.state(), E.world(), E.pos(), E.face()));
 
         BLOCK_IS_MAX_AGE = MethodRegistry.registerMethodBlock( DataCategories.BLOCKS,"isMaxAge", Boolean.class, CropsBlock.class, (E, B) -> B.isMaxAge(E.state()));
+
         /*
-        BLOCK_FLUID_LUMINOSITY = MethodRegistry.registerMethodBlock(DataCategories.FLUIDS,"getLuminosity", Integer.class, BlockFluidBase.class, (E, B) -> B.getFluid().getLuminosity());
-        BLOCK_FLUID_DENSITY = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getDensity", Integer.class, BlockFluidBase.class, (E, B) -> B.getFluid().getDensity());
-        BLOCK_FLUID_TEMPERATURE = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getTemperature", Integer.class, BlockFluidBase.class, (E, B) -> B.getFluid().getTemperature());
-        BLOCK_FLUID_VISCOSITY = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getViscosity", Integer.class, BlockFluidBase.class, (E, B) -> B.getFluid().getViscosity());
-        BLOCK_FLUID_IS_GASEOUS = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"isGaseous", Boolean.class, BlockFluidBase.class, (E, B) -> B.getFluid().isGaseous());
-        BLOCK_FLUID_RARITY = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getRarity", String.class, BlockFluidBase.class, (E, B) -> B.getFluid().getRarity().rarityName);
-        */
+        BLOCK_FLUID_LUMINOSITY = MethodRegistry.registerMethodBlock(DataCategories.FLUIDS,"getLuminosity", Integer.class, IBucketPickupHandler.class, (E, B) -> B.getFluid().getLuminosity());
+        BLOCK_FLUID_DENSITY = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getDensity", Integer.class, IBucketPickupHandler.class, (E, B) -> B.getFluid().getDensity());
+        BLOCK_FLUID_TEMPERATURE = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getTemperature", Integer.class, IBucketPickupHandler.class, (E, B) -> B.getFluid().getTemperature());
+        BLOCK_FLUID_VISCOSITY = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getViscosity", Integer.class, IBucketPickupHandler.class, (E, B) -> B.getFluid().getViscosity());
+        BLOCK_FLUID_IS_GASEOUS = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"isGaseous", Boolean.class, IBucketPickupHandler.class, (E, B) -> B.getFluid().isGaseous());
+        BLOCK_FLUID_RARITY = MethodRegistry.registerMethodBlock( DataCategories.FLUIDS,"getRarity", String.class, IBucketPickupHandler.class, (E, B) -> B.getFluid().getRarity().rarityName);
+         */
+
         WORLD_IS_RAINING = MethodRegistry.registerMethodWorld( DataCategories.WORLD,"isRaining", Boolean.class, W -> W.getWorldInfo().isRaining());
         WORLD_IS_THUNDERING = MethodRegistry.registerMethodWorld( DataCategories.WORLD,"isThundering", Boolean.class, W -> W.getWorldInfo().isThundering());
         WORLD_NAME = MethodRegistry.registerMethodWorld( DataCategories.WORLD,"getWorldName", String.class, W -> W.getWorldInfo().getWorldName());

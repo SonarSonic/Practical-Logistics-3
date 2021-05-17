@@ -1,53 +1,33 @@
 package sonar.logistics.server.data;
 
-import net.minecraft.item.ItemStack;
-import sonar.logistics.PL3;
-import sonar.logistics.server.data.api.IData;
-import sonar.logistics.server.data.api.IDataFactory;
 import sonar.logistics.server.data.api.IDataMerger;
 import sonar.logistics.server.data.api.IDataWatcher;
 import sonar.logistics.server.data.api.methods.IMethod;
-import sonar.logistics.server.data.generators.InventoryDataMerger;
-import sonar.logistics.server.data.generators.StoredItemDataMerger;
 import sonar.logistics.server.data.holders.DataHolder;
 import sonar.logistics.server.data.holders.DataMergerHolder;
 import sonar.logistics.server.data.holders.SourceHolder;
 import sonar.logistics.server.data.sources.IDataSource;
 import sonar.logistics.server.data.sources.IDataSourceList;
-import sonar.logistics.server.data.types.energy.EnergyStorageData;
-import sonar.logistics.server.data.types.energy.EnergyStorageDataFactory;
-import sonar.logistics.server.data.types.fluid.FluidHandlerData;
-import sonar.logistics.server.data.types.fluid.FluidHandlerDataFactory;
-import sonar.logistics.server.data.types.general.PrimitiveDataTypes;
-import sonar.logistics.server.data.types.general.SpecialDataTypes;
-import sonar.logistics.server.data.types.inventory.InventoryData;
-import sonar.logistics.server.data.types.inventory.InventoryDataFactory;
-import sonar.logistics.server.data.types.inventory.StoredItemData;
-import sonar.logistics.server.data.types.inventory.StoredItemDataFactory;
-import sonar.logistics.server.data.types.items.ItemHandlerData;
-import sonar.logistics.server.data.types.items.ItemHandlerDataFactory;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 
 public class DataManager {
 
-    private Map<Class, Integer> DATA_TYPES = new HashMap<>();
-    private Map<Class, List<IDataMerger>> MERGERS = new HashMap<>();
-    private Map<Class, IDataFactory> FACTORIES = new HashMap<>();
+    public static final DataManager INSTANCE = new DataManager();
 
 
-    private List<IDataWatcher> addedWatchers = new ArrayList<>();
-    private List<IDataWatcher> removedWatchers = new ArrayList<>();
+    private final List<IDataWatcher> addedWatchers = new ArrayList<>();
+    private final List<IDataWatcher> removedWatchers = new ArrayList<>();
     //private Map<InfoUUID, IDataWatcher> LOADED_WATCHERS = new HashMap<>();
     //private Map<IDataSource, DataGeneratorHolder> DATA_MERGERS = new HashMap<>();
 
-    private List<IDataSourceList> DATA_SOURCE_LISTS = new ArrayList<>();
-    private Map<IDataSource, SourceHolder> DATA_SOURCES = new HashMap<>();
-    private List<DataMergerHolder> DATA_MERGERS = new ArrayList<>();
+    private final List<IDataSourceList> DATA_SOURCE_LISTS = new ArrayList<>();
+    private final Map<IDataSource, SourceHolder> DATA_SOURCES = new HashMap<>();
+    private final List<DataMergerHolder> DATA_MERGERS = new ArrayList<>();
 
     public static DataManager instance(){
-        return PL3.proxy.getDataManager();
+        return INSTANCE;
     }
 
     private int identity;
@@ -174,89 +154,10 @@ public class DataManager {
     }
 
 
-
-
-
-    ////DATA FACTORIES
-
-    @Nonnull
-    public static IDataFactory getFactory(Class dataType){
-        if(IData.class.isAssignableFrom(dataType)){
-            return getFactoryForData(dataType);
-        }else{
-            return getFactoryForPrimitive(dataType);
-        }
-    }
-
-    @Nonnull
-    public static <D extends IData> IDataFactory<D> getFactoryForData(Class<D> dataType){
-        IDataFactory factory = instance().FACTORIES.get(dataType);
-        if(factory == null){
-            throw new NullPointerException("NO DATA FACTORY FOR: " + dataType);
-        }
-        return factory;
-    }
-
-
-    @Nonnull
-    public static IDataFactory getFactoryForPrimitive(Class returnType){
-        Optional<IDataFactory> factory = instance().FACTORIES.values().stream().filter(f -> f.canConvert(returnType)).findFirst();
-        if(!factory.isPresent()){
-            throw new NullPointerException("NO DATA FACTORY FOR: " + returnType);
-        }
-        return factory.get();
-    }
-
-
-
     ////REGISTERING
 
-    public void register(){
-        DATA_TYPES.put(InventoryData.class, 0);
-        MERGERS.computeIfAbsent(InventoryData.class, (c) -> new ArrayList<>()).add(new InventoryDataMerger());
-        FACTORIES.put(InventoryData.class, new InventoryDataFactory());
 
-        DATA_TYPES.put(EnergyStorageData.class, 1);
-        //MERGERS.computeIfAbsent(EnergyData.class, (c) -> new ArrayList<>()).add(new EnergyDataGenerator());
-        FACTORIES.put(EnergyStorageData.class, new EnergyStorageDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.BooleanData.class, 2);
-        FACTORIES.put(PrimitiveDataTypes.BooleanData.class, new PrimitiveDataTypes.BooleanDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.IntegerData.class, 3);
-        FACTORIES.put(PrimitiveDataTypes.IntegerData.class, new PrimitiveDataTypes.IntegerDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.LongData.class, 4);
-        FACTORIES.put(PrimitiveDataTypes.LongData.class, new PrimitiveDataTypes.LongDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.DoubleData.class, 5);
-        FACTORIES.put(PrimitiveDataTypes.DoubleData.class, new PrimitiveDataTypes.DoubleDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.FloatData.class, 6);
-        FACTORIES.put(PrimitiveDataTypes.FloatData.class, new PrimitiveDataTypes.FloatDataFactory());
-
-        DATA_TYPES.put(SpecialDataTypes.StringData.class, 7);
-        FACTORIES.put(SpecialDataTypes.StringData.class, new SpecialDataTypes.StringDataFactory());
-
-        DATA_TYPES.put(SpecialDataTypes.ItemStackData.class, 8);
-        FACTORIES.put(SpecialDataTypes.ItemStackData.class, new SpecialDataTypes.ItemStackDataFactory());
-
-        DATA_TYPES.put(SpecialDataTypes.NBTData.class, 9);
-        FACTORIES.put(SpecialDataTypes.NBTData.class, new SpecialDataTypes.NBTDataFactory());
-
-        DATA_TYPES.put(ItemHandlerData.class, 10);
-        FACTORIES.put(ItemHandlerData.class, new ItemHandlerDataFactory());
-
-        DATA_TYPES.put(FluidHandlerData.class, 11);
-        FACTORIES.put(FluidHandlerData.class, new FluidHandlerDataFactory());
-
-        DATA_TYPES.put(StoredItemData.class, 12);
-        MERGERS.computeIfAbsent(StoredItemData.class, (c) -> new ArrayList<>()).add(new StoredItemDataMerger(ItemStack.EMPTY)); //FIXME MERGERS NEED INPUTS!
-        FACTORIES.put(StoredItemData.class, new StoredItemDataFactory());
-
-    }
-
-    public void unregister(){
+    public void clear(){
         addedWatchers.clear();
         removedWatchers.clear();
         //LOADED_WATCHERS.clear();

@@ -134,7 +134,7 @@ public class DesignInterfaces {
         applyWindowStyling(colourSelectionWindow);
 
         HeaderGroup headerGroup = createHeader(colourSelectionWindow, "Colour Picker", false);
-
+        headerGroup.getStyling().setZLayer(10);
         textToolsWidget.gsi.addComponent(headerGroup).getStyling().setSizing(100, 100, 160, 80, Unit.PIXEL);
         textToolsWidget.gsi.addComponent(selectedColourButton.setTrigger(new CustomTrigger<>((b, h) -> headerGroup.toggleVisibility(), (b, h) -> true)).setColours(GSIDesignSettings.selectedColour.rgba, -1, -1)).getStyling().setSizing(16*21, 8, 16, 16, Unit.PIXEL);
         headerGroup.isVisible = false;

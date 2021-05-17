@@ -28,6 +28,7 @@ import sonar.logistics.common.multiparts.cable.DataCableBlock;
 import sonar.logistics.common.multiparts.displays.DisplayScreenBlock;
 import sonar.logistics.common.multiparts.displays.LargeDisplayScreenBlock;
 import sonar.logistics.common.multiparts.displays.MiniDisplayScreenBlock;
+import sonar.logistics.common.multiparts.reader.ReaderBlock;
 import sonar.logistics.common.multiparts.utils.MultipartBlockItem;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -50,11 +51,12 @@ public class Registry {
 
         event.getRegistry().register(new MultipartHostBlock());
 
-        Block.Properties multipart_props = Block.Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(2.0f);
-        event.getRegistry().register(new DataCableBlock(multipart_props).setRegistryName("data_cable"));
-        event.getRegistry().register(new MiniDisplayScreenBlock(multipart_props).setRegistryName("mini_display_screen"));
-        event.getRegistry().register(new DisplayScreenBlock(multipart_props).setRegistryName("display_screen"));
-        event.getRegistry().register(new LargeDisplayScreenBlock(multipart_props).setRegistryName("large_display_screen"));
+        Block.Properties multipartProps = Block.Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(2.0f);
+        event.getRegistry().register(new DataCableBlock(multipartProps).setRegistryName("data_cable"));
+        event.getRegistry().register(new ReaderBlock(multipartProps).setRegistryName("reader"));
+        event.getRegistry().register(new MiniDisplayScreenBlock(multipartProps).setRegistryName("mini_display_screen"));
+        event.getRegistry().register(new DisplayScreenBlock(multipartProps).setRegistryName("display_screen"));
+        event.getRegistry().register(new LargeDisplayScreenBlock(multipartProps).setRegistryName("large_display_screen"));
 
         PL3.LOGGER.info("Finishing: Block Registry Event");
     }
@@ -70,6 +72,7 @@ public class Registry {
         event.getRegistry().register(new BlockItem(PL3Blocks.FORGING_HAMMER_BLOCK, props).setRegistryName("forging_hammer"));
 
         event.getRegistry().register(new MultipartBlockItem(PL3Blocks.DATA_CABLE, props).setRegistryName("data_cable"));
+        event.getRegistry().register(new MultipartBlockItem(PL3Blocks.READER_BLOCK, props).setRegistryName("reader"));
         event.getRegistry().register(new MultipartBlockItem(PL3Blocks.MINI_DISPLAY_SCREEN, props).setRegistryName("mini_display_screen"));
         event.getRegistry().register(new MultipartBlockItem(PL3Blocks.DISPLAY_SCREEN, props).setRegistryName("display_screen"));
         event.getRegistry().register(new MultipartBlockItem(PL3Blocks.LARGE_DISPLAY_SCREEN, props).setRegistryName("large_display_screen"));

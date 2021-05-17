@@ -16,13 +16,13 @@ public class DataHolder<D extends IData> {
     public int ticks;
     public int tickRate;
     public boolean hasWatchers = false;
-    public boolean forceUpdate = false;
+    public boolean forceUpdate = false; //ignores data watchers
     public boolean sourceIncompatible = false;
 
     public DataHolder(int tickRate){
         this.dataWatchers = new ArrayList<>();
         this.tickRate = tickRate;
-        this.ticks = MathUtils.randInt(0, tickRate); ///attempting to distribute updates more evenly
+        this.ticks = MathUtils.randInt(0, tickRate); ///distributes updates more evenly
     }
 
     public boolean canUpdateData() {

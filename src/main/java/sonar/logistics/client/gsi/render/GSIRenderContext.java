@@ -57,7 +57,6 @@ public class GSIRenderContext {
 
         this.bakedLight = GSIRenderHelper.getBakedLight(light);
         this.setNormalFromDir(dir.getOpposite());
-
     }
 
     public void preRender() {

@@ -64,11 +64,6 @@ public class ClientProxy implements IProxy {
         return Minecraft.getInstance().player;
     }
 
-    @Override
-    public DataManager getDataManager() {
-        throw new NullPointerException("The Data Manager should only be used on the server side!");
-    }
-
     @Nullable
     @Override
     public IMultipartRenderer<MultipartTile> getMultipartRenderer(MultipartTile tile){

@@ -3,6 +3,8 @@ package sonar.logistics.client.gsi.components;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
+import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
+import sonar.logistics.client.gsi.interactions.main.EmptyInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.style.ComponentStyling;
 import sonar.logistics.client.gsi.style.ComponentBounds;
@@ -15,13 +17,16 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * A component is a user interface widget can be rendered in the world or in a gui
+ * A component is a user interface widget that can be rendered in the world or in a gui
  */
-public abstract class Component {
+public abstract class Component implements IInteractionHandler {
 
-    public IComponentHost host;
+    public transient IComponentHost host;
+
     public ComponentBounds bounds = new ComponentBounds();
     public ComponentStyling styling = new ComponentStyling();
+
+    public boolean isVisible = true;
 
     public Component(){}
 
@@ -40,7 +45,7 @@ public abstract class Component {
     /**the bounds are used for finding the position / size of the component
      * the bounds will always be relative to the GSI, which means each component can be rendered independently of any sub containers*/
     @Nonnull
-     public ComponentBounds getBounds() {
+    public ComponentBounds getBounds() {
         return bounds;
     }
 
@@ -77,7 +82,7 @@ public abstract class Component {
         }
     }
 
-    /**this method will be called by the "host" and is used for rendering the component within the bounds setup*/
+    /**this method will be called by the "host" and is used for rendering the component within the bounds setup, should only be called if {@link #isVisible} returns true*/
     public void render(GSIRenderContext context) {
         GSIRenderHelper.renderComponentBackground(context, bounds, styling);
         GSIRenderHelper.renderComponentBorder(context, bounds, styling);
@@ -86,9 +91,21 @@ public abstract class Component {
     /**called every game tick, client side*/
     public void tick(){}
 
+    ///
+
+    public boolean isVisible(){
+        return isVisible;
+    }
+
+    public boolean canInteract(){
+        return isVisible();
+    }
+
 
     /**this is used if the component is itself a "host"
-     * sub components should be rendered by component that declares them, not the declaring component's "host" */
+     * sub components should be rendered by the component that declares them.
+     * sub components interactions are still handled by the GSI
+     * if a component has sub components only it's sub components will be interacted with, it will be bypassed*/
     @Nullable
     public List<Component> getSubComponents(){
         return null;
@@ -117,11 +134,15 @@ public abstract class Component {
     }
 
     public boolean isFocusedComponent(){
-        return getHost().getFocusedListener().filter(listener -> listener == this).isPresent();
+        return getGSI().getFocusedListener().filter(listener -> listener == this).isPresent();
     }
 
     public boolean isDraggedComponent(){
-        return isFocusedComponent() && getHost().isDragging();
+        return isFocusedComponent() && getGSI().isDragging();
+    }
+
+    public boolean isHoveredComponent(){
+        return getGSI().getHoveredListener().filter(listener -> listener == this).isPresent();
     }
 
     public boolean isMoveable(){

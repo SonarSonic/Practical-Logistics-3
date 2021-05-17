@@ -1,6 +1,7 @@
 package sonar.logistics.server.data.holders;
 
 import sonar.logistics.server.data.DataManager;
+import sonar.logistics.server.data.DataRegistry;
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.data.api.IDataFactory;
 import sonar.logistics.server.data.api.IDataMerger;
@@ -24,7 +25,7 @@ public class DataMergerHolder<D extends IData> extends DataHolder<D> implements 
     public DataMergerHolder(IDataMerger<D> generator, int tickRate){
         super(tickRate);
         this.generator = generator;
-        this.factory = DataManager.getFactoryForData(generator.getDataType());
+        this.factory = DataRegistry.getFactoryForData(generator.getDataType());
     }
 
     @Override

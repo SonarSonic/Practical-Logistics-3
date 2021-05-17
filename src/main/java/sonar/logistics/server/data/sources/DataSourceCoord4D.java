@@ -20,6 +20,7 @@ public class DataSourceCoord4D implements IDataSource {
     public DataSourceCoord4D(BlockPos pos, DimensionType dimension, Direction facing){
         this(pos.getX(), pos.getY(), pos.getZ(), dimension, facing);
     }
+
     public DataSourceCoord4D(int x, int y, int z, DimensionType dimension, Direction facing){
         this.x = x;
         this.y = y;

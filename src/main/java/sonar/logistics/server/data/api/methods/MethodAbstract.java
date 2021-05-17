@@ -2,18 +2,19 @@ package sonar.logistics.server.data.api.methods;
 
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.server.data.DataManager;
+import sonar.logistics.server.data.DataRegistry;
 import sonar.logistics.server.data.api.IDataFactory;
 
 public abstract class MethodAbstract<O> implements IMethod<O> {
 
     private Class<O> returnType;
-    private IDataFactory factory;
+    private IDataFactory<?> factory;
     private ResourceLocation identifier;
 
     public MethodAbstract(ResourceLocation identifier, Class<O> returnType){
         this.identifier = identifier;
         this.returnType = returnType;
-        this.factory = DataManager.getFactoryForPrimitive(returnType);
+        this.factory = DataRegistry.getFactoryForPrimitive(returnType);
     }
 
     @Override

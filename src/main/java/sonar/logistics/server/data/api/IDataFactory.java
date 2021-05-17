@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 
 /**used for converting objects into usable data
- * also used for creating the data and saving/loading it*/
+ * also used for creating the data and saving / loading it*/
 public interface IDataFactory<D extends IData>{
 
         D create();

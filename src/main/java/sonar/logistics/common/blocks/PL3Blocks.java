@@ -14,6 +14,7 @@ import sonar.logistics.common.multiparts.cable.DataCableBlock;
 import sonar.logistics.common.multiparts.displays.DisplayScreenBlock;
 import sonar.logistics.common.multiparts.displays.LargeDisplayScreenBlock;
 import sonar.logistics.common.multiparts.displays.MiniDisplayScreenBlock;
+import sonar.logistics.common.multiparts.reader.ReaderBlock;
 
 @ObjectHolder("practicallogistics3")
 public class PL3Blocks {
@@ -39,9 +40,11 @@ public class PL3Blocks {
     @ObjectHolder("multipart_host")
     public static final TileEntityType<NetworkedHostTile> MULTIPART_HOST_TILE = null;
 
-
     @ObjectHolder("data_cable")
     public static final DataCableBlock DATA_CABLE = null;
+
+    @ObjectHolder("reader")
+    public static final ReaderBlock READER_BLOCK = null;
 
     @ObjectHolder("mini_display_screen")
     public static final MiniDisplayScreenBlock MINI_DISPLAY_SCREEN = null;

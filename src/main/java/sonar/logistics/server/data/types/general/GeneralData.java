@@ -32,5 +32,4 @@ public abstract class GeneralData<D> implements IData {
         return newData != currentData;
     }
 
-
 }

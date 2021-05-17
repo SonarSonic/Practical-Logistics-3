@@ -1,17 +1,14 @@
 package sonar.logistics.client.gsi.components.groups;
 
-import com.google.common.collect.Lists;
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.layouts.ListLayout;
-import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.util.vectors.Vector2D;
-
-import java.util.List;
 
 /**
  * TODO make this useable as a dropdown button.
@@ -20,8 +17,6 @@ public class HeaderGroup extends LayoutGroup {
 
     public Component header;
     public Component internal;
-
-    public boolean isInternalVisible = true;
 
     public HeaderGroup(){
         this.setLayout(ListLayout.INSTANCE);
@@ -45,17 +40,15 @@ public class HeaderGroup extends LayoutGroup {
             GSIRenderHelper.renderComponentBackground(context, bounds, styling);
             GSIRenderHelper.renderComponentBorder(context, bounds, styling);
 
-            header.render(context);
-            if(isInternalVisible) {
-                internal.render(context);
-            }
+            GSIRenderHelper.renderComponent(context, header);
+            GSIRenderHelper.renderComponent(context, internal);
         }
     }
 
     @Override
     public boolean isMouseOver() {
         //windows always check their own bounds, to avoid people interacting with things beneath them.
-        return isVisible && getBounds().outerSize().contains(getInteractionHandler().mousePos) || interactions.stream().anyMatch(IInteractionListener::isMouseOver);
+        return isVisible && getBounds().outerSize().contains(getInteractionHandler().mousePos) || subComponents.stream().anyMatch(IInteractionHandler::isMouseOver);
     }
 
     @Override
@@ -66,15 +59,10 @@ public class HeaderGroup extends LayoutGroup {
     }
 
     public void toggleInternalVisibility(){
-        this.isInternalVisible = !isInternalVisible;
+        this.internal.isVisible = !internal.isVisible;
     }
 
-    @Override
-    public List<IInteractionListener> getChildren() {
-        return isInternalVisible ? super.getChildren() : header instanceof IInteractionListener ?  Lists.newArrayList((IInteractionListener) header) : Lists.newArrayList();
-    }
-
-    ////moving group -- TODO: make a more universal way of moving windows.
+    ////moving group -- TODO: make a more universal way of moving windows??
 
     private Vector2D dragStart;
     private Vector2D oldAlignment;
@@ -82,8 +70,8 @@ public class HeaderGroup extends LayoutGroup {
 
     public void startDrag(){
         this.moveDrag = true;
-        this.getHost().setDragging(true);
-        this.getHost().setFocused(this);
+        this.getGSI().setDragging(true);
+        this.getGSI().setFocused(this);
         onDragStarted(0);
     }
 

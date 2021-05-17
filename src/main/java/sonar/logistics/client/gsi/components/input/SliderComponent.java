@@ -1,7 +1,7 @@
 package sonar.logistics.client.gsi.components.input;
 
 import sonar.logistics.client.gsi.components.Component;
-import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
@@ -12,7 +12,7 @@ import sonar.logistics.util.MathUtils;
 
 import javax.annotation.Nullable;
 
-public class SliderComponent extends Component implements IInteractionListener {
+public class SliderComponent extends Component implements IInteractionHandler {
 
     public double sliderValue = 0;
     public double stepSize = Double.MIN_VALUE;

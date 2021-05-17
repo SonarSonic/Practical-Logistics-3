@@ -2,7 +2,6 @@ package sonar.logistics.client.gsi.interactions.api;
 
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
@@ -11,29 +10,15 @@ import java.util.function.Supplier;
 
 
 /// similar to INestedGuiEventHandler for IInteractionListeners - however to be more consistent all interactions will check isMouseOver first
-public interface INestedInteractionListener extends IInteractionListener {
+public interface INestedInteractionHandler extends IInteractionHandler {
 
-    List<IInteractionListener> getChildren();
+    List<IInteractionHandler> getChildren();
 
-    void setFocused(IInteractionListener listener);
+    void setFocused(IInteractionHandler listener);
 
-    Optional<IInteractionListener> getFocusedListener();
+    Optional<IInteractionHandler> getFocusedListener();
 
-    /**returns the first child to return true for isMouseOver, TODO add Z depth awareness*/
-    default Optional<IInteractionListener> getHoveredListener() {
-        Iterator<IInteractionListener> iterator = this.getChildren().iterator();
-
-        IInteractionListener listener;
-        do {
-            if (!iterator.hasNext()) {
-                return Optional.empty();
-            }
-
-            listener = iterator.next();
-        } while(!listener.isMouseOver());
-
-        return Optional.of(listener);
-    }
+    Optional<IInteractionHandler> getHoveredListener();
 
     ///
 
@@ -44,13 +29,13 @@ public interface INestedInteractionListener extends IInteractionListener {
 
     @Override
     default void mouseMoved() {
-        getFocusedListener().ifPresent(IInteractionListener::mouseMoved);
+        getFocusedListener().ifPresent(IInteractionHandler::mouseMoved);
     }
 
     @Override
     default boolean mouseClicked(int button) {
         //first gets the interaction listener at the mouse
-        Optional<IInteractionListener> listener = getHoveredListener();
+        Optional<IInteractionHandler> listener = getHoveredListener();
         //update focus
         setFocused(listener.orElse(null));
         ///updates drag: before mouse clicked allowing drag variables to be set within the listeners mouse clicked method
@@ -69,7 +54,7 @@ public interface INestedInteractionListener extends IInteractionListener {
         if(!isDragging()){
             return false;
         }
-        return getFocusedListener().filter(IInteractionListener::mouseDragged).isPresent();
+        return getFocusedListener().filter(IInteractionHandler::mouseDragged).isPresent();
     }
 
     @Override
@@ -94,11 +79,11 @@ public interface INestedInteractionListener extends IInteractionListener {
 
     @Override
     default boolean changeFocus(boolean focused) {
-        Optional<IInteractionListener> focusedListener = this.getFocusedListener();
+        Optional<IInteractionHandler> focusedListener = this.getFocusedListener();
         if (focusedListener.filter(l -> l.changeFocus(focused)).isPresent()) {
             return true;
         } else {
-            List<? extends IInteractionListener> children = this.getChildren();
+            List<? extends IInteractionHandler> children = this.getChildren();
             int focusedIndex = children.indexOf(focusedListener.orElse(null));
             int startIndex;
             if (focusedListener.isPresent() && focusedIndex >= 0) {
@@ -109,11 +94,11 @@ public interface INestedInteractionListener extends IInteractionListener {
                 startIndex = children.size();
             }
 
-            ListIterator<? extends IInteractionListener> it = children.listIterator(startIndex);
+            ListIterator<? extends IInteractionHandler> it = children.listIterator(startIndex);
             BooleanSupplier booleanSupplier = focused ? it::hasNext : it::hasPrevious;
-            Supplier<? extends IInteractionListener> supplier = focused ? it::next : it::previous;
+            Supplier<? extends IInteractionHandler> supplier = focused ? it::next : it::previous;
 
-            IInteractionListener listener;
+            IInteractionHandler listener;
             do {
                 if (!booleanSupplier.getAsBoolean()) {
                     this.setFocused(null);

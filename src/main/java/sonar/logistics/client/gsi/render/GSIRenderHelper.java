@@ -10,6 +10,7 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import sonar.logistics.PL3;
+import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.style.ComponentStyling;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
@@ -50,6 +51,14 @@ public class GSIRenderHelper {
     /**simple helper method to translate the context back from specific z layer*/
     public static void popLayerOffset(GSIRenderContext context, int layer){
         context.matrix.translate(0, 0, -layerZOffset(layer));
+    }
+
+    ///// COMPONENTS \\\\\
+
+    public static void renderComponent(GSIRenderContext context, Component component){
+        if(component.isVisible()){
+            component.render(context);
+        }
     }
 
     ///// COLOURED RECTS \\\\\

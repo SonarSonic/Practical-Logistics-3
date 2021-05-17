@@ -23,6 +23,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import sonar.logistics.common.blocks.host.MultipartHostHelper;
 import sonar.logistics.common.blocks.host.MultipartHostTile;
 import sonar.logistics.common.multiparts.base.IMultipartBlock;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
@@ -53,9 +54,14 @@ public class DataCableBlock extends Block implements IMultipartBlock {
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
         VoxelShape shape = PL3Shapes.DATA_CABLE_CENTRE_VOXEL;
+        MultipartHostTile host = MultipartHostHelper.getMultipartHostTile(reader, pos);
         for(Direction dir : Direction.values()){
             if(state.get(CONNECTIONS[dir.ordinal()])){
-                shape = VoxelShapes.combine(shape, PL3Shapes.DATA_CABLE_CONNECTOR_ROTATED_VOXELS[dir.ordinal()], IBooleanFunction.OR);
+                if(host != null && host.getMultipart(EnumMultipartSlot.fromDirection(dir)) != null){
+                    shape = VoxelShapes.combine(shape, PL3Shapes.DATA_CABLE_CONNECTOR_ROTATED_VOXELS_SHORT[dir.ordinal()], IBooleanFunction.OR);
+                }else{
+                    shape = VoxelShapes.combine(shape, PL3Shapes.DATA_CABLE_CONNECTOR_ROTATED_VOXELS[dir.ordinal()], IBooleanFunction.OR);
+                }
             }
         }
         return shape;

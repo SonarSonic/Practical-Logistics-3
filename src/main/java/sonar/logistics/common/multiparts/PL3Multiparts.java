@@ -17,6 +17,7 @@ public class PL3Multiparts {
         MULTIPART_BLOCKS.add(PL3Blocks.DISPLAY_SCREEN);
         MULTIPART_BLOCKS.add(PL3Blocks.LARGE_DISPLAY_SCREEN);
         MULTIPART_BLOCKS.add(PL3Blocks.DATA_CABLE);
+        MULTIPART_BLOCKS.add(PL3Blocks.READER_BLOCK);
     }
 
     @Nullable

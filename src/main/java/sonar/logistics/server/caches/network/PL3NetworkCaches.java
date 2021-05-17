@@ -16,10 +16,13 @@ public class PL3NetworkCaches<T extends INetworkedTile> {
 
     public PL3NetworkCaches(Class<T> clazz, Consumer<PL3Network> changeCache) {
         this.clazz = clazz;
+        this.changeCache = changeCache;
     }
 
     public static final PL3NetworkCaches<INetworkedTile> TILE = new PL3NetworkCaches<INetworkedTile>(INetworkedTile.class, (network) -> {}) {};
+
     public static final PL3NetworkCaches<IDataSourceNode> DATA_SOURCE_NODES = new PL3NetworkCaches<IDataSourceNode>(IDataSourceNode.class, network -> network.queueNetworkUpdate(EnumNetworkUpdate.DATA_SOURCES)) {};
+
     public static final PL3NetworkCaches<?>[] handlers = new PL3NetworkCaches<?>[]{TILE, DATA_SOURCE_NODES};
 
     public static Map<PL3NetworkCaches<?>, List<INetworkedTile>> newCachesMap(){

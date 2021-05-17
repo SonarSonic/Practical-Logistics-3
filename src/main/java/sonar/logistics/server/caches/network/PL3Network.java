@@ -32,6 +32,10 @@ public class PL3Network implements ICableCache<PL3Network> {
         this.cableType = cableType;
     }
 
+    public void tick(){
+        flushNetworkUpdates();
+    }
+
     public int getNetworkID() {
         return globalNetworkID;
     }

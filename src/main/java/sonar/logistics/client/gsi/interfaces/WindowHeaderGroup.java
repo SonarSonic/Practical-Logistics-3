@@ -28,9 +28,7 @@ public class WindowHeaderGroup extends LayoutGroup {
 
         addComponent(windowBar = new ColouredButtonComponent((source, handler) -> moveWindow()).setColours(ScreenUtils.display_black_border.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.dark_grey.rgba));
         if(isDropdown){
-
             addComponent(headerButton = new TextButtonComponent("\u2630", new CustomTrigger<>((b, h) -> dropdownWindow(), (b, h) -> false))).setColours(ScreenUtils.red_button.rgba, ScreenUtils.display_black_border.rgba, ScreenUtils.red_button.rgba);
-
         }else{
             addComponent(headerButton = new TextButtonComponent(isDropdown ? "\u2630":  "\u2715", new CustomTrigger<>((b, h) -> {
                 if(isDropdown){

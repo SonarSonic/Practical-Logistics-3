@@ -1,4 +1,4 @@
-package sonar.logistics.server.data.generators;
+package sonar.logistics.server.data.mergers;
 
 import net.minecraft.item.ItemStack;
 import sonar.logistics.server.data.api.IDataMerger;

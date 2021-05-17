@@ -7,33 +7,33 @@ import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.image.SimpleImageComponent;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
+import sonar.logistics.client.gsi.interactions.api.INestedInteractionHandler;
 import sonar.logistics.client.gsi.interactions.resize.ResizingInteraction;
-import sonar.logistics.client.gsi.interactions.api.IInteractionListener;
+import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextString;
 import sonar.logistics.client.gsi.components.text.glyph.LineBreakGlyph;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
+import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.GSIDesignScreen;
+import sonar.logistics.client.gui.MyMinecraftScreen;
 import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.util.vectors.Vector2D;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
-public class GSI implements IComponentHost {
+public class GSI implements IComponentHost, INestedInteractionHandler {
 
     public GSIInteractionHandler interactionHandler = new GSIInteractionHandler(this, Minecraft.getInstance().player);
     private List<Component> components = new ArrayList<>();
-    private List<IInteractionListener> interactions = new ArrayList<>();
+    private List<IInteractionHandler> interactions = new ArrayList<>();
     private Quad2D bounds;
 
     @Nullable //if the GSI is a GUI Interface only the display will be null.
@@ -74,27 +74,26 @@ public class GSI implements IComponentHost {
             // it also allows smoother dragging as positions are updated before rendering
             mouseDragged();
         }
+        hovered = getHoveredComponent(interactions);
+
         context.preRender();
-        components.forEach(c -> c.render(context));
+        components.forEach(c -> GSIRenderHelper.renderComponent(context, c));
         renderInteraction(context);
+
         context.postRender();
     }
 
     public Component addComponent(Component component){
         component.setHost(this);
         components.add(component);
-        if(component instanceof  IInteractionListener){
-            interactions.add((IInteractionListener)component);
-        }
+        interactions.add(component);
         return component;
     }
 
     public Component removeComponent(Component component){
         component.setHost(null);
         components.remove(component);
-        if(component instanceof  IInteractionListener){
-            interactions.remove((IInteractionListener)component);
-        }
+        interactions.remove(component);
         return component;
     }
 
@@ -126,6 +125,7 @@ public class GSI implements IComponentHost {
             case WORLD_INTERACTION:
                 if(interactionHandler.hasShiftDown()) {
                     //TODO REPLACE ME!
+                    //Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new MyMinecraftScreen(this)));
                     Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this)));
                     if(components.isEmpty()) {
                         testStructure();
@@ -145,7 +145,7 @@ public class GSI implements IComponentHost {
                     }
                     return true;
                 }
-                Component hovered = getComponent(components, c -> c.getBounds().outerSize().contains(interactionHandler.mousePos));
+                Component hovered = getComponent(components, c -> c.canInteract() && c.getBounds().outerSize().contains(interactionHandler.mousePos));
                 if(hovered != null) {
                     setFocused(new ResizingInteraction(hovered));
                     tryStartDragging(button);
@@ -154,7 +154,7 @@ public class GSI implements IComponentHost {
                 setFocused(null);
                 return false;
         }
-        return IComponentHost.super.mouseClicked(button);
+        return INestedInteractionHandler.super.mouseClicked(button);
     }
 
 
@@ -284,24 +284,48 @@ public class GSI implements IComponentHost {
 
     ///
 
-    private IInteractionListener focused = null;
+    private IInteractionHandler focused = null;
+    private IInteractionHandler hovered = null;
 
     @Override
-    public List<IInteractionListener> getChildren() {
+    public List<IInteractionHandler> getChildren() {
         return interactions;
     }
 
-    @Nullable
     @Override
-    public Optional<IInteractionListener> getFocusedListener() {
+    public Optional<IInteractionHandler> getFocusedListener() {
         return Optional.ofNullable(focused);
     }
 
+    @Override
+    public Optional<IInteractionHandler> getHoveredListener() {
+        return Optional.ofNullable(hovered);
+    }
 
     @Override
-    public void setFocused(IInteractionListener listener) {
+    public void setFocused(IInteractionHandler listener) {
         this.focused = listener;
     }
+
+
+    /**returns the first child to return true for isMouseOver, note the interactions are already sorted by z layer.*/
+    public <I extends IInteractionHandler> IInteractionHandler getHoveredComponent(List<I> interactions){
+        for(IInteractionHandler interaction : interactions){
+            if(interaction.canInteract() && interaction.isMouseOver()){
+                if(interaction instanceof Component){
+                    List<Component> subComponents = ((Component) interaction).getSubComponents();
+                    if(subComponents != null && !subComponents.isEmpty()){
+                        IInteractionHandler subComponent = getHoveredComponent(subComponents);
+                        return subComponent == null ? interaction : subComponent;
+                    }
+                }
+                return interaction;
+            }
+        }
+        return null;
+    }
+
+    ///
 
     private boolean isDragging;
 
@@ -314,7 +338,6 @@ public class GSI implements IComponentHost {
     public void setDragging(boolean dragging) {
         this.isDragging = dragging;
     }
-
 
     @Override
     public GSI getGSI() {
