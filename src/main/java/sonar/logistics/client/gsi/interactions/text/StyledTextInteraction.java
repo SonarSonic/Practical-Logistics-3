@@ -84,7 +84,7 @@ public class StyledTextInteraction<C extends AbstractTextComponent> extends Stan
             if(line != null && info != null) {
                 GSIDesignSettings.glyphStyle = info.glyph.getStyle();
                 GSIDesignSettings.lineStyle = line.lineStyle;
-                GSIDesignSettings.screen.onCursorStyleChanged();
+                //GSIDesignSettings.screen.onCursorStyleChanged(); //FIXME
             }
             int cursorPage = pages.getPageNumber(cursor.getCharIndex());
             if(cursorPage != -1 && cursorPage != pages.page){

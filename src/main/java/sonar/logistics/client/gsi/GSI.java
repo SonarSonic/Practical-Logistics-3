@@ -1,12 +1,17 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
+import sonar.logistics.client.gsi.components.basic.ElementComponent;
+import sonar.logistics.client.gsi.components.groups.GridGroup;
 import sonar.logistics.client.gsi.components.image.EnumImageFillType;
 import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.image.SimpleImageComponent;
 import sonar.logistics.client.gsi.components.input.SliderComponent;
+import sonar.logistics.client.gsi.elements.ItemStackElement;
 import sonar.logistics.client.gsi.interactions.api.INestedInteractionHandler;
 import sonar.logistics.client.gsi.interactions.resize.ResizingInteraction;
 import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
@@ -17,10 +22,13 @@ import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
+import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.GSIDesignScreen;
-import sonar.logistics.client.gui.MyMinecraftScreen;
+import sonar.logistics.client.imgui.GSIEditorScreen;
+import sonar.logistics.client.imgui.ImGuiScreen;
+import sonar.logistics.common.items.PL3Items;
 import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.util.vectors.Vector2D;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
@@ -32,9 +40,9 @@ import java.util.function.Function;
 public class GSI implements IComponentHost, INestedInteractionHandler {
 
     public GSIInteractionHandler interactionHandler = new GSIInteractionHandler(this, Minecraft.getInstance().player);
-    private List<Component> components = new ArrayList<>();
-    private List<IInteractionHandler> interactions = new ArrayList<>();
-    private Quad2D bounds;
+    public List<Component> components = new ArrayList<>();
+    public List<IInteractionHandler> interactions = new ArrayList<>();
+    public Quad2D bounds;
 
     @Nullable //if the GSI is a GUI Interface only the display will be null.
     public IDisplay display;
@@ -125,8 +133,9 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
             case WORLD_INTERACTION:
                 if(interactionHandler.hasShiftDown()) {
                     //TODO REPLACE ME!
-                    //Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new MyMinecraftScreen(this)));
-                    Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this)));
+                    Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIEditorScreen(this)));
+
+                    //Minecraft.getInstance().deferTask(() -> Minecraft.getInstance().displayGuiScreen(new GSIDesignScreen(this)));
                     if(components.isEmpty()) {
                         testStructure();
                     }
@@ -188,7 +197,7 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
         lines.pages.text = element;
 
         addComponent(lines);
-
+        /*
         SliderComponent slider = new SliderComponent();
         slider.getStyling().setSizing(0, 0.5, 1, 0.2, Unit.PERCENT);
         addComponent(slider);
@@ -197,16 +206,17 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
         SimpleImageComponent imageComponent = new SimpleImageComponent(new ResourceLocation("minecraft", "textures/block/bedrock.png"), EnumImageFillType.IMAGE_FILL);
         imageComponent.getStyling().setSizing(0, 0.7, 1, 0.3, Unit.PERCENT);
         addComponent(imageComponent);
+        */
 
-        /*
-        GridContainer grid = new GridContainer();
-        grid.setBounds(new ScaleableBounds(new Quad2D(0, 0.5, 1, 0.5)));
+        GridGroup grid = new GridGroup();
+        grid.getStyling().setSizing(0, 0, 1, 0.5, Unit.PERCENT);
 
-        grid.styling.marginWidth.value = 0.0625F/2;
-        grid.styling.marginHeight.value = 0.0625F/2;
+        grid.styling.setMarginWidth(new LengthProperty(Unit.PIXEL, 0.0625F/2));
+        grid.styling.setMarginHeight(new LengthProperty(Unit.PIXEL, 0.0625F/2));
 
-        grid.styling.borderSize.value = 0.0625F/4;
-        grid.styling.borderPadding.value = 0.0625F/4;
+
+        grid.styling.setBorderWidth(new LengthProperty(Unit.PIXEL, 0.0625F/4));
+        grid.styling.setBorderHeight(new LengthProperty(Unit.PIXEL, 0.0625F/4));
         grid.setGridSize(3, 3);
 
         grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.STONE), 200)));
@@ -220,7 +230,7 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
 
         addComponent(grid);
 
-         */
+
         /*
         GridContainer subGrid = new GridContainer();
         subGrid.alignment.setAlignmentPercentages(new Vec3d(0, 0.5, 0), new Vec3d(1, 0.5 , 1));

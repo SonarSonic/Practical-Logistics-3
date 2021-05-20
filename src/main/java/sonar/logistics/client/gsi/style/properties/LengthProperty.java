@@ -10,7 +10,7 @@ public class LengthProperty {
     public static final LengthProperty MIN_PIXEL = new LengthProperty(Unit.PIXEL, 0);
     public static final LengthProperty MAX_PIXEL = new LengthProperty(Unit.PIXEL, Float.MAX_VALUE);
     public static final LengthProperty MIN_PERCENT = new LengthProperty(Unit.PERCENT, 0);
-    public static final LengthProperty MAX_PERCENT = new LengthProperty(Unit.PERCENT, 100);
+    public static final LengthProperty MAX_PERCENT = new LengthProperty(Unit.PERCENT, 1);
 
     public Unit unitType;
     public double value;

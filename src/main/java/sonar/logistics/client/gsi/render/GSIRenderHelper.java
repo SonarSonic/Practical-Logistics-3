@@ -142,12 +142,12 @@ public class GSIRenderHelper {
     }
 
     public static void renderComponentBackground(GSIRenderContext context, ComponentBounds bounds, ComponentStyling styling){
-        if(styling.getOuterBackgroundColour() != null) {
+        if(styling.getOuterBackgroundColour().getAlpha() != 0) {
             GSIRenderHelper.renderColouredRect(context, true, bounds.outerSize(), styling.getOuterBackgroundColour());
             GSIRenderHelper.pushLayerOffset(context, 1);
         }
 
-        if(styling.getInnerBackgroundColour() != null) {
+        if(styling.getInnerBackgroundColour().getAlpha() != 0) {
             GSIRenderHelper.renderColouredRect(context, true, bounds.innerSize(), styling.getInnerBackgroundColour());
             GSIRenderHelper.pushLayerOffset(context, 1);
         }

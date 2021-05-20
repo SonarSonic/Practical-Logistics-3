@@ -27,20 +27,20 @@ public final class DefaultStyling extends ComponentStyling {
         ///offsets
         marginWidth = new LengthProperty(Unit.PIXEL, 0.0625/2);
         marginHeight = new LengthProperty(Unit.PIXEL, 0.0625/2);
-        paddingWidth = null;
-        paddingHeight = null;
-        borderWidth = null;
-        borderHeight = null;
+        paddingWidth = new LengthProperty(Unit.PIXEL, 0);
+        paddingHeight = new LengthProperty(Unit.PIXEL, 0);
+        borderWidth = new LengthProperty(Unit.PIXEL, 0);
+        borderHeight = new LengthProperty(Unit.PIXEL, 0);
 
         ///component colours
-        outerBackgroundColour = null;
-        innerBackgroundColour = null;
+        outerBackgroundColour = new ColourProperty(0, 0,0, 0);
+        innerBackgroundColour = new ColourProperty(0, 0,0, 0);
         borderColour = new ColourProperty(255, 255, 255, 255);
 
         ///text colours
-        enabledTextColour = null;
-        hoveredTextColour = null;
-        disabledTextColour = null;
+        enabledTextColour = new ColourProperty(0, 0,0, 0);
+        hoveredTextColour = new ColourProperty(0, 0,0, 0);
+        disabledTextColour = new ColourProperty(0, 0,0, 0);
     }
 
     @Nonnull
@@ -79,49 +79,49 @@ public final class DefaultStyling extends ComponentStyling {
         return height;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public LengthProperty getMarginWidth() {
         return marginWidth;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public LengthProperty getMarginHeight() {
         return marginHeight;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public LengthProperty getPaddingWidth() {
         return paddingWidth;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public LengthProperty getPaddingHeight() {
         return paddingHeight;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public LengthProperty getBorderWidth() {
         return borderWidth;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public LengthProperty getBorderHeight() {
         return borderHeight;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public ColourProperty getOuterBackgroundColour() {
         return outerBackgroundColour;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public ColourProperty getInnerBackgroundColour() {
         return innerBackgroundColour;
@@ -133,19 +133,19 @@ public final class DefaultStyling extends ComponentStyling {
         return borderColour;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public ColourProperty getEnabledTextColour() {
         return enabledTextColour;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public ColourProperty getHoveredTextColour() {
         return hoveredTextColour;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public ColourProperty getDisabledTextColour() {
         return disabledTextColour;

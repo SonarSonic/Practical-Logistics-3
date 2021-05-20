@@ -14,7 +14,6 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
     public GSIDesignScreen(GSI displayGSI){
         this.displayGSI = displayGSI;
         this.displayGSI.interactionHandler.setInteractionType(GSIInteractionHandler.InteractionType.GUI_EDITING);
-        GSIDesignSettings.setDesignScreen(this);
         DesignInterfaces.initNormalTools(this);
         DesignInterfaces.initTextTools(this);
     }

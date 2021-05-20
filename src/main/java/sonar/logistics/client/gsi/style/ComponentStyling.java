@@ -122,7 +122,7 @@ public class ComponentStyling {
 
     ///
 
-    @Nullable
+    @Nonnull
     public LengthProperty getMarginWidth() {
         return marginWidth == null ? DefaultStyling.INSTANCE.getMarginWidth() : marginWidth;
     }
@@ -131,7 +131,7 @@ public class ComponentStyling {
         this.marginWidth = marginWidth;
     }
 
-    @Nullable
+    @Nonnull
     public LengthProperty getMarginHeight() {
         return marginHeight == null ? DefaultStyling.INSTANCE.getMarginHeight() : marginHeight;
     }
@@ -140,7 +140,7 @@ public class ComponentStyling {
         this.marginHeight = marginHeight;
     }
 
-    @Nullable
+    @Nonnull
     public LengthProperty getPaddingWidth() {
         return paddingWidth == null ? DefaultStyling.INSTANCE.getPaddingWidth() : paddingWidth;
     }
@@ -149,7 +149,7 @@ public class ComponentStyling {
         this.paddingWidth = paddingWidth;
     }
 
-    @Nullable
+    @Nonnull
     public LengthProperty getPaddingHeight() {
         return paddingHeight == null ? DefaultStyling.INSTANCE.getPaddingHeight() : paddingHeight;
     }
@@ -158,7 +158,7 @@ public class ComponentStyling {
         this.paddingHeight = paddingHeight;
     }
 
-    @Nullable
+    @Nonnull
     public LengthProperty getBorderWidth() {
         return borderWidth == null ? DefaultStyling.INSTANCE.getBorderWidth() : borderWidth;
     }
@@ -167,7 +167,7 @@ public class ComponentStyling {
         this.borderWidth = borderWidth;
     }
 
-    @Nullable
+    @Nonnull
     public LengthProperty getBorderHeight() {
         return borderHeight == null ? DefaultStyling.INSTANCE.getBorderHeight() : borderHeight;
     }
@@ -178,7 +178,7 @@ public class ComponentStyling {
 
     ///
 
-    @Nullable
+    @Nonnull
     public ColourProperty getOuterBackgroundColour() {
         return outerBackgroundColour == null ? DefaultStyling.INSTANCE.getOuterBackgroundColour() : outerBackgroundColour;
     }
@@ -187,7 +187,7 @@ public class ComponentStyling {
         this.outerBackgroundColour = outerBackgroundColour;
     }
 
-    @Nullable
+    @Nonnull
     public ColourProperty getInnerBackgroundColour() {
         return innerBackgroundColour == null ? DefaultStyling.INSTANCE.getInnerBackgroundColour() : innerBackgroundColour;
     }
@@ -207,7 +207,7 @@ public class ComponentStyling {
 
     ///
 
-    @Nullable
+    @Nonnull
     public ColourProperty getEnabledTextColour() {
         return enabledTextColour == null ? DefaultStyling.INSTANCE.getEnabledTextColour() : enabledTextColour;
     }
@@ -216,7 +216,7 @@ public class ComponentStyling {
         this.enabledTextColour = enabledTextColour;
     }
 
-    @Nullable
+    @Nonnull
     public ColourProperty getHoveredTextColour() {
         return hoveredTextColour == null ? DefaultStyling.INSTANCE.getHoveredTextColour() : hoveredTextColour;
     }
@@ -225,7 +225,7 @@ public class ComponentStyling {
         this.hoveredTextColour = hoveredTextColour;
     }
 
-    @Nullable
+    @Nonnull
     public ColourProperty getDisabledTextColour() {
         return disabledTextColour == null ? DefaultStyling.INSTANCE.getDisabledTextColour() : disabledTextColour;
     }

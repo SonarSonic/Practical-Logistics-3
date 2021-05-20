@@ -5,6 +5,7 @@ import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
+import sonar.logistics.client.imgui.GSIEditorScreen;
 import sonar.logistics.util.MathUtils;
 
 /**
@@ -12,9 +13,9 @@ import sonar.logistics.util.MathUtils;
  */
 public class GSIDesignSettings {
 
-    public static GSIDesignScreen screen;
+    public static GSIEditorScreen screen;
 
-    public static void setDesignScreen(GSIDesignScreen screen){
+    public static void setDesignScreen(GSIEditorScreen screen){
         GSIDesignSettings.screen = screen;
     }
 

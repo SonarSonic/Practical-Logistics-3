@@ -19,6 +19,14 @@ public class ColourProperty {
                 ((b & 0xFF) << 0);
     }
 
+    public ColourProperty(float[] colour){
+        this((int)(colour[0]*255), (int)(colour[1]*255), (int)(colour[2]*255), (int)(colour[3]*255));
+    }
+
+    public float[] asFloatArray(){
+        return new float[]{getRed()/255F, getGreen()/255F, getBlue()/255F, getAlpha()/255F};
+    }
+
     public int getRed(){
         return getRed(rgba);
     }
