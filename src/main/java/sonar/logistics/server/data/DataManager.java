@@ -1,294 +1,211 @@
 package sonar.logistics.server.data;
 
-import sonar.logistics.server.data.api.IDataMerger;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.PacketDistributor;
+import sonar.logistics.networking.PL3PacketHandler;
+import sonar.logistics.networking.packets.DataSyncPacket;
+import sonar.logistics.networking.packets.DataUpdatePacket;
+import sonar.logistics.server.data.api.IData;
+import sonar.logistics.server.data.api.IDataSource;
 import sonar.logistics.server.data.api.IDataWatcher;
-import sonar.logistics.server.data.api.methods.IMethod;
-import sonar.logistics.server.data.holders.DataHolder;
-import sonar.logistics.server.data.holders.DataMergerHolder;
-import sonar.logistics.server.data.holders.SourceHolder;
-import sonar.logistics.server.data.sources.IDataSource;
-import sonar.logistics.server.data.sources.IDataSourceList;
+import sonar.logistics.server.data.methods.Method;
+import sonar.logistics.server.data.source.Address;
+import sonar.logistics.server.data.source.DataAddress;
+import sonar.logistics.server.data.source.Environment;
 
-import javax.annotation.Nonnull;
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DataManager {
 
     public static final DataManager INSTANCE = new DataManager();
 
+    public List<IDataWatcher> watchers = new ArrayList<>();
+    public Map<Address, DataSource> dataSources = new HashMap<>();
 
-    private final List<IDataWatcher> addedWatchers = new ArrayList<>();
-    private final List<IDataWatcher> removedWatchers = new ArrayList<>();
-    //private Map<InfoUUID, IDataWatcher> LOADED_WATCHERS = new HashMap<>();
-    //private Map<IDataSource, DataGeneratorHolder> DATA_MERGERS = new HashMap<>();
-
-    private final List<IDataSourceList> DATA_SOURCE_LISTS = new ArrayList<>();
-    private final Map<IDataSource, SourceHolder> DATA_SOURCES = new HashMap<>();
-    private final List<DataMergerHolder> DATA_MERGERS = new ArrayList<>();
-
-    public static DataManager instance(){
-        return INSTANCE;
-    }
+    public Map<ServerPlayerEntity, List<DataAddress>> updatePackets = new HashMap<>();
+    public Map<ServerPlayerEntity, List<DataAddress>> syncPackets = new HashMap<>();
 
     private int identity;
 
-    public int getNextIdentity(){
+    public int getNextIdentity() {
         return identity++;
     }
 
-    ////CREATION
-
-    @Nonnull
-    public SourceHolder getOrCreateSourceHolder(IDataSource source){
-        SourceHolder sourceHolder = DATA_SOURCES.get(source);
-
-        if(sourceHolder == null){
-            sourceHolder = new SourceHolder(source, source.getEnvironment());
-            DATA_SOURCES.putIfAbsent(source, sourceHolder);
-            /*
-            MethodRegistry.tileEntityFunction.stream().filter(f -> f.canInvoke(env)).forEach(f -> dataHolder.holders.put(f, new DataHolder(20)));
-            MethodRegistry.blockFunction.stream().filter(f -> f.canInvoke(env)).forEach(f -> dataHolder.holders.put(f, new DataHolder(20)));
-            MethodRegistry.worldFunction.stream().filter(f -> f.canInvoke(env)).forEach(f -> dataHolder.holders.put(f, new DataHolder(20)));
-            */
-        }
-        return sourceHolder;
+    public void clear() {
+        watchers.clear();
+        dataSources.clear();
+        syncPackets.clear();
+        updatePackets.clear();
     }
 
-    public DataHolder getOrCreateDataHolder(IDataSource source, IMethod method, int tickRate){
-        SourceHolder holder = getOrCreateSourceHolder(source);
-        DataHolder dataHolder = holder.holders.get(method);
+    public void update(){
+        watchers.forEach(IDataWatcher::preDataUpdate);
+        dataSources.values().forEach(DataSource::tick);
+        watchers.forEach(IDataWatcher::postDataUpdate);
 
-        if(dataHolder == null){
-            dataHolder = new DataHolder(tickRate);
-            dataHolder.sourceIncompatible = !method.canInvoke(source.getEnvironment());
-            dataHolder.data = method.getDataFactory().create();
-            dataHolder.forceUpdate = true;
-            holder.holders.put(method, dataHolder);
-        }
-        return dataHolder;
-    }
-
-    public DataMergerHolder createDataMerger(IDataSourceList sourceList, IDataMerger merger, int tickRate){
-        DataMergerHolder generatorHolder = new DataMergerHolder(merger, tickRate);
-        IMethod method = merger.getDataMethod();
-
-        for(IDataSource source : sourceList.getDataSources()){
-            DataHolder dataHolder = getOrCreateDataHolder(source, method, tickRate);
-            if (dataHolder != null) {
-                generatorHolder.addDataHolder(dataHolder);
-                dataHolder.addWatcher(generatorHolder);
-            }
+        ///send sync packets
+        for(Map.Entry<ServerPlayerEntity, List<DataAddress>> entry : syncPackets.entrySet()){
+            Map<DataAddress, IData> dataMap = getDataMapFromAddressList(entry.getValue());
+            PL3PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(entry::getKey), new DataSyncPacket(dataMap));
         }
 
-        DATA_MERGERS.add(generatorHolder);
-        return generatorHolder;
-    }
-
-
-
-
-    ////CHANGES
-
-    public void onSourceChanged(IDataSource source){
-        SourceHolder methodHolder = DATA_SOURCES.get(source);
-        if(methodHolder != null){
-            for(Map.Entry<IMethod, DataHolder> entry : methodHolder.holders.entrySet()){
-                if(!entry.getKey().canInvoke(source.getEnvironment())){
-                    entry.getValue().sourceIncompatible = true;
-
-                    entry.getValue().data.preUpdate();
-                    entry.getValue().data = entry.getKey().getDataFactory().create();
-                    entry.getValue().data.postUpdate();
-
-                    entry.getValue().onDataChanged();
-                    entry.getValue().data.onUpdated();
-                }else{
-                    if(entry.getValue().sourceIncompatible) {
-                        entry.getValue().sourceIncompatible = false;
-                        entry.getValue().forceUpdate = true;
-                    }
-                }
-            }
+        //send update packets
+        for(Map.Entry<ServerPlayerEntity, List<DataAddress>> entry : updatePackets.entrySet()){
+            Map<DataAddress, IData> dataMap = getDataMapFromAddressList(entry.getValue());
+            PL3PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(entry::getKey), new DataUpdatePacket(dataMap));
         }
     }
 
-    public void onSourceAdded(IDataSource source){
-
+    public void addDataToSyncPacket(ServerPlayerEntity entity, List<DataAddress> addresses){
+        syncPackets.putIfAbsent(entity, new ArrayList<>());
+        syncPackets.get(entity).addAll(addresses);
     }
 
-    public void onSourceRemoved(IDataSource source){
-
+    public void addDataToUpdatePacket(ServerPlayerEntity entity, List<DataAddress> addresses){
+        updatePackets.putIfAbsent(entity, new ArrayList<>());
+        updatePackets.get(entity).addAll(addresses);
     }
 
-
-    ////REMOVALS
-
-
-
-    //// UPDATING
-
-    public void flushWatchers(){
-        addedWatchers.forEach(watcher -> watcher.getDataHolders().stream().filter(Objects::nonNull).forEach(h -> h.addWatcher(watcher)));
-        removedWatchers.forEach(watcher -> watcher.getDataHolders().stream().filter(Objects::nonNull).forEach(h -> h.removeWatcher(watcher)));
-
-        addedWatchers.clear();
-        removedWatchers.clear();
+    public void addMethod(DataAddress address, IDataWatcher watcher){
+        dataSources.computeIfAbsent(address.source, DataSource::new);
+        dataSources.get(address.source).addMethod(address.method, watcher);
     }
 
-    public void flushUpdates(){
-        DATA_SOURCES.values().forEach(SourceHolder::updateData);
-        DATA_MERGERS.forEach(DataMergerHolder::doTick);
-    }
-
-    public void constructingPhase(){
-        DataManager.instance().flushWatchers();
-        DataManager.instance().flushUpdates();
-    }
-
-    public void updatingPhase(){
-        //TODO ?
-    }
-
-    public void notifyingPhase(){
-        ////FIXME SEND DATA CHANGES
-    }
-
-
-    ////REGISTERING
-
-
-    public void clear(){
-        addedWatchers.clear();
-        removedWatchers.clear();
-        //LOADED_WATCHERS.clear();
-        DATA_SOURCES.clear();
-        DATA_MERGERS.clear();
-    }
-
-    /*
-    @Nonnull
-    public <D extends IData> DataHolder<D> getOrCreateDataHolder(Class<D> dataType, IDataSource source, int tickRate){
-        DataHolder holder = getDataHolder(dataType, source);
-        if(holder != null){
-            return holder;
-        }
-
-        if(source instanceof IDataMultiSource) {
-            IDataMultiSource multiSource = (IDataMultiSource) source;
-            DataHolderMultiSource newMultiHolder = new DataHolderMultiSource(multiSource, getFactory(dataType), tickRate);
-            multiSource.getDataSources().forEach(s -> {
-                DataHolder dataHolder = getOrCreateDataHolder(dataType, s, tickRate);
-                newMultiHolder.addDataHolder(dataHolder);
-                dataHolder.addWatcher(newMultiHolder);
-            });
-            HOLDER_MULTI_SOURCE_MAP.computeIfAbsent(multiSource, FunctionHelper.ARRAY).add(newMultiHolder);
-            return newMultiHolder;
-        }else{
-            DataHolder newHolder = new DataHolder(getValidGenerator(source, dataType), source, getFactory(dataType).create(), tickRate);
-            HOLDER_SOURCE_MAP.computeIfAbsent(source, FunctionHelper.ARRAY).add(newHolder);
-            return newHolder;
+    public void removeMethod(DataAddress address, IDataWatcher watcher){
+        DataSource source = dataSources.get(address.source);
+        if(source != null){
+            source.removeMethod(address.method, watcher);
         }
     }
 
+    ///// Ad hoc Method Calling \\\\\
 
     @Nullable
-    public <D extends IData> DataHolder getDataHolder(Class<D> dataType, IDataSource source){
-        List<? extends DataHolder> holders = (source instanceof IDataMultiSource? HOLDER_MULTI_SOURCE_MAP : HOLDER_SOURCE_MAP).get(source);
-        if(holders != null && !holders.isEmpty()){
-            for(DataHolder holder : holders){
-                if(dataType == holder.data.getClass()){
-                    return holder;
-                }
+    public static Environment getEnvironment(Address address){
+        Environment environment = new Environment(address);
+        boolean valid = address.updateEnvironment(environment);
+        return valid ? environment : null;
+    }
+
+    public static List<IData> invokeMethods(Address source, List<Method> methods){
+        List<IData> dataList = new ArrayList<>();
+        Environment environment = getEnvironment(source);
+        for(Method method : methods){
+            IData data = invokeMethod(method, environment);
+            if(data != null){
+                dataList.add(data);
             }
+        }
+        return dataList;
+    }
+
+    public static IData invokeMethod(DataAddress address){
+        return invokeMethod(address.method, getEnvironment(address.source));
+    }
+
+    public static IData invokeMethod(Method method, @Nullable IDataSource dataSource){
+        if(dataSource != null && method.canInvoke(dataSource)){
+            IData data = method.getDataFactory().create();
+            Object returned = method.invoke(dataSource);
+            method.getDataFactory().convert(data, returned);
+            return data;
         }
         return null;
     }
 
-    public void removeDataHolder(DataHolder holder){
-        if(holder instanceof DataHolderMultiSource){
-            DataHolderMultiSource multiHolder = (DataHolderMultiSource) holder;
-            List<DataHolderMultiSource> holders = HOLDER_MULTI_SOURCE_MAP.get(multiHolder.source);
-            holders.remove(holder);
-            if(holders.size() == 0){
-                HOLDER_SOURCE_MAP.remove(holder.source);
-            }
-            multiHolder.subDataHolders.forEach(h -> ((DataHolder)h).removeWatcher(multiHolder));
-            holder.onHolderDestroyed();
-        }else{
-            List<DataHolder> holders = HOLDER_SOURCE_MAP.get(holder.source);
-            holders.remove(holder);
-            if(holders.size() == 0){
-                HOLDER_SOURCE_MAP.remove(holder.source);
-            }
-            holder.onHolderDestroyed();
+    @Nullable
+    public static IData getData(DataAddress address){
+        DataSource source = INSTANCE.dataSources.get(address.source);
+        if(source != null){
+            return source.getData(address);
         }
+        return null;
     }
 
-
-    public void removeDataSource(IDataSource source){
-        List<DataHolder> holders = HOLDER_SOURCE_MAP.get(source);
-        if(holders != null && !holders.isEmpty()){
-            holders.forEach(h -> h.onHolderDestroyed());
-            holders.clear();
-        }
-    }
-
-
-    public Map<InfoUUID, IDataWatcher> getDataWatchers(){
-        return LOADED_WATCHERS;
-    }
-
-    public void addWatcher(IDataWatcher watcher){
-        if(watcher != null) {
-            addedWatchers.add(watcher);
-        }
-    }
-
-    public void removeWatcher(IDataWatcher watcher){
-        if(watcher != null) {
-            removedWatchers.add(watcher);
-        }
-    }
-
-    public void onWatcherChanged(IDataWatcher watcher){
-        watcher.getDataHolders().forEach(holder -> holder.onWatchersChanged());
-    }
-
-    public void onMultiSourceChanged(IDataMultiSource multiSource){
-        List<DataHolderMultiSource> holders = HOLDER_MULTI_SOURCE_MAP.get(multiSource);
-        if(holders !=null && !holders.isEmpty()) {
-            //holders.forEach(mHolder -> mHolder.getDataHolders().forEach(holder -> ((IDataHolder)holder).removeWatcher(mHolder)));
-            for(DataHolderMultiSource mHolder : holders) {
-                List<DataHolder> oldHolders = Lists.newArrayList(mHolder.subDataHolders);
-                List<DataHolder> newHolders = new ArrayList<>();
-                multiSource.getDataSources().forEach(s -> {
-                    newHolders.add(getOrCreateDataHolder(mHolder.data.getClass(), s, mHolder.tickRate));
-                });
-                List<DataHolder> removed = new ArrayList<>();
-                for (DataHolder ref : oldHolders) {
-                    if (!newHolders.contains(ref)) {
-                        removed.add(ref);
-                        continue;
-                    }
-                    newHolders.remove(ref);
-                }
-
-                if (!newHolders.isEmpty() || !removed.isEmpty()) {
-                    newHolders.forEach(holder -> mHolder.addDataHolder(holder));
-                    removed.forEach(holder -> mHolder.removeDataHolder(holder));
-                }
+    public static Map<DataAddress, IData> getDataMapFromAddressList(List<DataAddress> addressList){
+        Map<DataAddress, IData> dataMap = new HashMap<>();
+        for(DataAddress address : addressList){
+            IData data = getData(address);
+            if(data != null){
+                dataMap.put(address, data);
             }
         }
-
+        return dataMap;
     }
 
-    public void sendInfoPackets(){
-        for(Map.Entry<InfoUUID, IDataWatcher> entry : LOADED_WATCHERS.entrySet()){
-            if(entry.getValue().isWatcherActive()){
-                IInfo oldInfo = ServerInfoHandler.instance().getInfoMap().get(entry.getKey());
-               // IInfo newInfo = entry.createValue().updateData(oldInfo);
+    /// General Data Saving
+
+    public static ListNBT writeDataList(List<IData> data){
+        ListNBT list = new ListNBT();
+        for(IData d : data){
+            list.add(writeData(d));
+        }
+        return list;
+    }
+
+    public static List<IData> readDataList(ListNBT listNBT){
+        List<IData> dataList = new ArrayList<>();
+        for(INBT tag : listNBT){
+            CompoundNBT nbt = (CompoundNBT) tag;
+            dataList.add(readData(nbt));
+        }
+        return dataList;
+    }
+
+    public static void writeDataList(List<IData> dataList, PacketBuffer buffer){
+        buffer.writeInt(dataList.size());
+        for(IData data : dataList){
+            buffer.writeCompoundTag(writeData(data));
+        }
+    }
+
+    public static void readDataList(List<IData> dataList, PacketBuffer buffer){
+        int size = buffer.readInt();
+        for(int i = 0; i < size; i++){
+            CompoundNBT nbt = buffer.readCompoundTag();
+            if(nbt != null){
+                dataList.add(readData(nbt));
             }
         }
     }
-    */
+
+    public static CompoundNBT writeData(IData data){
+        CompoundNBT nbt = new CompoundNBT();
+        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(data.getClass());
+        nbt.putInt("type", dataType.id);
+        dataType.factory.save(data, "data", nbt);
+        return nbt;
+    }
+
+    public static IData readData(CompoundNBT nbt){
+        int type = nbt.getInt("type");
+        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(type);
+        IData data = dataType.factory.create();
+        dataType.factory.read(data, "data", nbt);
+        return data;
+    }
+
+    public static void writeDataUpdate(IData data, PacketBuffer buffer){
+        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(data.getClass());
+        buffer.writeInt(dataType.id);
+        dataType.factory.saveUpdate(data, buffer);
+    }
+
+    public static void readDataUpdate(IData data, PacketBuffer buffer){
+        int type = buffer.readInt();
+        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(type);
+        dataType.factory.readUpdate(data, buffer);
+    }
+
+    public static DataManager instance(){
+        return INSTANCE;
+    }
 }

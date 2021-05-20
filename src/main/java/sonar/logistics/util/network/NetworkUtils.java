@@ -21,7 +21,7 @@ public class NetworkUtils {
     @Nullable
     public static TileEntity getSafeTileEntity(BlockPos pos, NetworkEvent.Context context){
         World world = getWorld(context);
-        if(world != null && world.isBlockLoaded(pos)){
+        if(world != null && world.isBlockPresent(pos)){
             return world.getTileEntity(pos);
         }
         return null;

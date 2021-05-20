@@ -7,12 +7,12 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sonar.logistics.client.ClientDataCache;
 import sonar.logistics.common.blocks.ores.SapphireOreGen;
 import sonar.logistics.common.multiparts.PL3Multiparts;
 import sonar.logistics.networking.PL3PacketHandler;
@@ -23,6 +23,7 @@ import sonar.logistics.server.caches.network.PL3Network;
 import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.server.data.DataManager;
 import sonar.logistics.server.data.DataRegistry;
+import sonar.logistics.server.data.methods.MethodRegistry;
 
 @Mod(PL3.MODID)
 public class PL3 {
@@ -54,6 +55,9 @@ public class PL3 {
 
         LOGGER.info("Registering Data Types");
         DataRegistry.INSTANCE.init();
+
+        LOGGER.info("Registering Methods");
+        MethodRegistry.init();
         //TODO RECIPES
     }
 
@@ -67,6 +71,7 @@ public class PL3 {
         LOGGER.info("PL3: - SERVER STARTED EVENT");
         PL3NetworkManager.INSTANCE.clear();
         DataManager.instance().clear();
+        ClientDataCache.instance().clear();
     }
 
     @SubscribeEvent
@@ -74,6 +79,7 @@ public class PL3 {
         LOGGER.info("PL3: - SERVER STOPPED EVENT");
         PL3NetworkManager.INSTANCE.clear();
         DataManager.instance().clear();
+        ClientDataCache.instance().clear();
     }
 
     @SubscribeEvent
@@ -83,10 +89,7 @@ public class PL3 {
                 break;
             case END:
                 PL3NetworkManager.INSTANCE.cached.values().forEach(PL3Network::tick);
-
-                DataManager.instance().constructingPhase();
-                DataManager.instance().updatingPhase();
-                DataManager.instance().notifyingPhase();
+                DataManager.instance().update();
                 break;
         }
     }

@@ -22,6 +22,10 @@ public class NetworkedHostTile extends MultipartHostTile {
         return network;
     }
 
+    public int getNetworkID(){
+        return globalNetworkID;
+    }
+
     public boolean canConnect(){
         MultipartEntry entry = getMultipart(EnumMultipartSlot.CENTRE);
         return entry != null && entry.multipart == PL3Blocks.DATA_CABLE;
@@ -51,6 +55,7 @@ public class NetworkedHostTile extends MultipartHostTile {
     @Override
     public boolean doRemoveMultipart(MultipartEntry entry) {
         boolean removed = super.doRemoveMultipart(entry);
+        //TODO DETACH FROM NETWORK??
         return removed;
     }
 

@@ -7,7 +7,7 @@ import sonar.logistics.common.blocks.host.NetworkedHostTile;
 import sonar.logistics.common.multiparts.networking.INetworkedTile;
 import sonar.logistics.server.cables.EnumCableTypes;
 import sonar.logistics.server.cables.ICableCache;
-import sonar.logistics.server.data.sources.IDataSource;
+import sonar.logistics.server.data.source.Address;
 import sonar.logistics.util.ListHelper;
 
 import javax.annotation.Nullable;
@@ -17,14 +17,14 @@ import java.util.Map;
 
 public class PL3Network implements ICableCache<PL3Network> {
 
-    private final World world;
-    private int globalNetworkID;
-    private final EnumCableTypes cableType;
+    public final World world;
+    public int globalNetworkID;
+    public final EnumCableTypes cableType;
 
-    private final List<NetworkedHostTile> loadedHosts = new ArrayList<>();
-    private final List<IDataSource> localSources = new ArrayList<>();
-    private final Map<PL3NetworkCaches<?>, List<INetworkedTile>> localCaches = PL3NetworkCaches.newCachesMap();
-    private final boolean[] networkUpdates = new boolean[EnumNetworkUpdate.values().length];
+    public final List<NetworkedHostTile> loadedHosts = new ArrayList<>();
+    public final List<Address> addressList = new ArrayList<>();
+    public final Map<PL3NetworkCaches<?>, List<INetworkedTile>> localCaches = PL3NetworkCaches.newCachesMap();
+    public final boolean[] networkUpdates = new boolean[EnumNetworkUpdate.values().length];
 
     public PL3Network(World world, int globalNetworkID, EnumCableTypes cableType){
         this.world = world;
@@ -58,8 +58,8 @@ public class PL3Network implements ICableCache<PL3Network> {
     }
 
     public void updateNetworkSources(){
-        localSources.clear();
-        getCacheList(PL3NetworkCaches.DATA_SOURCE_NODES).forEach(node -> node.addDataSources(localSources));
+        addressList.clear();
+        getCacheList(PL3NetworkCaches.DATA_SOURCE_NODES).forEach(node -> node.addSourceAddresses(addressList));
         //TODO if a source has gone offline and someone is waiting for it.
     }
 
@@ -74,7 +74,7 @@ public class PL3Network implements ICableCache<PL3Network> {
 
     public void clear(){
         loadedHosts.clear();
-        localSources.clear();
+        addressList.clear();
         localCaches.clear();
     }
 
@@ -141,6 +141,7 @@ public class PL3Network implements ICableCache<PL3Network> {
         for (PL3NetworkCaches<?> handler : PL3NetworkCaches.handlers) {
             if (handler.clazz.isInstance(part) && ListHelper.addWithCheck(localCaches.get(handler), part)) {
                 handler.changeCache.accept(this);
+                part.onNetworkConnected(this);
             }
         }
     }
@@ -149,9 +150,14 @@ public class PL3Network implements ICableCache<PL3Network> {
         for (PL3NetworkCaches<?> handler : PL3NetworkCaches.handlers) {
             if (handler.clazz.isInstance(part) && localCaches.get(handler).remove(part)) {
                 handler.changeCache.accept(this);
+                part.onNetworkDisconnected(this);
             }
         }
     }
+
+    ///// CONNECTED SOURCES \\\\\
+
+
 
     public static void dump(@Nullable PL3Network net){
         PL3.LOGGER.debug("------ PL3 NETWORK DATA START ------");
@@ -161,7 +167,7 @@ public class PL3Network implements ICableCache<PL3Network> {
             PL3.LOGGER.debug("NetworkID: {}", net.globalNetworkID);
             PL3.LOGGER.debug("Dimension: {}", net.world.getDimension().getType());
             PL3.LOGGER.debug("Hosts: {} List: {}",net.loadedHosts.size(), net.loadedHosts);
-            PL3.LOGGER.debug("Sources: {} List: {}", net.localSources.size(), net.localSources);
+            PL3.LOGGER.debug("Sources: {} List: {}", net.addressList.size(), net.addressList);
             PL3.LOGGER.debug("Network Updates {}", net.networkUpdates);
             PL3.LOGGER.debug("Cache Map: {}", net.localCaches);
 

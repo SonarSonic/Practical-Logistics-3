@@ -9,13 +9,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import sonar.logistics.util.ListHelper;
 import sonar.logistics.util.network.EnumSyncType;
-import sonar.logistics.util.network.ISyncable;
+import sonar.logistics.util.network.INBTSyncable;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class WorldCableData implements ISyncable {
+public class WorldCableData implements INBTSyncable {
 
     public final int dimension;
     protected final HashMap<EnumCableTypes, HashSet<LocalCableData>> localCableDataMap = new HashMap<>();

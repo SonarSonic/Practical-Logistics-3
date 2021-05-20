@@ -7,19 +7,20 @@ import net.minecraft.network.PacketBuffer;
  * also used for creating the data and saving / loading it*/
 public interface IDataFactory<D extends IData>{
 
-        D create();
+     D create();
 
-        void save(D data, String key, CompoundNBT tag);
+     void save(D data, String key, CompoundNBT tag);
 
-        void read(D data, String key, CompoundNBT tag);
+     void read(D data, String key, CompoundNBT tag);
 
-        void saveUpdate(D data, PacketBuffer buf);
+     void saveUpdate(D data, PacketBuffer buf);
 
-        void readUpdate(D data, PacketBuffer buf);
+     void readUpdate(D data, PacketBuffer buf);
 
-        default boolean canConvert(Class returnType){
-                return false;
-        }
+     default boolean canConvert(Class returnType){
+return false;
+}
 
-        default void convert(D data, Object obj){}
+     default void convert(D data, Object obj){}
+
 }

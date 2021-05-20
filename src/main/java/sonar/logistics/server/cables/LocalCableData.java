@@ -7,11 +7,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import sonar.logistics.util.network.EnumSyncType;
-import sonar.logistics.util.network.ISyncable;
+import sonar.logistics.util.network.INBTSyncable;
 
 import java.util.HashSet;
 
-public class LocalCableData implements ISyncable {
+public class LocalCableData implements INBTSyncable {
 
     public final WorldCableData worldData;
     public final int globalNetworkID;

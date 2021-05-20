@@ -17,14 +17,18 @@ public abstract class AbstractCableCacheListener<C extends ICableCache<C>> imple
 
     public abstract C createNewCache(World world, int globalCacheID, EnumCableTypes cableType);
 
+    public C getCachedData(int globalCacheID){
+        return cached.get(globalCacheID);
+    }
+
     @Nullable
-    public LocalCableData getCableData(World world, BlockPos pos, EnumCableTypes cableType){
+    public LocalCableData getCachedData(World world, BlockPos pos, EnumCableTypes cableType){
         WorldCableData worldData = GlobalCableData.getWorldData(world);
         return worldData.getCableData(pos, cableType);
     }
 
     public int getGlobalNetworkID(World world, BlockPos pos, EnumCableTypes cableType){
-        LocalCableData cableData = getCableData(world, pos, cableType);
+        LocalCableData cableData = getCachedData(world, pos, cableType);
         return cableData == null ? -1 : cableData.globalNetworkID;
     }
 

@@ -10,12 +10,12 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.TileSyncPacket;
 import sonar.logistics.util.network.EnumSyncType;
-import sonar.logistics.util.network.ISyncable;
+import sonar.logistics.util.network.INBTSyncable;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 
-public class SyncableTile extends TileEntity implements ITickableTileEntity, ISyncable {
+public class SyncableTile extends TileEntity implements ITickableTileEntity, INBTSyncable {
 
     private boolean queueMarkDirty = true;
     private boolean queueSyncPacket = true;

@@ -1,6 +1,5 @@
 package sonar.logistics.server.data.api;
 
-/**represents any type of data obtained via a {@link IDataMerger}*/
 public interface IData {
 
     default void preUpdate(){}
@@ -13,7 +12,5 @@ public interface IData {
     default boolean hasUpdated(){
         return true;
     }
-
-
 
 }

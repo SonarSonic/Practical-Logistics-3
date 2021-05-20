@@ -1,6 +1,6 @@
 package sonar.logistics.server.data.api;
 
-import sonar.logistics.server.data.holders.DataHolder;
+import sonar.logistics.server.data.source.DataAddress;
 
 import java.util.List;
 
@@ -10,12 +10,16 @@ public interface IDataWatcher {
     /**if the data watcher is currently activated by a viewer (generally a player)*/
     boolean isWatcherActive();
 
-    /**the list of Data Holders the watcher is currently waiting for data from.*/
-    List<DataHolder> getDataHolders();
+    /**the list of addresses the data */
+    List<DataAddress> getAddresses();
 
-    default void onDataChanged(DataHolder holder){}
+    default void preDataUpdate(){
 
-    default void addDataHolder(DataHolder holder){}
+    }
 
-    default void removeDataHolder(DataHolder holder){}
+    default void onDataUpdate(DataAddress address, IData data){}
+
+    default void postDataUpdate(){
+
+    }
 }

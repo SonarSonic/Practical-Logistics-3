@@ -1,13 +1,11 @@
 package sonar.logistics.server.data;
 
-import net.minecraft.item.ItemStack;
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.data.api.IDataFactory;
-import sonar.logistics.server.data.api.IDataMerger;
-import sonar.logistics.server.data.mergers.InventoryDataMerger;
-import sonar.logistics.server.data.mergers.StoredItemDataMerger;
 import sonar.logistics.server.data.types.energy.EnergyStorageData;
 import sonar.logistics.server.data.types.energy.EnergyStorageDataFactory;
+import sonar.logistics.server.data.types.sources.SourceData;
+import sonar.logistics.server.data.types.sources.SourceDataFactory;
 import sonar.logistics.server.data.types.fluid.FluidHandlerData;
 import sonar.logistics.server.data.types.fluid.FluidHandlerDataFactory;
 import sonar.logistics.server.data.types.general.PrimitiveDataTypes;
@@ -19,64 +17,47 @@ import sonar.logistics.server.data.types.inventory.StoredItemDataFactory;
 import sonar.logistics.server.data.types.items.ItemHandlerData;
 import sonar.logistics.server.data.types.items.ItemHandlerDataFactory;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 
+/**
+ * For registering data types
+ */
 public class DataRegistry {
 
     public static final DataRegistry INSTANCE = new DataRegistry();
 
-    public final Map<Class<?>, Integer> DATA_TYPES = new HashMap<>();
-    public final Map<Class<?>, List<IDataMerger<?>>> MERGERS = new HashMap<>();
-    public final Map<Class<?>, IDataFactory<?>> FACTORIES = new HashMap<>();
+    public final List<DataType> DATA_TYPES = new ArrayList<>();
+
+    public void registerDataType(Integer typeID, Class<? extends IData> type, IDataFactory<? extends IData> factory){
+        DATA_TYPES.add(new DataType(typeID, type, factory));
+    }
 
     public void init(){
-        DATA_TYPES.put(InventoryData.class, 0);
-        MERGERS.computeIfAbsent(InventoryData.class, (c) -> new ArrayList<>()).add(new InventoryDataMerger());
-        FACTORIES.put(InventoryData.class, new InventoryDataFactory());
+        int typeID = 0;
+        registerDataType(typeID++, InventoryData.class, new InventoryDataFactory());
+        registerDataType(typeID++, EnergyStorageData.class, new EnergyStorageDataFactory());
+        registerDataType(typeID++, PrimitiveDataTypes.BooleanData.class, new PrimitiveDataTypes.BooleanDataFactory());
+        registerDataType(typeID++, PrimitiveDataTypes.IntegerData.class, new PrimitiveDataTypes.IntegerDataFactory());
+        registerDataType(typeID++, PrimitiveDataTypes.LongData.class, new PrimitiveDataTypes.LongDataFactory());
+        registerDataType(typeID++, PrimitiveDataTypes.DoubleData.class, new PrimitiveDataTypes.DoubleDataFactory());
+        registerDataType(typeID++, PrimitiveDataTypes.FloatData.class, new PrimitiveDataTypes.FloatDataFactory());
+        registerDataType(typeID++, SpecialDataTypes.StringData.class, new SpecialDataTypes.StringDataFactory());
+        registerDataType(typeID++, SpecialDataTypes.ItemStackData.class, new SpecialDataTypes.ItemStackDataFactory());
+        registerDataType(typeID++, SpecialDataTypes.NBTData.class, new SpecialDataTypes.NBTDataFactory());
+        registerDataType(typeID++, ItemHandlerData.class, new ItemHandlerDataFactory());
+        registerDataType(typeID++, FluidHandlerData.class, new FluidHandlerDataFactory());
+        registerDataType(typeID++, StoredItemData.class, new StoredItemDataFactory());
+        registerDataType(typeID++, SourceData.class, new SourceDataFactory());
 
-        DATA_TYPES.put(EnergyStorageData.class, 1);
+        //MERGERS.computeIfAbsent(InventoryData.class, (c) -> new ArrayList<>()).add(new InventoryDataMerger());
         //MERGERS.computeIfAbsent(EnergyData.class, (c) -> new ArrayList<>()).add(new EnergyDataGenerator());
-        FACTORIES.put(EnergyStorageData.class, new EnergyStorageDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.BooleanData.class, 2);
-        FACTORIES.put(PrimitiveDataTypes.BooleanData.class, new PrimitiveDataTypes.BooleanDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.IntegerData.class, 3);
-        FACTORIES.put(PrimitiveDataTypes.IntegerData.class, new PrimitiveDataTypes.IntegerDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.LongData.class, 4);
-        FACTORIES.put(PrimitiveDataTypes.LongData.class, new PrimitiveDataTypes.LongDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.DoubleData.class, 5);
-        FACTORIES.put(PrimitiveDataTypes.DoubleData.class, new PrimitiveDataTypes.DoubleDataFactory());
-
-        DATA_TYPES.put(PrimitiveDataTypes.FloatData.class, 6);
-        FACTORIES.put(PrimitiveDataTypes.FloatData.class, new PrimitiveDataTypes.FloatDataFactory());
-
-        DATA_TYPES.put(SpecialDataTypes.StringData.class, 7);
-        FACTORIES.put(SpecialDataTypes.StringData.class, new SpecialDataTypes.StringDataFactory());
-
-        DATA_TYPES.put(SpecialDataTypes.ItemStackData.class, 8);
-        FACTORIES.put(SpecialDataTypes.ItemStackData.class, new SpecialDataTypes.ItemStackDataFactory());
-
-        DATA_TYPES.put(SpecialDataTypes.NBTData.class, 9);
-        FACTORIES.put(SpecialDataTypes.NBTData.class, new SpecialDataTypes.NBTDataFactory());
-
-        DATA_TYPES.put(ItemHandlerData.class, 10);
-        FACTORIES.put(ItemHandlerData.class, new ItemHandlerDataFactory());
-
-        DATA_TYPES.put(FluidHandlerData.class, 11);
-        FACTORIES.put(FluidHandlerData.class, new FluidHandlerDataFactory());
-
-        DATA_TYPES.put(StoredItemData.class, 12);
-        MERGERS.computeIfAbsent(StoredItemData.class, (c) -> new ArrayList<>()).add(new StoredItemDataMerger(ItemStack.EMPTY)); //FIXME MERGERS NEED INPUTS!
-        FACTORIES.put(StoredItemData.class, new StoredItemDataFactory());
+        //MERGERS.computeIfAbsent(StoredItemData.class, (c) -> new ArrayList<>()).add(new StoredItemDataMerger(ItemStack.EMPTY)); //FIXME MERGERS NEED INPUTS!
 
     }
 
     ////DATA FACTORIES
 
+    /*
     @Nonnull
     public static IDataFactory getFactory(Class dataType){
         if(IData.class.isAssignableFrom(dataType)){
@@ -103,5 +84,42 @@ public class DataRegistry {
             throw new NullPointerException("NO DATA FACTORY FOR: " + returnType);
         }
         return factory.get();
+    }
+        */
+
+    public DataType getDataType(Class dataType){
+        if(IData.class.isAssignableFrom(dataType)){
+            return DATA_TYPES.stream().filter(type -> type.dataType.isAssignableFrom(dataType)).findFirst().orElseThrow(() -> new NullPointerException("Invalid Special Data Type: " + dataType));
+        }
+        return DATA_TYPES.stream().filter(type -> type.factory.canConvert(dataType)).findFirst().orElseThrow(() -> new NullPointerException("Invalid Primitive Data Type: " + dataType));
+    }
+
+    public DataType getDataType(int id){
+        return DATA_TYPES.stream().filter(type -> type.id == id).findFirst().orElseThrow(() -> new NullPointerException("No Data Type with ID: " + id));
+    }
+
+    public static class DataType{
+        public int id;
+        public Class<IData> dataType;
+        public IDataFactory<IData> factory;
+
+        public DataType(int id, Class<? extends IData> dataType, IDataFactory<? extends IData> factory){
+            this.id = id;
+            this.dataType = (Class<IData>) dataType;
+            this.factory = (IDataFactory<IData>) factory;
+        }
+
+        @Override
+        public int hashCode() {
+            return id;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj instanceof DataType){
+                return ((DataType) obj).id == id;
+            }
+            return super.equals(obj);
+        }
     }
 }

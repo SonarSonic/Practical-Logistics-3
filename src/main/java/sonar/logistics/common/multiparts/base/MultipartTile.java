@@ -8,12 +8,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import sonar.logistics.util.network.EnumSyncType;
-import sonar.logistics.util.network.ISyncable;
+import sonar.logistics.util.network.INBTSyncable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class MultipartTile implements ICapabilityProvider, ISyncable {
+public class MultipartTile implements ICapabilityProvider, INBTSyncable {
 
     protected final MultipartEntry entry;
 

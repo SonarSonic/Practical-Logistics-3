@@ -103,6 +103,17 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.2.50'
 
 
+    compile "io.github.spair:imgui-java-binding:$imgui_version"
+    compile("io.github.spair:imgui-java-lwjgl3:$imgui_version") {
+        exclude group: "org.lwjgl"
+        exclude group: "org.lwjgl.lwjgl"
+    }
+
+    ["linux", "linux-x86", "macos", "windows", "windows-x86"].each {
+        implementation("io.github.spair:imgui-java-natives-$it:$imgui_version") {
+            exclude group: "org.lwjgl"
+        }
+    }
     //embed group: "org.joml", name: "joml", version: "1.9.25", changing: true
 
 

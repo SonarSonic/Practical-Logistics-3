@@ -4,118 +4,63 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import sonar.logistics.PL3;
-import sonar.logistics.server.data.api.categories.IDataCategory;
-import sonar.logistics.server.data.api.methods.IMethod;
-import sonar.logistics.server.data.api.methods.MethodBlock;
-import sonar.logistics.server.data.api.methods.MethodTileEntity;
-import sonar.logistics.server.data.api.methods.MethodWorld;
-import sonar.logistics.server.data.api.methods.types.IMethodBlock;
-import sonar.logistics.server.data.api.methods.types.IMethodEntity;
-import sonar.logistics.server.data.api.methods.types.IMethodTileEntity;
-import sonar.logistics.server.data.api.methods.types.IMethodWorld;
+import sonar.logistics.server.caches.network.PL3Network;
+import sonar.logistics.server.data.DataRegistry;
+import sonar.logistics.server.data.api.IDataSource;
+import sonar.logistics.server.data.methods.categories.DataCategory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class MethodRegistry {
 
-    public static List<IMethod> tileEntityFunction = new ArrayList<>();
-    public static List<IMethod> blockFunction = new ArrayList<>();
-    public static List<IMethod> worldFunction = new ArrayList<>();
-    public static List<IMethod> specialFunction = new ArrayList<>();
+    public static Map<String, Method> methods = new HashMap<>();
 
-    static{
+    public static void init(){
         VanillaMethods.init();
-        SpecialMethods.init();
     }
 
-    public static <O, T extends TileEntity> IMethod<O> registerMethodTileEntity(IDataCategory category, String name, Class<O> returnType, Class<T> tileEntity, IMethodTileEntity<O,T> method){
-        ResourceLocation identifier = new ResourceLocation(category.getID(), name);
-        IMethod hashTest = hashTest(identifier.hashCode());
-        if(hashTest != null){
-            logHashError(hashTest.getIdentifier(), identifier);
+    public static Method getMethodFromIdentifier(String identifier){
+        return methods.get(identifier);
+    }
+
+    public static <O, T extends TileEntity> Method registerTileEntityMethod(DataCategory category, String name, Class<O> returnType, Class<T> tileEntity, BiFunction<IDataSource, T, O> method){
+        return registerMethod(category, name, returnType, source -> source.tile() != null && tileEntity.isInstance(source.tile()), source -> method.apply(source, (T)source.tile()));
+    }
+
+    public static <O, B extends Block> Method registerBlockMethod(DataCategory category, String name, Class<O> returnType, Class<B> block, BiFunction<IDataSource, B, O> method){
+        return registerMethod(category, name, returnType, source -> source.state() != null && block.isInstance(source.state().getBlock()), source -> method.apply(source, (B)source.state().getBlock()));
+    }
+
+    public static <O, E extends Entity> Method registerEntityMethod(DataCategory category, String name, Class<O> returnType, Class<E> entity, BiFunction<IDataSource, E, O> method){
+        return registerMethod(category, name, returnType, source -> source.entity() != null && entity.isInstance(source.entity()), source -> method.apply(source, (E)source.entity()));
+    }
+
+    public static <O> Method registerWorldMethod(DataCategory category, String name, Class<O> returnType, Function<World, O> method){
+        return registerMethod(category, name, returnType, source -> source.world() != null, source -> method.apply(source.world()));
+    }
+
+    public static <O> Method registerNetworkMethod(DataCategory category, String name, Class<O> returnType, Function<PL3Network, O> method){
+        return registerMethod(category, name, returnType, source -> source.network() != null, source -> method.apply(source.network()));
+    }
+
+    public static <O> Method registerMethod(DataCategory category, String name, Class<O> returnType, Function<IDataSource, Boolean> canInvoke, Function<IDataSource, O> invoke){
+        String identifier = category.getID() + ":" + name;
+        if(methods.containsKey(identifier)){
+            PL3.LOGGER.error("Duplicate Method: {}", identifier);
             return null;
-        }else{
-            MethodTileEntity<O,T> function = new MethodTileEntity<>(identifier, returnType, tileEntity, method);
-            tileEntityFunction.add(function);
-            return function;
         }
 
+        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(returnType);
+
+        Method method = new Method(identifier, dataType, canInvoke, invoke);
+        methods.put(identifier, method);
+        PL3.LOGGER.info("Registered Method: {}, Return Type {}", identifier, returnType.getSimpleName());
+        return method;
     }
-
-    public static <O, B extends Block> IMethod<O> registerMethodBlock(IDataCategory category, String name, Class<O> returnType, Class<B> block, IMethodBlock<O,B> method){
-        ResourceLocation identifier = new ResourceLocation(category.getID(), name);
-        IMethod hashTest = hashTest(identifier.hashCode());
-        if(hashTest != null){
-            logHashError(hashTest.getIdentifier(), identifier);
-            return null;
-        }else {
-            MethodBlock<O, B> function = new MethodBlock<>(identifier, returnType, block, method);
-            blockFunction.add(function);
-            return function;
-        }
-    }
-
-
-    public static <O> IMethod<O> registerMethodWorld(IDataCategory category, String name, Class<O> returnType, IMethodWorld<O> method){
-            ResourceLocation identifier = new ResourceLocation(category.getID(), name);
-            IMethod hashTest = hashTest(identifier.hashCode());
-            if(hashTest != null){
-                logHashError(hashTest.getIdentifier(), identifier);
-                return null;
-            }else {
-                MethodWorld<O> function = new MethodWorld<>(identifier, returnType, method);
-                worldFunction.add(function);
-                return function;
-            }
-    }
-
-    public static <O, E extends Entity> IMethod<O> registerMethodEntity(IDataCategory category, String name, Class<O> returnType, Class<E> entity, IMethodEntity<O,E> method){
-        /* FIXME ENTITY SYSTEM
-        ResourceLocation identifier = new ResourceLocation(domain, name);
-        IFunction hashTest = hashTest(identifier.hashCode());
-        if(hashTest != null){
-            logHashError(hashTest.getIdentifier(), identifier);
-            return null;
-        }else{
-            FunctionEntity<O,E> method = new FunctionEntity<>(identifier, returnType, entity, method);
-            entityFunction.add(method);
-            return method;
-        }
-        */
-        return null;
-    }
-
-    /*
-    public static <O> IMethod<O> registerMethodSpecial(IDataCategory category, String name, Class<O> returnType, IMethodSpecial<O> method){
-        ResourceLocation identifier = new ResourceLocation(category.getID(), name);
-        IMethod hashTest = hashTest(identifier.hashCode());
-        if(hashTest != null){
-            logHashError(hashTest.getIdentifier(), identifier);
-            return null;
-        }else {
-            MethodSpecial<O> function = new MethodSpecial<>(identifier, returnType, method);
-            specialFunction.add(function);
-            return function;
-        }
-    }
-
-     */
-
-    public static IMethod hashTest(int hashCode){
-        Optional<IMethod> tileFunc = tileEntityFunction.stream().filter(f -> f.getIdentifier().hashCode() == hashCode).findAny();
-        Optional<IMethod> blockFunc = blockFunction.stream().filter(f -> f.getIdentifier().hashCode() == hashCode).findAny();
-        Optional<IMethod> worldFunc = worldFunction.stream().filter(f -> f.getIdentifier().hashCode() == hashCode).findAny();
-        Optional<IMethod> specialFunc = specialFunction.stream().filter(f -> f.getIdentifier().hashCode() == hashCode).findAny();
-        return tileFunc.orElseGet(() -> blockFunc.orElseGet(() -> worldFunc.orElseGet(() -> specialFunc.orElse(null))));
-    }
-
-    public static void logHashError(ResourceLocation existing, ResourceLocation identifier){
-        PL3.LOGGER.fatal("TWO METHODS HAVE MATCHING HASH CODES! Existing Method: {} New Method {}", existing, identifier);
-        PL3.LOGGER.fatal("REGISTERING HAS FAILED FOR New Method {}", identifier);
-    }
-
 
 }
