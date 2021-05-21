@@ -1,6 +1,7 @@
 package sonar.logistics.server.data.types.general;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import sonar.logistics.server.data.api.IData;
@@ -63,6 +64,13 @@ public class SpecialDataTypes {
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
         }
+
+        @Override
+        public StringData createTest() {
+            StringData data = create();
+            data.data = "this is a data test!";
+            return data;
+        }
     }
 
     ////
@@ -78,6 +86,8 @@ public class SpecialDataTypes {
         public boolean hasUpdated(ItemStack newData, ItemStack currentData){
             return !ItemStack.areItemStacksEqual(newData, currentData) || !ItemStack.areItemStackTagsEqual(newData, currentData);
         }
+
+
 
     }
 
@@ -120,6 +130,13 @@ public class SpecialDataTypes {
                 return;
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
+        }
+
+        @Override
+        public ItemStackData createTest() {
+            ItemStackData data = create();
+            data.data = new ItemStack(Items.GOLD_INGOT, 32);
+            return data;
         }
     }
 
@@ -177,6 +194,17 @@ public class SpecialDataTypes {
                 return;
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
+        }
+
+        @Override
+        public NBTData createTest() {
+            NBTData data = create();
+            data.data = new CompoundNBT();
+            data.data.putInt("test", 50);
+            data.data.putLong("test2", 100);
+            data.data.putDouble("test3", 50000);
+            data.data.putString("hey", "another test");
+            return data;
         }
     }
 }

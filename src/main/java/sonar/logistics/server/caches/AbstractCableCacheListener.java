@@ -95,7 +95,9 @@ public abstract class AbstractCableCacheListener<C extends ICableCache<C>> imple
         if(network != null){
             network.mergeCache(merging);
         }else{
+            cached.remove(mergedID);
             merging.changeCacheID(globalID);
+            cached.put(globalID, merging);
         }
 
     }

@@ -98,6 +98,7 @@ public class PL3Network implements ICableCache<PL3Network> {
         merging.loadedHosts.forEach(this::connectHost);
         merging.clear();
         PL3NetworkManager.INSTANCE.cached.remove(merging.globalNetworkID);
+        queueNetworkUpdate(EnumNetworkUpdate.DATA_SOURCES);
     }
 
     public void verifyIntegrity(){
@@ -111,6 +112,7 @@ public class PL3Network implements ICableCache<PL3Network> {
     public void changeCacheID(int networkID) {
         globalNetworkID = networkID;
         loadedHosts.forEach(host -> host.globalNetworkID = networkID);
+        queueNetworkUpdate(EnumNetworkUpdate.DATA_SOURCES);
     }
 
     ///// MULTIPART HOSTS \\\\\
@@ -119,6 +121,7 @@ public class PL3Network implements ICableCache<PL3Network> {
         host.network = network;
         host.globalNetworkID = network == null ? -1 : network.globalNetworkID;
         host.queueMarkDirty();
+        host.queueSyncPacket();
     }
 
     public void connectHost(NetworkedHostTile host){

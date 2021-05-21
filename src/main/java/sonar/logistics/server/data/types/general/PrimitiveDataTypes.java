@@ -61,6 +61,13 @@ public class PrimitiveDataTypes {
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
         }
+
+        @Override
+        public BooleanData createTest() {
+            BooleanData data = create();
+            data.data = true;
+            return data;
+        }
     }
 
     ////
@@ -117,6 +124,13 @@ public class PrimitiveDataTypes {
                 return;
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
+        }
+
+        @Override
+        public IntegerData createTest() {
+            IntegerData data = create();
+            data.data = 12345;
+            return data;
         }
     }
 
@@ -175,6 +189,13 @@ public class PrimitiveDataTypes {
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
         }
+
+        @Override
+        public LongData createTest() {
+            LongData data = create();
+            data.data = 12345L;
+            return data;
+        }
     }
 
     ////
@@ -232,6 +253,13 @@ public class PrimitiveDataTypes {
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
         }
+
+        @Override
+        public DoubleData createTest() {
+            DoubleData data = create();
+            data.data = 12345D;
+            return data;
+        }
     }
 
     ////
@@ -288,6 +316,13 @@ public class PrimitiveDataTypes {
                 return;
             }
             throw new NullPointerException("INVALID CONVERSION: " + this + " given " + obj);
+        }
+
+        @Override
+        public FloatData createTest() {
+            FloatData data = create();
+            data.data = 12345F;
+            return data;
         }
     }
 

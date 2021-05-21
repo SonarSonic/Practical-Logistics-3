@@ -4,11 +4,12 @@ import net.minecraft.item.ItemStack;
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.data.api.IDataSource;
 import sonar.logistics.server.data.source.Address;
+import sonar.logistics.server.data.source.InvalidAddress;
 
 public class SourceData implements IData {
 
-    public Address address;
-    public ItemStack stack;
+    public Address address = InvalidAddress.INSTANCE;
+    public ItemStack stack = ItemStack.EMPTY;
 
     public SourceData(){
         super();

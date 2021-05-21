@@ -2,6 +2,7 @@ package sonar.logistics.server.data.types.items;
 
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
@@ -109,5 +110,15 @@ public class ItemHandlerDataFactory implements IDataFactory<ItemHandlerData> {
                 }
             }
         }
+    }
+
+    @Override
+    public ItemHandlerData createTest() {
+        ItemHandlerData data = create();
+        data.stackList.set(0, new ItemStack(Items.FURNACE, 64));
+        data.inventory_count = 64;
+        data.inventory_max = 10000;
+        data.hasCountChanged = true;
+        return data;
     }
 }

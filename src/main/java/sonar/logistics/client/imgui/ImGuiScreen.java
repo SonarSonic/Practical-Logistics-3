@@ -196,6 +196,7 @@ public class ImGuiScreen extends SimpleWidgetScreen {
 
         super.onClose();
 
+        //TODO RESET IMGUI on close
         ClientDataCache.INSTANCE.clearUICaches();
     }
 

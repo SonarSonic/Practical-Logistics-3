@@ -1,11 +1,16 @@
 package sonar.logistics.server.caches.displays;
 
 import com.google.common.collect.Lists;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sonar.logistics.PL3;
+import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.common.multiparts.displays.LargeDisplayScreenTile;
+import sonar.logistics.common.multiparts.displays.api.IDisplay;
 import sonar.logistics.server.cables.EnumCableTypes;
 import sonar.logistics.server.cables.ICableCache;
+import sonar.logistics.server.caches.network.PL3Network;
 import sonar.logistics.util.ListHelper;
 
 import javax.annotation.Nullable;
@@ -24,6 +29,11 @@ public class ConnectedDisplay implements ICableCache<ConnectedDisplay> {
         this.connectedDisplayID = connectedDisplayID;
         this.cableType = cableType;
     }
+
+    public void update(){
+
+    }
+
     ///// NETWORKING \\\\\
 
     @Override
@@ -78,6 +88,7 @@ public class ConnectedDisplay implements ICableCache<ConnectedDisplay> {
         display.connectedDisplay = connectedDisplay;
         display.connectedDisplayID = connectedDisplay == null ? -1 : connectedDisplay.connectedDisplayID;
         display.queueMarkDirty();
+        display.queueSyncPacket();
     }
 
     public void connectDisplay(LargeDisplayScreenTile display){
@@ -90,6 +101,9 @@ public class ConnectedDisplay implements ICableCache<ConnectedDisplay> {
         setConnectedDisplay(display, null);
         verifyIntegrity();
     }
+
+    //// IDisplay \\\\
+
 
     public static void dump(@Nullable ConnectedDisplay net){
         PL3.LOGGER.debug("------ CONNECTED DISPLAY DATA START ------");

@@ -125,7 +125,7 @@ public class DataCableBlock extends Block implements IMultipartBlock {
                 if (networkCableData == null) {
                     player.sendMessage(new StringTextComponent(pos.toString() + ": " + "NO NETWORK FOUND"));
                 } else {
-                    player.sendMessage(new StringTextComponent(pos.toString() + ": " + networkCableData.globalNetworkID + " Cable Count: " + networkCableData.cables.size()));
+                    player.sendMessage(new StringTextComponent(pos.toString() + ": " + "Network ID: " +networkCableData.globalNetworkID + " Cable Count: " + networkCableData.cables.size()));
                 }
             }else{
                 PL3Network.dump(PL3NetworkManager.INSTANCE.getCableCache(world, pos, EnumCableTypes.NETWORK_CABLE));

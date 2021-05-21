@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
  */
 public abstract class Address implements INBTSyncable, IByteBufSaveable {
 
+    public static final int INVALID_ADDRESS = -1;
     public static final int DATA_ADDRESS = 0;
     public static final int BLOCK_ADDRESS = 1;
     public static final int NETWORK_ADDRESS = 2;
@@ -25,6 +26,8 @@ public abstract class Address implements INBTSyncable, IByteBufSaveable {
     @Nonnull
     public static Address ofType(int type){
         switch (type){
+            case INVALID_ADDRESS:
+                return InvalidAddress.INSTANCE;
             case DATA_ADDRESS:
                 return new DataAddress();
             case BLOCK_ADDRESS:

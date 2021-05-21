@@ -9,6 +9,7 @@ import sonar.logistics.common.blocks.base.OrientatedBlock;
 import sonar.logistics.common.multiparts.utils.EnumMultipartSlot;
 import sonar.logistics.util.PL3Properties;
 
+//TODO BETTER PLACING!!
 public abstract class OrientatedMultipart extends OrientatedBlock implements IMultipartBlock {
 
     public final VoxelShape[] rotatedVoxels;

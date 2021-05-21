@@ -1,6 +1,7 @@
 package sonar.logistics.server.data.types.inventory;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
@@ -82,5 +83,14 @@ public class InventoryDataFactory implements IDataFactory<InventoryData> {
         ItemStack stack = ItemStack.read(tag);
         long count = tag.getLong(COUNT_KEY);
         data.data.put(stack, new ChangeableNumber(count));
+    }
+
+    @Override
+    public InventoryData createTest() {
+        InventoryData data = create();
+        data.inventory_max = 1000;
+        data.inventory_count = 100;
+        data.addData(new ItemStack(Items.LAPIS_ORE, 1), 40);
+        return data;
     }
 }

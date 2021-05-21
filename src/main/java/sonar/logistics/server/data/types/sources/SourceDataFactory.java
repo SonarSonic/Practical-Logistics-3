@@ -1,8 +1,14 @@
 package sonar.logistics.server.data.types.sources;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import sonar.logistics.server.data.api.IDataFactory;
 import sonar.logistics.server.data.source.Address;
 
@@ -61,5 +67,13 @@ public class SourceDataFactory implements IDataFactory<SourceData> {
             SourceData addressData = (SourceData) obj;
             data.copyFrom(addressData);
         }
+    }
+
+    @Override
+    public SourceData createTest() {
+        SourceData data = create();
+        data.address = Address.createBlockAddress(new BlockPos(14, 1231, 60), DimensionType.OVERWORLD, Direction.DOWN);
+        data.stack = new ItemStack(Blocks.FURNACE, 10);
+        return data;
     }
 }

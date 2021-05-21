@@ -1,5 +1,6 @@
 package sonar.logistics;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -8,6 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -19,11 +21,13 @@ import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.proxy.ClientProxy;
 import sonar.logistics.networking.proxy.IProxy;
 import sonar.logistics.networking.proxy.ServerProxy;
+import sonar.logistics.server.caches.displays.ConnectedDisplayManager;
 import sonar.logistics.server.caches.network.PL3Network;
 import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.server.data.DataManager;
 import sonar.logistics.server.data.DataRegistry;
 import sonar.logistics.server.data.methods.MethodRegistry;
+import sonar.logistics.util.debug.DebugCommands;
 
 @Mod(PL3.MODID)
 public class PL3 {
@@ -39,6 +43,7 @@ public class PL3 {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupCommon);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(DebugCommands.class);
     }
 
     private void setupCommon(final FMLCommonSetupEvent event) {
@@ -69,15 +74,13 @@ public class PL3 {
     @SubscribeEvent
     public void onServerStarted(FMLServerStartedEvent event){
         LOGGER.info("PL3: - SERVER STARTED EVENT");
-        PL3NetworkManager.INSTANCE.clear();
-        DataManager.instance().clear();
-        ClientDataCache.instance().clear();
     }
 
     @SubscribeEvent
     public void onServerStopped(FMLServerStoppedEvent event){
         LOGGER.info("PL3: - SERVER STOPPED EVENT");
         PL3NetworkManager.INSTANCE.clear();
+        ConnectedDisplayManager.INSTANCE.clear();
         DataManager.instance().clear();
         ClientDataCache.instance().clear();
     }

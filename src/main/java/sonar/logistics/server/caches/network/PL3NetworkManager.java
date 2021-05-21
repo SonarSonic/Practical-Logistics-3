@@ -47,7 +47,7 @@ public class PL3NetworkManager extends AbstractCableCacheListener<PL3Network> im
             PL3.LOGGER.error("PL3NetworkManager: FAILED HOST CONNECTION - FAILED TO FIND NETWORK AT: POS: {} DIM: {}", tile.getPos().toString(), tile.getWorld().getDimension().getType().getId());
         }else{
             network.connectHost(tile);
-            PL3.LOGGER.debug("Connected Host: {} Network ID: {}", tile.getPos().toString(), network.getNetworkID());
+            PL3.LOGGER.info("Connected Host: {} Network ID: {}", tile.getPos().toString(), network.getNetworkID());
         }
     }
 

@@ -18,9 +18,16 @@ public interface IDataFactory<D extends IData>{
      void readUpdate(D data, PacketBuffer buf);
 
      default boolean canConvert(Class returnType){
-return false;
-}
+          return false;
+     }
 
      default void convert(D data, Object obj){}
+
+     /**
+      * Used for debugging only
+      */
+     default D createTest(){
+          return create();
+     }
 
 }

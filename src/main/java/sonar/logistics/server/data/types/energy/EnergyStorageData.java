@@ -4,7 +4,7 @@ import sonar.logistics.server.data.api.IData;
 
 public class EnergyStorageData implements IData {
 
-    public EnumEnergyType type;
+    public EnumEnergyType type = EnumEnergyType.FE;
     public long energy, capacity;
     public boolean hasUpdated;
 

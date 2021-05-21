@@ -67,4 +67,13 @@ public class EnergyStorageDataFactory implements IDataFactory<EnergyStorageData>
             }
         }
     }
+
+    @Override
+    public EnergyStorageData createTest() {
+        EnergyStorageData testData = create();
+        testData.energy = 1000;
+        testData.capacity = 50000;
+        testData.type = EnumEnergyType.FE;
+        return testData;
+    }
 }

@@ -1,5 +1,6 @@
 package sonar.logistics.server.data.types.fluid;
 
+import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
@@ -122,9 +123,17 @@ public class FluidHandlerDataFactory implements IDataFactory<FluidHandlerData> {
         if(fluid1 == null && fluid2 == null){
             return true;
         }
-        if(fluid1 != null && fluid2 == null || fluid1 == null){
+        if(fluid1 == null || fluid2 == null){
             return false;
         }
         return fluid1.isFluidStackIdentical(fluid2);
+    }
+
+    @Override
+    public FluidHandlerData createTest() {
+        FluidHandlerData data = create();
+        data.tankMap.put(0, new FluidHandlerData.SimpleFluidTank(new FluidStack(Fluids.LAVA, 500), 1000));
+        data.tankMap.put(1, new FluidHandlerData.SimpleFluidTank(new FluidStack(Fluids.WATER, 1000), 1000));
+        return data;
     }
 }

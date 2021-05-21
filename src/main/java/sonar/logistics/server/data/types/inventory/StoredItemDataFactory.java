@@ -1,9 +1,11 @@
 package sonar.logistics.server.data.types.inventory;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import sonar.logistics.server.data.api.IDataFactory;
+import sonar.logistics.server.data.types.changes.EnumChangeable;
 
 public class StoredItemDataFactory implements IDataFactory<StoredItemData> {
 
@@ -18,7 +20,7 @@ public class StoredItemDataFactory implements IDataFactory<StoredItemData> {
     public void save(StoredItemData data, String key, CompoundNBT tag) {
         CompoundNBT nbt = new CompoundNBT();
         data.stack.write(nbt);
-        nbt.putLong(COUNT_KEY, data.countData.count);
+        tag.putLong(COUNT_KEY, data.countData.count);
         tag.put(key, nbt);
     }
 
@@ -40,5 +42,14 @@ public class StoredItemDataFactory implements IDataFactory<StoredItemData> {
     public void readUpdate(StoredItemData data, PacketBuffer buf) {
         data.stack = buf.readItemStack();
         data.countData.count = buf.readLong();
+    }
+
+    @Override
+    public StoredItemData createTest() {
+        StoredItemData itemData = new StoredItemData();
+        itemData.stack = new ItemStack(Items.DIAMOND, 1);
+        itemData.countData.count = 1000;
+        itemData.countData.enumChange = EnumChangeable.INCREASED;
+        return itemData;
     }
 }
