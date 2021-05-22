@@ -2,9 +2,9 @@ package sonar.logistics.server.data;
 
 import sonar.logistics.server.data.api.*;
 import sonar.logistics.server.data.methods.Method;
-import sonar.logistics.server.data.source.Address;
-import sonar.logistics.server.data.source.DataAddress;
-import sonar.logistics.server.data.source.Environment;
+import sonar.logistics.server.address.Address;
+import sonar.logistics.server.address.DataAddress;
+import sonar.logistics.server.address.Environment;
 import sonar.logistics.util.MathUtils;
 
 import javax.annotation.Nullable;

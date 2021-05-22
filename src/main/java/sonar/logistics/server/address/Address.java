@@ -1,4 +1,4 @@
-package sonar.logistics.server.data.source;
+package sonar.logistics.server.address;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -84,4 +84,14 @@ public abstract class Address implements INBTSyncable, IByteBufSaveable {
 
     public abstract boolean updateEnvironment(Environment environment);
 
+    //// COMPARING METHODS \\\\
+
+    @Override
+    public abstract String toString();
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract boolean equals(Object obj);
 }

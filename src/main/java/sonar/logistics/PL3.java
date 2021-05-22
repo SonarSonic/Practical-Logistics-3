@@ -21,6 +21,7 @@ import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.proxy.ClientProxy;
 import sonar.logistics.networking.proxy.IProxy;
 import sonar.logistics.networking.proxy.ServerProxy;
+import sonar.logistics.server.ServerDataCache;
 import sonar.logistics.server.caches.displays.ConnectedDisplayManager;
 import sonar.logistics.server.caches.network.PL3Network;
 import sonar.logistics.server.caches.network.PL3NetworkManager;
@@ -81,8 +82,9 @@ public class PL3 {
         LOGGER.info("PL3: - SERVER STOPPED EVENT");
         PL3NetworkManager.INSTANCE.clear();
         ConnectedDisplayManager.INSTANCE.clear();
-        DataManager.instance().clear();
-        ClientDataCache.instance().clear();
+        DataManager.INSTANCE.clear();
+        ClientDataCache.INSTANCE.clear();
+        ServerDataCache.INSTANCE.clear();
     }
 
     @SubscribeEvent
@@ -92,7 +94,7 @@ public class PL3 {
                 break;
             case END:
                 PL3NetworkManager.INSTANCE.cached.values().forEach(PL3Network::tick);
-                DataManager.instance().update();
+                DataManager.INSTANCE.update();
                 break;
         }
     }

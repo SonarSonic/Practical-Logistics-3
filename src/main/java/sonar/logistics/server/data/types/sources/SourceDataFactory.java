@@ -1,16 +1,14 @@
 package sonar.logistics.server.data.types.sources;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
 import sonar.logistics.server.data.api.IDataFactory;
-import sonar.logistics.server.data.source.Address;
+import sonar.logistics.server.address.Address;
 
 public class SourceDataFactory implements IDataFactory<SourceData> {
 

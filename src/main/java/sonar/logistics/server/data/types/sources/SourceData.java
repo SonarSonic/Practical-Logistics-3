@@ -2,9 +2,9 @@ package sonar.logistics.server.data.types.sources;
 
 import net.minecraft.item.ItemStack;
 import sonar.logistics.server.data.api.IData;
-import sonar.logistics.server.data.api.IDataSource;
-import sonar.logistics.server.data.source.Address;
-import sonar.logistics.server.data.source.InvalidAddress;
+import sonar.logistics.server.address.Address;
+import sonar.logistics.server.address.Environment;
+import sonar.logistics.server.address.InvalidAddress;
 
 public class SourceData implements IData {
 
@@ -26,12 +26,12 @@ public class SourceData implements IData {
         stack = dataSource.stack;
     }
 
-    public static SourceData fromDataSource(IDataSource source){
+    public static SourceData fromEnvironment(Environment environment){
         ItemStack stack = ItemStack.EMPTY;
-        if(source.state() != null){
-            stack = new ItemStack(source.state().getBlock());
+        if(environment.state() != null){
+            stack = new ItemStack(environment.state().getBlock());
         }
-        return new SourceData(source.address(), stack);
+        return new SourceData(environment.address(), stack);
     }
 
 }

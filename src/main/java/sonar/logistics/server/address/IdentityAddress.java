@@ -1,9 +1,11 @@
-package sonar.logistics.server.data.source;
+package sonar.logistics.server.address;
 
-import com.google.common.base.Objects;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import sonar.logistics.server.ServerDataCache;
 import sonar.logistics.util.network.EnumSyncType;
+
+import java.util.Objects;
 
 public class IdentityAddress extends Address {
     public int identity;
@@ -16,16 +18,6 @@ public class IdentityAddress extends Address {
 
     public int getIdentity() {
         return identity;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(IDENTITY_ADDRESS, identity);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Identity: (%s)", identity);
     }
 
     @Override
@@ -58,7 +50,25 @@ public class IdentityAddress extends Address {
     @Override
     public boolean updateEnvironment(Environment environment) {
         environment.reset();
-        //TODO;
+        environment.networkedTile = ServerDataCache.INSTANCE.getNetworkedTile(this);
+        return environment.networkedTile != null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof IdentityAddress){
+            return ((IdentityAddress) obj).identity == identity;
+        }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(IDENTITY_ADDRESS, identity);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Identity: (%s)", identity);
     }
 }

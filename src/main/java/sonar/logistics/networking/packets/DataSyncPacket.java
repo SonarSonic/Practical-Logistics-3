@@ -4,14 +4,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import sonar.logistics.client.ClientDataCache;
-import sonar.logistics.server.caches.network.PL3Network;
-import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.server.data.api.IData;
-import sonar.logistics.server.data.source.Address;
-import sonar.logistics.server.data.source.DataAddress;
+import sonar.logistics.server.address.Address;
+import sonar.logistics.server.address.DataAddress;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 

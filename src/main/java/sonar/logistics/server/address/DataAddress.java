@@ -1,12 +1,13 @@
-package sonar.logistics.server.data.source;
+package sonar.logistics.server.address;
 
-import com.google.common.base.Objects;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import sonar.logistics.server.data.DataManager;
 import sonar.logistics.server.data.methods.Method;
 import sonar.logistics.server.data.methods.MethodRegistry;
 import sonar.logistics.util.network.EnumSyncType;
+
+import java.util.Objects;
 
 //TODO cool idea, you could have address to other data, which are then used to make more data!!!
 public class DataAddress extends Address {
@@ -14,22 +15,11 @@ public class DataAddress extends Address {
     public Address source;
     public Method method;
 
-    public DataAddress() {
-    }
+    public DataAddress() {}
 
     public DataAddress(Address source, Method method) {
         this.source = source;
         this.method = method;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(DATA_ADDRESS, source, method);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Source: (%s), Method (%s)", source.toString(), method.getIdentifier().toString());
     }
 
     @Override
@@ -69,7 +59,27 @@ public class DataAddress extends Address {
     @Override
     public boolean updateEnvironment(Environment environment) {
         environment.reset();
-        //TODO;
+        environment.data = DataManager.getData(this);
+        return environment.data != null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof DataAddress){
+            DataAddress dataAddress = (DataAddress) obj;
+            return Objects.equals(dataAddress.source, source) && Objects.equals(dataAddress.method, method);
+        }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(DATA_ADDRESS, source, method);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Source: (%s), Method (%s)", source.toString(), method.getIdentifier().toString());
+    }
+
 }

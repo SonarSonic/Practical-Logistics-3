@@ -1,10 +1,9 @@
 package sonar.logistics.server.data.methods;
 
-import net.minecraft.util.ResourceLocation;
 import sonar.logistics.server.data.DataRegistry;
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.data.api.IDataFactory;
-import sonar.logistics.server.data.api.IDataSource;
+import sonar.logistics.server.address.Environment;
 
 import java.util.function.Function;
 
@@ -12,10 +11,10 @@ public class Method {
 
     private final String identifier;
     private final DataRegistry.DataType dataType;
-    private final Function<IDataSource, Boolean> canInvoke;
-    private final Function<IDataSource, ?> invoke;
+    private final Function<Environment, Boolean> canInvoke;
+    private final Function<Environment, ?> invoke;
 
-    public Method(String identifier, DataRegistry.DataType dataType, Function<IDataSource, Boolean> canInvoke, Function<IDataSource, ?> invoke){
+    public Method(String identifier, DataRegistry.DataType dataType, Function<Environment, Boolean> canInvoke, Function<Environment, ?> invoke){
         this.identifier = identifier;
         this.dataType = dataType;
         this.canInvoke = canInvoke;
@@ -34,12 +33,12 @@ public class Method {
         return dataType.factory;
     }
 
-    public boolean canInvoke(IDataSource source){
-        return canInvoke.apply(source);
+    public boolean canInvoke(Environment environment){
+        return canInvoke.apply(environment);
     }
 
-    public Object invoke(IDataSource source){
-        return invoke.apply(source);
+    public Object invoke(Environment environment){
+        return invoke.apply(environment);
     }
 
     @Override

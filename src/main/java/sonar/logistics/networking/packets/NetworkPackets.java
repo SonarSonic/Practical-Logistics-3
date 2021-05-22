@@ -7,8 +7,8 @@ import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.server.data.DataManager;
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.data.methods.VanillaMethods;
-import sonar.logistics.server.data.source.Address;
-import sonar.logistics.server.data.source.Environment;
+import sonar.logistics.server.address.Address;
+import sonar.logistics.server.address.Environment;
 import sonar.logistics.server.data.types.sources.SourceData;
 
 import java.util.ArrayList;

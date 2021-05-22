@@ -1,6 +1,5 @@
-package sonar.logistics.server.data.source;
+package sonar.logistics.server.address;
 
-import com.google.common.base.Objects;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
@@ -11,13 +10,14 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import sonar.logistics.util.network.EnumSyncType;
 
+import java.util.Objects;
+
 public class BlockAddress extends Address {
     public BlockPos blockPos;
     public DimensionType dimension;
     public Direction direction;
 
-    public BlockAddress() {
-    }
+    public BlockAddress() {}
 
     public BlockAddress(long blockPos, int dimension, int direction) {
         this(BlockPos.fromLong(blockPos), DimensionType.getById(dimension), Direction.values()[direction]);
@@ -39,16 +39,6 @@ public class BlockAddress extends Address {
 
     public Direction getDirection() {
         return direction;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(BLOCK_ADDRESS, blockPos.toLong(), dimension.getId(), direction.ordinal());
-    }
-
-    @Override
-    public String toString() {
-        return String.format("BlockPos: (%s) Dimension: (%s) Direction: (%s)", blockPos, dimension, direction);
     }
 
     @Override
@@ -103,5 +93,24 @@ public class BlockAddress extends Address {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof BlockAddress){
+            BlockAddress blockAddress = (BlockAddress) obj;
+            return Objects.equals(blockAddress.blockPos, blockPos) && Objects.equals(blockAddress.dimension, dimension) && Objects.equals(blockAddress.direction, direction);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(BLOCK_ADDRESS, blockPos.toLong(), dimension.getId(), direction.ordinal());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("BlockPos: (%s) Dimension: (%s) Direction: (%s)", blockPos, dimension, direction);
     }
 }

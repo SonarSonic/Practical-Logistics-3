@@ -1,6 +1,6 @@
 package sonar.logistics.server.caches.network;
 
-import sonar.logistics.common.multiparts.networking.ISourceAddressProvider;
+import sonar.logistics.common.multiparts.networking.IAddressProvider;
 import sonar.logistics.common.multiparts.networking.INetworkedTile;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class PL3NetworkCaches<T extends INetworkedTile> {
 
     public static final PL3NetworkCaches<INetworkedTile> TILE = new PL3NetworkCaches<INetworkedTile>(INetworkedTile.class, (network) -> {}) {};
 
-    public static final PL3NetworkCaches<ISourceAddressProvider> DATA_SOURCE_NODES = new PL3NetworkCaches<ISourceAddressProvider>(ISourceAddressProvider.class, network -> network.queueNetworkUpdate(EnumNetworkUpdate.DATA_SOURCES)) {};
+    public static final PL3NetworkCaches<IAddressProvider> DATA_SOURCE_NODES = new PL3NetworkCaches<IAddressProvider>(IAddressProvider.class, network -> network.queueNetworkUpdate(EnumNetworkUpdate.DATA_SOURCES)) {};
 
     public static final PL3NetworkCaches<?>[] handlers = new PL3NetworkCaches<?>[]{TILE, DATA_SOURCE_NODES};
 

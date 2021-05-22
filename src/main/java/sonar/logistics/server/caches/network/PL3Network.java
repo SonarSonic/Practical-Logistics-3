@@ -7,7 +7,7 @@ import sonar.logistics.common.blocks.host.NetworkedHostTile;
 import sonar.logistics.common.multiparts.networking.INetworkedTile;
 import sonar.logistics.server.cables.EnumCableTypes;
 import sonar.logistics.server.cables.ICableCache;
-import sonar.logistics.server.data.source.Address;
+import sonar.logistics.server.address.Address;
 import sonar.logistics.util.ListHelper;
 
 import javax.annotation.Nullable;

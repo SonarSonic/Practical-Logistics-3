@@ -4,7 +4,7 @@ import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.NetworkPackets;
 import sonar.logistics.networking.packets.NetworkRequestPacket;
 import sonar.logistics.server.data.api.IData;
-import sonar.logistics.server.data.source.DataAddress;
+import sonar.logistics.server.address.DataAddress;
 import sonar.logistics.server.data.types.sources.SourceData;
 
 import java.util.ArrayList;
@@ -44,9 +44,4 @@ public class ClientDataCache {
         }
         return networkSources.getOrDefault(networkID, new ArrayList<>());
     }
-
-    public static ClientDataCache instance(){
-        return INSTANCE;
-    }
-
 }

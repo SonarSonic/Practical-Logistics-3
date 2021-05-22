@@ -2,14 +2,13 @@ package sonar.logistics.common.multiparts.reader;
 
 import net.minecraft.util.Direction;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
-import sonar.logistics.common.multiparts.base.MultipartTile;
 import sonar.logistics.common.multiparts.base.NetworkedTile;
-import sonar.logistics.common.multiparts.networking.ISourceAddressProvider;
-import sonar.logistics.server.data.source.Address;
+import sonar.logistics.common.multiparts.networking.IAddressProvider;
+import sonar.logistics.server.address.Address;
 import sonar.logistics.util.PL3Properties;
 import java.util.List;
 
-public class ReaderTile extends NetworkedTile implements ISourceAddressProvider {
+public class ReaderTile extends NetworkedTile implements IAddressProvider {
 
     public ReaderTile(MultipartEntry entry) {
         super(entry);

@@ -10,12 +10,11 @@ import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.DataSyncPacket;
 import sonar.logistics.networking.packets.DataUpdatePacket;
 import sonar.logistics.server.data.api.IData;
-import sonar.logistics.server.data.api.IDataSource;
 import sonar.logistics.server.data.api.IDataWatcher;
 import sonar.logistics.server.data.methods.Method;
-import sonar.logistics.server.data.source.Address;
-import sonar.logistics.server.data.source.DataAddress;
-import sonar.logistics.server.data.source.Environment;
+import sonar.logistics.server.address.Address;
+import sonar.logistics.server.address.DataAddress;
+import sonar.logistics.server.address.Environment;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -32,12 +31,6 @@ public class DataManager {
 
     public Map<ServerPlayerEntity, List<DataAddress>> updatePackets = new HashMap<>();
     public Map<ServerPlayerEntity, List<DataAddress>> syncPackets = new HashMap<>();
-
-    private int identity;
-
-    public int getNextIdentity() {
-        return identity++;
-    }
 
     public void clear() {
         watchers.clear();
@@ -111,10 +104,10 @@ public class DataManager {
         return invokeMethod(address.method, getEnvironment(address.source));
     }
 
-    public static IData invokeMethod(Method method, @Nullable IDataSource dataSource){
-        if(dataSource != null && method.canInvoke(dataSource)){
+    public static IData invokeMethod(Method method, @Nullable Environment environment){
+        if(environment != null && method.canInvoke(environment)){
             IData data = method.getDataFactory().create();
-            Object returned = method.invoke(dataSource);
+            Object returned = method.invoke(environment);
             method.getDataFactory().convert(data, returned);
             return data;
         }
@@ -203,9 +196,5 @@ public class DataManager {
         int type = buffer.readInt();
         DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(type);
         dataType.factory.readUpdate(data, buffer);
-    }
-
-    public static DataManager instance(){
-        return INSTANCE;
     }
 }

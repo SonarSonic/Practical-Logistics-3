@@ -118,7 +118,7 @@ public class VanillaMethods {
         PLAYER_FOOD_LEVEL = MethodRegistry.registerEntityMethod(DataCategories.ENTITIES,"getFoodStats", Integer.class, ServerPlayerEntity.class, (E, P) -> P.getFoodStats().getFoodLevel());
         PLAYER_SATURATION_LEVEL = MethodRegistry.registerEntityMethod(DataCategories.ENTITIES,"getFoodStats", Float.class, ServerPlayerEntity.class, (E, P) -> P.getFoodStats().getSaturationLevel());
 
-        ADDRESS_DATA = MethodRegistry.registerMethod(DataCategories.NETWORK, "getSourceAddress", SourceData.class, (E) -> true, SourceData::fromDataSource);
+        ADDRESS_DATA = MethodRegistry.registerMethod(DataCategories.NETWORK, "getSourceAddress", SourceData.class, (E) -> true, SourceData::fromEnvironment);
 
 
 

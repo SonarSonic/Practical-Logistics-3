@@ -1,10 +1,11 @@
-package sonar.logistics.server.data.source;
+package sonar.logistics.server.address;
 
-import com.google.common.base.Objects;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.util.network.EnumSyncType;
+
+import java.util.Objects;
 
 public class NetworkAddress extends Address {
     public int networkID;
@@ -17,16 +18,6 @@ public class NetworkAddress extends Address {
 
     public int getNetworkID() {
         return networkID;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(NETWORK_ADDRESS, networkID);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Network ID: (%s)", networkID);
     }
 
     @Override
@@ -61,5 +52,23 @@ public class NetworkAddress extends Address {
         environment.reset();
         environment.network = PL3NetworkManager.INSTANCE.getCachedData(networkID);
         return environment.network != null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof NetworkAddress){
+            return ((NetworkAddress) obj).networkID == networkID;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(NETWORK_ADDRESS, networkID);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Network ID: (%s)", networkID);
     }
 }

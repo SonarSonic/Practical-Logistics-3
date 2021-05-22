@@ -1,4 +1,4 @@
-package sonar.logistics.server.data.source;
+package sonar.logistics.server.address;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -15,6 +15,7 @@ public class InvalidAddress extends Address{
 
     @Override
     public boolean updateEnvironment(Environment environment) {
+        environment.reset();
         return false;
     }
 
@@ -32,5 +33,20 @@ public class InvalidAddress extends Address{
     @Override
     public CompoundNBT write(CompoundNBT nbt, EnumSyncType syncType) {
         return nbt;
+    }
+
+    @Override
+    public String toString() {
+        return "Invalid Address";
+    }
+
+    @Override
+    public int hashCode() {
+        return -1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof InvalidAddress;
     }
 }
