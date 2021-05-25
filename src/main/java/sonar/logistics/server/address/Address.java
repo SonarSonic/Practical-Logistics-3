@@ -59,9 +59,10 @@ public abstract class Address implements INBTSyncable, IByteBufSaveable {
         return address;
     }
 
-    public static void toNBT(Address address, CompoundNBT nbt){
+    public static CompoundNBT toNBT(Address address, CompoundNBT nbt){
         nbt.putInt("type", address.getType());
         address.write(nbt, EnumSyncType.SAVE);
+        return nbt;
     }
 
     public static DataAddress createDataAddress(Address source, Method method){

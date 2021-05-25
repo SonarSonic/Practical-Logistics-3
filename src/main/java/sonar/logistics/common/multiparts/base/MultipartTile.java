@@ -1,5 +1,6 @@
 package sonar.logistics.common.multiparts.base;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -7,6 +8,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import sonar.logistics.common.blocks.host.MultipartHostTile;
 import sonar.logistics.util.network.EnumSyncType;
 import sonar.logistics.util.network.INBTSyncable;
 
@@ -40,6 +42,11 @@ public class MultipartTile implements ICapabilityProvider, INBTSyncable {
         return entry.getHost().getPos();
     }
 
+    public final void queueTileUpdate(){
+        queueMarkDirty();;
+        queueSyncPacket();
+    }
+
     public final void queueMarkDirty() {
         entry.getHost().queueMarkDirty();
     }
@@ -47,7 +54,6 @@ public class MultipartTile implements ICapabilityProvider, INBTSyncable {
     public final void queueSyncPacket() {
         entry.getHost().queueSyncPacket();
     }
-
 
 
     //// NBT METHODS \\\\
@@ -62,6 +68,16 @@ public class MultipartTile implements ICapabilityProvider, INBTSyncable {
         return tag;
     }
 
+
+    //// MULTIPART EVENTS \\\\
+
+    public void onPlaced(World world, BlockState state, BlockPos pos){}
+
+    public void onDestroyed(World world, BlockState state, BlockPos pos){}
+
+    public void onMultipartAdded(MultipartHostTile host, MultipartEntry entry, MultipartEntry added){}
+
+    public void onMultipartRemoved(MultipartHostTile host, MultipartEntry entry, MultipartEntry removed){}
 
 
     //// LOADING METHODS \\\\

@@ -30,9 +30,7 @@ public class ConnectedDisplay implements ICableCache<ConnectedDisplay> {
         this.cableType = cableType;
     }
 
-    public void update(){
-
-    }
+    public void update(){}
 
     ///// NETWORKING \\\\\
 
@@ -51,7 +49,7 @@ public class ConnectedDisplay implements ICableCache<ConnectedDisplay> {
     public void shrinkCache() {
         ///TODO IS THIS NECESSARY - DOESN'T IT HAPPEN DUE TO the ADD CABLE in shrink anyway?
         Lists.newArrayList(displays).forEach(display -> { //we copy the list, as it is modified in disconnectHost
-            ConnectedDisplay network = ConnectedDisplayManager.INSTANCE.getCableCache(display.getHostWorld(), display.getPos(), cableType);
+            ConnectedDisplay network = ConnectedDisplayManager.INSTANCE.getCableCache(display.getHostWorld(), display.getHostPos(), cableType);
             if(network != this){
                 disconnectDisplay(display);
                 if(network != null) { //if the network was null the host's network will already have been set to null in disconnectHost

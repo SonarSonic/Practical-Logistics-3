@@ -1,8 +1,11 @@
 package sonar.logistics.client.gsi.style.properties;
 
+import imgui.ImColor;
+
 public class ColourProperty {
 
     public int rgba;
+    public transient int argb = -1;
 
     public ColourProperty(int rgba){
         this.rgba = rgba;
@@ -13,10 +16,7 @@ public class ColourProperty {
     }
 
     public ColourProperty(int r, int g, int b, int a){
-        this.rgba = ((a & 0xFF) << 24) |
-                ((r & 0xFF) << 16) |
-                ((g & 0xFF) << 8)  |
-                ((b & 0xFF) << 0);
+        this.rgba = getRGBA(r, g, b, a);
     }
 
     public ColourProperty(float[] colour){
@@ -43,6 +43,20 @@ public class ColourProperty {
         return getAlpha(rgba);
     }
 
+    public int getRGBA(){
+        return rgba;
+    }
+
+    public int getARGB(){
+            int red = (rgba >> 16) & 0xFF;
+            int green = (rgba >> 8) & 0xFF;
+            int blue = (rgba >> 0) & 0xFF;
+            int alpha = (rgba >> 24) & 0xff;
+            argb = ImColor.intToColor(red, green, blue, alpha);
+
+        return argb;
+    }
+
     public static int getRed(int rgba) {
         return (rgba >> 16) & 0xFF;
     }
@@ -57,6 +71,13 @@ public class ColourProperty {
 
     public static int getAlpha(int rgba) {
         return (rgba >> 24) & 0xff;
+    }
+
+    public static int getRGBA(int r, int g, int b, int a){
+        return ((a & 0xFF) << 24) |
+                ((r & 0xFF) << 16) |
+                ((g & 0xFF) << 8)  |
+                ((b & 0xFF) << 0);
     }
 
     public ColourProperty copy(){

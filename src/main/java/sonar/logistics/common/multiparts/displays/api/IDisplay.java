@@ -5,11 +5,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.common.multiparts.networking.INetworkedTile;
+import sonar.logistics.server.data.watchers.DataWatcher;
 import sonar.logistics.util.vectors.VectorHelper;
 
 public interface IDisplay extends INetworkedTile {
 
     GSI getGSI();
+
+    DataWatcher getDataWatcher();
 
     Direction getFacing();
 

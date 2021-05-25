@@ -47,7 +47,7 @@ public class NetworkedHostTile extends MultipartHostTile {
     public boolean doAddMultipart(MultipartEntry entry) {
         boolean added = super.doAddMultipart(entry);
         if(!isNBTLoading && entry.getMultipartTile() instanceof INetworkedTile && network != null){
-            network.loadNetworkTile((INetworkedTile) entry.getMultipartTile());
+            network.connectNetworkedTile((INetworkedTile) entry.getMultipartTile());
         }
         return added;
     }
@@ -55,7 +55,9 @@ public class NetworkedHostTile extends MultipartHostTile {
     @Override
     public boolean doRemoveMultipart(MultipartEntry entry) {
         boolean removed = super.doRemoveMultipart(entry);
-        //TODO DETACH FROM NETWORK??
+        if(entry.getMultipartTile() instanceof INetworkedTile && network != null){
+            network.disconnectNetworkedTile((INetworkedTile) entry.getMultipartTile());
+        }
         return removed;
     }
 

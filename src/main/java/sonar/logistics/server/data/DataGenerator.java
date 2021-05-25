@@ -1,14 +1,14 @@
 package sonar.logistics.server.data;
 
 import sonar.logistics.server.data.api.IData;
-import sonar.logistics.server.data.api.IDataWatcher;
+import sonar.logistics.server.data.watchers.DataWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataGenerator {
 
-    public List<IDataWatcher> dataWatchers = new ArrayList<>();
+    public List<DataWatcher> dataWatchers = new ArrayList<>();
     public IData data = null;
     public DataRegistry.DataType type = null;
     public int ticks;

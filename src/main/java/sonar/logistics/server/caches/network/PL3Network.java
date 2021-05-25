@@ -5,6 +5,7 @@ import net.minecraft.world.World;
 import sonar.logistics.PL3;
 import sonar.logistics.common.blocks.host.NetworkedHostTile;
 import sonar.logistics.common.multiparts.networking.INetworkedTile;
+import sonar.logistics.server.ServerDataCache;
 import sonar.logistics.server.cables.EnumCableTypes;
 import sonar.logistics.server.cables.ICableCache;
 import sonar.logistics.server.address.Address;
@@ -13,7 +14,6 @@ import sonar.logistics.util.ListHelper;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PL3Network implements ICableCache<PL3Network> {
 
@@ -22,8 +22,10 @@ public class PL3Network implements ICableCache<PL3Network> {
     public final EnumCableTypes cableType;
 
     public final List<NetworkedHostTile> loadedHosts = new ArrayList<>();
-    public final List<Address> addressList = new ArrayList<>();
-    public final Map<PL3NetworkCaches<?>, List<INetworkedTile>> localCaches = PL3NetworkCaches.newCachesMap();
+    public final List<Address> localAddressList = new ArrayList<>();
+    public final List<Address> globalAddressList = new ArrayList<>();
+    public final List<Address> externalAddressList = new ArrayList<>();
+
     public final boolean[] networkUpdates = new boolean[EnumNetworkUpdate.values().length];
 
     public PL3Network(World world, int globalNetworkID, EnumCableTypes cableType){
@@ -32,16 +34,19 @@ public class PL3Network implements ICableCache<PL3Network> {
         this.cableType = cableType;
     }
 
+    public void clear(){
+        loadedHosts.clear();
+        localAddressList.clear();
+        globalAddressList.clear();
+        externalAddressList.clear();
+    }
+
     public void tick(){
         flushNetworkUpdates();
     }
 
     public int getNetworkID() {
         return globalNetworkID;
-    }
-
-    public <T extends INetworkedTile> List<T> getCacheList(PL3NetworkCaches<T> cacheType){
-        return (List<T>) localCaches.getOrDefault(cacheType, new ArrayList<>());
     }
 
     public void queueNetworkUpdate(EnumNetworkUpdate updateType){
@@ -57,10 +62,35 @@ public class PL3Network implements ICableCache<PL3Network> {
         }
     }
 
-    public void updateNetworkSources(){
-        addressList.clear();
-        getCacheList(PL3NetworkCaches.DATA_SOURCE_NODES).forEach(node -> node.addSourceAddresses(addressList));
-        //TODO if a source has gone offline and someone is waiting for it.
+    public void updateAddressLists(){
+        updateLocalAddressList();
+        updateGlobalAddressList();
+        updateExternalAddressList();
+    }
+
+    public void updateLocalAddressList(){
+        localAddressList.clear();
+        loadedHosts.forEach(host -> host.forEachNetworkedTile(tile -> ListHelper.addWithCheck(localAddressList, tile.getAddress())));
+    }
+
+    public void updateGlobalAddressList(){
+        globalAddressList.clear();
+        globalAddressList.addAll(localAddressList);
+
+        boolean crossChecked = false;
+        while(!crossChecked){
+            int size = globalAddressList.size();
+            List<INetworkedTile> tiles = ServerDataCache.INSTANCE.getNetworkedTiles(globalAddressList);
+            tiles.forEach(tile -> ServerDataCache.INSTANCE.addToGlobalAddressList(globalAddressList, tile, true));
+            crossChecked = size == globalAddressList.size();
+        }
+    }
+
+    public void updateExternalAddressList(){
+        externalAddressList.clear();
+
+        List<INetworkedTile> tiles = ServerDataCache.INSTANCE.getNetworkedTiles(globalAddressList);
+        tiles.forEach(tile -> ServerDataCache.INSTANCE.addToExternalAddressList(externalAddressList, tile));
     }
 
     ///// CABLE CACHE \\\\\
@@ -70,12 +100,6 @@ public class PL3Network implements ICableCache<PL3Network> {
         loadedHosts.forEach(host -> setHostNetwork(host, null));
         clear();
         PL3NetworkManager.INSTANCE.cached.remove(globalNetworkID);
-    }
-
-    public void clear(){
-        loadedHosts.clear();
-        addressList.clear();
-        localCaches.clear();
     }
 
     @Override
@@ -91,6 +115,7 @@ public class PL3Network implements ICableCache<PL3Network> {
             }
         });
         verifyIntegrity();
+        queueNetworkUpdate(EnumNetworkUpdate.UPDATE_ADDRESS_LISTS);
     }
 
     @Override
@@ -98,7 +123,7 @@ public class PL3Network implements ICableCache<PL3Network> {
         merging.loadedHosts.forEach(this::connectHost);
         merging.clear();
         PL3NetworkManager.INSTANCE.cached.remove(merging.globalNetworkID);
-        queueNetworkUpdate(EnumNetworkUpdate.DATA_SOURCES);
+        queueNetworkUpdate(EnumNetworkUpdate.UPDATE_ADDRESS_LISTS);
     }
 
     public void verifyIntegrity(){
@@ -112,10 +137,25 @@ public class PL3Network implements ICableCache<PL3Network> {
     public void changeCacheID(int networkID) {
         globalNetworkID = networkID;
         loadedHosts.forEach(host -> host.globalNetworkID = networkID);
-        queueNetworkUpdate(EnumNetworkUpdate.DATA_SOURCES);
+        queueNetworkUpdate(EnumNetworkUpdate.UPDATE_ADDRESS_LISTS);
     }
 
     ///// MULTIPART HOSTS \\\\\
+
+    public void connectHost(NetworkedHostTile host){
+        ListHelper.addWithCheck(loadedHosts, host);
+        host.forEachNetworkedTile(this::connectNetworkedTile);
+        setHostNetwork(host, this);
+        queueNetworkUpdate(EnumNetworkUpdate.UPDATE_ADDRESS_LISTS);
+    }
+
+    public void disconnectHost(NetworkedHostTile host){
+        loadedHosts.remove(host);
+        host.forEachNetworkedTile(this::disconnectNetworkedTile);
+        setHostNetwork(host, null);
+        verifyIntegrity();
+        queueNetworkUpdate(EnumNetworkUpdate.UPDATE_ADDRESS_LISTS);
+    }
 
     public void setHostNetwork(NetworkedHostTile host, @Nullable PL3Network network){
         host.network = network;
@@ -124,38 +164,17 @@ public class PL3Network implements ICableCache<PL3Network> {
         host.queueSyncPacket();
     }
 
-    public void connectHost(NetworkedHostTile host){
-        ListHelper.addWithCheck(loadedHosts, host);
-        host.forEachNetworkedTile(this::loadNetworkTile);
-        setHostNetwork(host, this);
-    }
-
-    public void disconnectHost(NetworkedHostTile host){
-        loadedHosts.remove(host);
-        host.forEachNetworkedTile(this::unloadNetworkTile);
-        setHostNetwork(host, null);
-        verifyIntegrity();
-    }
-
 
     ///// MULTIPARTS TILES \\\\\
 
-    public void loadNetworkTile(INetworkedTile part){
-        for (PL3NetworkCaches<?> handler : PL3NetworkCaches.handlers) {
-            if (handler.clazz.isInstance(part) && ListHelper.addWithCheck(localCaches.get(handler), part)) {
-                handler.changeCache.accept(this);
-                part.onNetworkConnected(this);
-            }
-        }
+    public void connectNetworkedTile(INetworkedTile part){
+        part.onNetworkConnected(this);
+        queueNetworkUpdate(EnumNetworkUpdate.UPDATE_ADDRESS_LISTS);
     }
 
-    public void unloadNetworkTile(INetworkedTile part){
-        for (PL3NetworkCaches<?> handler : PL3NetworkCaches.handlers) {
-            if (handler.clazz.isInstance(part) && localCaches.get(handler).remove(part)) {
-                handler.changeCache.accept(this);
-                part.onNetworkDisconnected(this);
-            }
-        }
+    public void disconnectNetworkedTile(INetworkedTile part){
+        part.onNetworkDisconnected(this);
+        queueNetworkUpdate(EnumNetworkUpdate.UPDATE_ADDRESS_LISTS);
     }
 
     ///// CONNECTED SOURCES \\\\\
@@ -170,10 +189,10 @@ public class PL3Network implements ICableCache<PL3Network> {
             PL3.LOGGER.debug("NetworkID: {}", net.globalNetworkID);
             PL3.LOGGER.debug("Dimension: {}", net.world.getDimension().getType());
             PL3.LOGGER.debug("Hosts: {} List: {}",net.loadedHosts.size(), net.loadedHosts);
-            PL3.LOGGER.debug("Sources: {} List: {}", net.addressList.size(), net.addressList);
+            PL3.LOGGER.debug("Local Address Size: {} List: {}", net.localAddressList.size(), net.localAddressList);
+            PL3.LOGGER.debug("Global Address Size: {} List: {}", net.globalAddressList.size(), net.globalAddressList);
+            PL3.LOGGER.debug("External Address Size: {} List: {}", net.externalAddressList.size(), net.externalAddressList);
             PL3.LOGGER.debug("Network Updates {}", net.networkUpdates);
-            PL3.LOGGER.debug("Cache Map: {}", net.localCaches);
-
         }
         PL3.LOGGER.debug("------ PL3 NETWORK DATA END ------");
     }

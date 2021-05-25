@@ -13,4 +13,6 @@ public interface IData {
         return true;
     }
 
+    String toString();
+
 }

@@ -4,7 +4,8 @@ import java.util.function.Consumer;
 
 public enum EnumNetworkUpdate {
 
-    DATA_SOURCES(PL3Network::updateNetworkSources);
+    UPDATE_ADDRESS_LISTS(PL3Network::updateAddressLists),
+    UPDATE_EXTERNAL_ADDRESS_LIST(PL3Network::updateExternalAddressList);
 
     public Consumer<PL3Network> action;
     EnumNetworkUpdate(Consumer<PL3Network> action){

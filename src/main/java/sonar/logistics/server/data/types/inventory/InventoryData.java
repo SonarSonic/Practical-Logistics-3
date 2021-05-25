@@ -29,5 +29,4 @@ public class InventoryData extends ChangeableList<ItemStack>  implements IData {
         inventory_count += count;
         inventory_max += max;
     }
-
 }

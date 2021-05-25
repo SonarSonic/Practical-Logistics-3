@@ -32,4 +32,8 @@ public abstract class GeneralData<D> implements IData {
         return newData != currentData;
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(data);
+    }
 }

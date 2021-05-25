@@ -5,6 +5,7 @@ import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.common.multiparts.base.NetworkedTile;
 import sonar.logistics.common.multiparts.networking.IAddressProvider;
 import sonar.logistics.server.address.Address;
+import sonar.logistics.util.ListHelper;
 import sonar.logistics.util.PL3Properties;
 import java.util.List;
 
@@ -19,7 +20,12 @@ public class ReaderTile extends NetworkedTile implements IAddressProvider {
     }
 
     @Override
-    public void addSourceAddresses(List<Address> addressList) {
-        addressList.add(Address.createBlockAddress(getHostPos().offset(getFacing()), getHostWorld().getDimension().getType(), getFacing()));
+    public void addToExternalAddressList(List<Address> addressList) {
+        ListHelper.addWithCheck(addressList, Address.createBlockAddress(getHostPos().offset(getFacing()), getHostWorld().getDimension().getType(), getFacing()));
+    }
+
+    @Override
+    public void addToGlobalAddressList(List<Address> addressList) {
+        ///NOP
     }
 }

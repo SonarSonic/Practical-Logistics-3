@@ -5,7 +5,6 @@ import net.minecraft.world.World;
 
 public interface ICableListener {
 
-
     void onCableAdded(World world, BlockPos pos, EnumCableTypes cableType);
 
 

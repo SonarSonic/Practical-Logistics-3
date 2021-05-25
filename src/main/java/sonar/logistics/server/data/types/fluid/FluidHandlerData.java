@@ -31,6 +31,16 @@ public class FluidHandlerData implements IData {
             this.capacity = capacity;
         }
 
+        @Override
+        public String toString(){
+            return String.valueOf(contents);
+        }
+
+    }
+
+    @Override
+    public String toString() {
+        return tankMap.values().toString();
     }
 
 }

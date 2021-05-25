@@ -20,6 +20,7 @@ public class IdentityAddress extends Address {
         return identity;
     }
 
+
     @Override
     public void read(PacketBuffer buffer) {
         identity = buffer.readInt();

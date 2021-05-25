@@ -19,6 +19,10 @@ public class GSIInteractionHandler implements IGuiEventListener {
 
     public Vector2D mousePos = new Vector2D(-1, -1);
 
+    public boolean isDoubleClick = false;
+    public boolean isTripleClick = false;
+    public long lastClickTime = -1;
+
     public GSIInteractionHandler(GSI gsi, PlayerEntity player){
         this.gsi = gsi;
         this.player = player;
@@ -98,6 +102,17 @@ public class GSIInteractionHandler implements IGuiEventListener {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        long currentTime = System.currentTimeMillis();
+        //500ms is the windows default, next click after triple is a normal click
+        if(!isTripleClick && lastClickTime != -1 && currentTime - lastClickTime < 500){
+            isTripleClick = isDoubleClick; //if it already was a double click it's must be a triple!
+            isDoubleClick = !isTripleClick;
+        }else{
+            isDoubleClick = false;
+            isTripleClick = false;
+        }
+        lastClickTime = currentTime;
+        System.out.println("TRIPLE: " + isTripleClick + " DOUBLE: " + isDoubleClick);
         return gsi.mouseClicked(button);
     }
 
@@ -147,8 +162,7 @@ public class GSIInteractionHandler implements IGuiEventListener {
 
         WORLD_INTERACTION,
         GUI_INTERACTION,
-        GUI_EDITING,
-        GUI_RESIZING; //handled by the GSI
+        GUI_EDITING;
 
         public boolean isUsingGui(){
             return this != WORLD_INTERACTION;

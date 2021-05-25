@@ -24,18 +24,18 @@ public class DataAddress extends Address {
 
     @Override
     public CompoundNBT read(CompoundNBT nbt, EnumSyncType syncType) {
-        CompoundNBT subTag = new CompoundNBT();
-        Address.toNBT(source, subTag);
-        nbt.put("source", subTag);
-        nbt.putString("method", method.getIdentifier().toString());
+        CompoundNBT subTag = nbt.getCompound("source");
+        source = Address.fromNBT(subTag);
+        method = MethodRegistry.getMethodFromIdentifier(nbt.getString("method"));
         return nbt;
     }
 
     @Override
     public CompoundNBT write(CompoundNBT nbt, EnumSyncType syncType) {
-        CompoundNBT subTag = nbt.getCompound("source");
-        source = Address.fromNBT(subTag);
-        method = MethodRegistry.getMethodFromIdentifier(nbt.getString("method"));
+        CompoundNBT subTag = new CompoundNBT();
+        Address.toNBT(source, subTag);
+        nbt.put("source", subTag);
+        nbt.putString("method", method.getIdentifier());
         return nbt;
     }
 

@@ -10,23 +10,21 @@ import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.DataSyncPacket;
 import sonar.logistics.networking.packets.DataUpdatePacket;
 import sonar.logistics.server.data.api.IData;
-import sonar.logistics.server.data.api.IDataWatcher;
 import sonar.logistics.server.data.methods.Method;
 import sonar.logistics.server.address.Address;
 import sonar.logistics.server.address.DataAddress;
 import sonar.logistics.server.address.Environment;
+import sonar.logistics.server.data.watchers.DataWatcher;
+import sonar.logistics.util.ListHelper;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataManager {
 
     public static final DataManager INSTANCE = new DataManager();
 
-    public List<IDataWatcher> watchers = new ArrayList<>();
+    public Map<Address, DataWatcher> watchers = new HashMap<>();
     public Map<Address, DataSource> dataSources = new HashMap<>();
 
     public Map<ServerPlayerEntity, List<DataAddress>> updatePackets = new HashMap<>();
@@ -40,39 +38,77 @@ public class DataManager {
     }
 
     public void update(){
-        watchers.forEach(IDataWatcher::preDataUpdate);
-        dataSources.values().forEach(DataSource::tick);
-        watchers.forEach(IDataWatcher::postDataUpdate);
+        //reset sync & update packets
+        syncPackets.clear();
+        updatePackets.clear();
 
-        ///send sync packets
+        //update the watchers / data sources
+        watchers.values().forEach(DataWatcher::tick);
+        watchers.values().forEach(DataWatcher::preDataUpdate);
+        dataSources.values().forEach(DataSource::tick);
+        watchers.values().forEach(DataWatcher::postDataUpdate);
+
+        //send sync packets to players who require full data packets
         for(Map.Entry<ServerPlayerEntity, List<DataAddress>> entry : syncPackets.entrySet()){
             Map<DataAddress, IData> dataMap = getDataMapFromAddressList(entry.getValue());
-            PL3PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(entry::getKey), new DataSyncPacket(dataMap));
+            if(!dataMap.isEmpty()){
+                PL3PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(entry::getKey), new DataSyncPacket(dataMap));
+            }
         }
 
-        //send update packets
+        //send update packets to players who require only an update packet
         for(Map.Entry<ServerPlayerEntity, List<DataAddress>> entry : updatePackets.entrySet()){
             Map<DataAddress, IData> dataMap = getDataMapFromAddressList(entry.getValue());
-            PL3PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(entry::getKey), new DataUpdatePacket(dataMap));
+            if(!dataMap.isEmpty()){
+                PL3PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(entry::getKey), new DataUpdatePacket(dataMap));
+            }
         }
+    }
+
+    public void addDataToSyncPacket(List<ServerPlayerEntity> entity, List<DataAddress> addresses){
+        entity.forEach(e -> addDataToSyncPacket(e, addresses));
     }
 
     public void addDataToSyncPacket(ServerPlayerEntity entity, List<DataAddress> addresses){
         syncPackets.putIfAbsent(entity, new ArrayList<>());
-        syncPackets.get(entity).addAll(addresses);
+        ListHelper.addWithCheck(syncPackets.get(entity), addresses);
+    }
+
+    public void addDataToUpdatePacket(List<ServerPlayerEntity> entity, List<DataAddress> addresses){
+        entity.forEach(e -> addDataToUpdatePacket(e, addresses));
     }
 
     public void addDataToUpdatePacket(ServerPlayerEntity entity, List<DataAddress> addresses){
         updatePackets.putIfAbsent(entity, new ArrayList<>());
-        updatePackets.get(entity).addAll(addresses);
+        ListHelper.addWithCheck(updatePackets.get(entity), addresses);
     }
 
-    public void addMethod(DataAddress address, IDataWatcher watcher){
+    //// Data Watchers \\\\
+
+    public DataWatcher getDataWatcher(Address address){
+        return watchers.get(address);
+    }
+
+    public void addDataWatcher(DataWatcher watcher){
+        watchers.put(watcher.getAddress(), watcher);
+        for(DataAddress dataAddress : watcher.getWatchingAddressList()){
+            startWatching(dataAddress, watcher);
+        }
+    }
+
+    public void removeDataWatcher(DataWatcher watcher){
+        watchers.remove(watcher.getAddress());
+        for(DataAddress dataAddress : watcher.getWatchingAddressList()){
+            stopWatching(dataAddress, watcher);
+        }
+    }
+
+    public void startWatching(DataAddress address, DataWatcher watcher){
         dataSources.computeIfAbsent(address.source, DataSource::new);
         dataSources.get(address.source).addMethod(address.method, watcher);
     }
 
-    public void removeMethod(DataAddress address, IDataWatcher watcher){
+    public void stopWatching(DataAddress address, DataWatcher watcher){
         DataSource source = dataSources.get(address.source);
         if(source != null){
             source.removeMethod(address.method, watcher);
@@ -88,20 +124,31 @@ public class DataManager {
         return valid ? environment : null;
     }
 
-    public static List<IData> invokeMethods(Address source, List<Method> methods){
-        List<IData> dataList = new ArrayList<>();
-        Environment environment = getEnvironment(source);
-        for(Method method : methods){
-            IData data = invokeMethod(method, environment);
-            if(data != null){
-                dataList.add(data);
+    public static List<Method> getAvailableMethods(Collection<Method> methods, @Nullable Environment environment){
+        List<Method> available = new ArrayList<>();
+        if(environment != null){
+            for(Method method : methods){
+                if(method.canInvoke(environment)){
+                    available.add(method);
+                }
             }
         }
-        return dataList;
+        return available;
     }
 
     public static IData invokeMethod(DataAddress address){
         return invokeMethod(address.method, getEnvironment(address.source));
+    }
+
+    public static List<IData> invokeMethods(Collection<Method> methods, @Nullable Environment environment){
+        List<IData> dataList = new ArrayList<>();
+        if(environment != null){
+            for(Method method : methods){
+                IData data = invokeMethod(method, environment);
+                dataList.add(data);
+            }
+        }
+        return dataList;
     }
 
     public static IData invokeMethod(Method method, @Nullable Environment environment){

@@ -111,6 +111,6 @@ public class BlockAddress extends Address {
 
     @Override
     public String toString() {
-        return String.format("BlockPos: (%s) Dimension: (%s) Direction: (%s)", blockPos, dimension, direction);
+        return String.format("X: %s, Y: %s, Z: %s, Dim: %s, Dir: %s ", blockPos.getX(), blockPos.getY(), blockPos.getZ(), dimension.getId(), direction);
     }
 }

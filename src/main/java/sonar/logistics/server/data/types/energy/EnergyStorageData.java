@@ -15,4 +15,9 @@ public class EnergyStorageData implements IData {
     public boolean hasUpdated(){
         return hasUpdated;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s / %s %s", energy, type.toString(), capacity, type.toString());
+    }
 }

@@ -23,7 +23,7 @@ public abstract class Component implements IInteractionHandler {
 
     public transient IComponentHost host;
 
-    public ComponentBounds bounds = new ComponentBounds();
+    public transient ComponentBounds bounds = new ComponentBounds();
     public ComponentStyling styling = new ComponentStyling();
 
     public boolean isVisible = true;

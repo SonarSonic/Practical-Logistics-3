@@ -39,7 +39,8 @@ public class DataUpdatePacket {
             DataAddress dataAddress = (DataAddress) address;
             IData data = ClientDataCache.INSTANCE.dataMap.get(address);
             if(data == null){
-                ClientDataCache.INSTANCE.dataMap.put(dataAddress, dataAddress.method.getDataFactory().create());
+                data = dataAddress.method.getDataFactory().create();
+                ClientDataCache.INSTANCE.dataMap.put(dataAddress, data);
             }
             dataAddress.method.getDataFactory().readUpdate(data, b);
         }

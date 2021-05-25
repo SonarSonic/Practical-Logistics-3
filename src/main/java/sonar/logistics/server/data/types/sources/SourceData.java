@@ -34,4 +34,8 @@ public class SourceData implements IData {
         return new SourceData(environment.address(), stack);
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s, %s", stack.getDisplayName().getFormattedText(), address);
+    }
 }

@@ -44,8 +44,6 @@ public class StyledTextComponent extends AbstractTextComponent implements IFlexi
                 break;
             case GUI_EDITING:
                 return textInteraction;
-            case GUI_RESIZING:
-                break;
         }
         return null;
     }

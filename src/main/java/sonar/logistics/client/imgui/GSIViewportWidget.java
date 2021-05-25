@@ -3,16 +3,14 @@ package sonar.logistics.client.imgui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import imgui.ImGui;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gui.widgets.AbstractWidget;
+import sonar.logistics.util.MathUtils;
 import sonar.logistics.util.vectors.Quad2D;
-
-import java.text.DecimalFormat;
 
 public class GSIViewportWidget extends AbstractWidget implements IImGuiEventListener {
 
@@ -20,12 +18,11 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
     public Quad2D bounds;
 
     public double centreX, centreY;
-    public double scaling;
+    public double defaultScale;
+    public float scaleMultiplier;
 
     public boolean isViewportActive = false;
     public boolean isViewportHovered = false;
-
-    public float relativeMouseX, relativeMouseY;
 
     public GSIViewportWidget(GSI gsi, double x, double y, double width, double height){
         this.gsi = gsi;
@@ -34,9 +31,14 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
         this.defaultScaling();
     }
 
-    //the default multiplier for rendering the GSI.
+    //the default multiplier for rendering the GSI, which fills 80% on the screen
     public void defaultScaling(){
-        this.scaling = Math.min(160, Math.min(bounds.width / getGSIRenderWidth(), bounds.height / getGSIRenderHeight()));
+        this.defaultScale = Math.min(bounds.width / getGSIRenderWidth(), bounds.height / getGSIRenderHeight())*0.8D;
+        this.scaleMultiplier = 1;
+    }
+
+    public double getScale(){
+        return defaultScale * scaleMultiplier;
     }
 
     public void defaultCentre(){
@@ -80,22 +82,22 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
 
     //the total x render offset relative to the gui, not the display
     public double getRenderOffsetX(){
-        return getCentreOffsetX() + (-(getGSIRenderWidth() - getGSIBorderWidth()*2)/2)*scaling;
+        return getCentreOffsetX() + (-(getGSIRenderWidth() - getGSIBorderWidth()*2)/2)* getScale();
     }
 
     //the total y render offset relative to the gui, not the display
     public double getRenderOffsetY(){
-        return getCentreOffsetY() + (-(getGSIRenderHeight() - getGSIBorderHeight()*2)/2)*scaling;
+        return getCentreOffsetY() + (-(getGSIRenderHeight() - getGSIBorderHeight()*2)/2)* getScale();
     }
 
     //the bounds of the gsi, within the "fake" screen
     public Quad2D getBoundsForGSI(){
-        return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * scaling, gsi.getGSIBounds().getHeight() * scaling);
+        return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * getScale(), gsi.getGSIBounds().getHeight() * getScale());
     }
 
     //the bounds of the gsi, including the fake screens borders
     public Quad2D getBoundsForFakeDisplay(){
-        return new Quad2D(getCentreOffsetX() - (getGSIRenderWidth()*scaling)/2, getCentreOffsetY() - (getGSIRenderHeight()*scaling)/2, getGSIRenderWidth()*scaling, getGSIRenderHeight()*scaling);
+        return new Quad2D(getCentreOffsetX() - (getGSIRenderWidth()* getScale())/2, getCentreOffsetY() - (getGSIRenderHeight()* getScale())/2, getGSIRenderWidth()* getScale(), getGSIRenderHeight()* getScale());
     }
 
     @Override
@@ -113,12 +115,12 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
         //gsi rendering - context / interaction handler update
         RenderSystem.enableDepthTest();
         GSIRenderContext context = new GSIRenderContext(gsi, partialTicks, new MatrixStack());
-        context.gsiScaling = (float)scaling;
-        gsi.interactionHandler.updateMouseFromGui((absoluteMouseX - getRenderOffsetX()) / scaling, (absoluteMouseY - getRenderOffsetY()) / scaling);
+        context.gsiScaling = (float) getScale();
+        gsi.interactionHandler.updateMouseFromGui((absoluteMouseX - getRenderOffsetX()) / getScale(), (absoluteMouseY - getRenderOffsetY()) / getScale());
 
         //gsi rendering - alignment & scaling
         context.matrix.translate(centreX, centreY, 0);
-        context.matrix.scale((float)scaling, (float)scaling, 1);
+        context.matrix.scale((float) getScale(), (float) getScale(), 1);
         context.matrix.translate(-(getGSIRenderWidth()/2) + getGSIBorderWidth(), - (getGSIRenderHeight()/2) + getGSIBorderHeight(), 0);
 
         //gsi rendering - main
@@ -138,12 +140,14 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
         RenderSystem.disableDepthTest();
 
         //render coordinates + zoom scaling
+        /*
         RenderSystem.enableDepthTest();
         RenderSystem.translated(0, 0, 1);
         DecimalFormat df = new DecimalFormat("#.##");
         Minecraft.getInstance().fontRenderer.drawString("X: " + df.format(centreX - bounds.width / 2) + ", Y: " + df.format(centreY - bounds.height / 2) + ", Zoom: " + df.format(scaling/16), (int)bounds.getX() + 2, (int) (bounds.getMaxY() - 11), ScreenUtils.white.rgba);
         RenderSystem.translated(0, 0, -1);
         RenderSystem.disableDepthTest();
+        */
 
 
         //end scissor test
@@ -194,7 +198,7 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
             return true;
         }
         if(isMouseOver(absoluteMouseX, absoluteMouseY)){
-            scaling += scroll*10;
+            scaleMultiplier = MathUtils.clamp((float)(scaleMultiplier + scroll*0.1F), 0.1F, 10F);
             return true;
         }
         return false;

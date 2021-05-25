@@ -6,11 +6,15 @@ import sonar.logistics.common.multiparts.networking.INetworkedTile;
 import sonar.logistics.server.ServerDataCache;
 import sonar.logistics.server.caches.network.PL3Network;
 import sonar.logistics.server.address.Address;
+import sonar.logistics.server.data.DataManager;
+import sonar.logistics.server.data.watchers.DataWatcher;
 import sonar.logistics.util.network.EnumSyncType;
+
+import javax.annotation.Nullable;
 
 public class NetworkedTile extends MultipartTile implements INetworkedTile {
 
-    private int identity = -1;
+    private int identity = 0;
     private Address address;
 
     public NetworkedTile(MultipartEntry entry) {
@@ -18,7 +22,7 @@ public class NetworkedTile extends MultipartTile implements INetworkedTile {
     }
 
     private int getOrCreateIdentity(){
-        if(identity == -1){
+        if(identity <= 0){
             identity = ServerDataCache.INSTANCE.getNextIdentity();
         }
         return identity;
@@ -65,10 +69,24 @@ public class NetworkedTile extends MultipartTile implements INetworkedTile {
     @Override
     public void onNetworkConnected(PL3Network network) {
         ServerDataCache.INSTANCE.connectNetworkedTile(this);
+        DataWatcher dataWatcher = getDataWatcher();
+        if(dataWatcher != null){
+            DataManager.INSTANCE.addDataWatcher(dataWatcher);
+        }
     }
 
     @Override
     public void onNetworkDisconnected(PL3Network network) {
         ServerDataCache.INSTANCE.disconnectNetworkedTile(this);
+        DataWatcher dataWatcher = getDataWatcher();
+        if(dataWatcher != null){
+            DataManager.INSTANCE.removeDataWatcher(dataWatcher);
+        }
+    }
+
+    @Nullable
+    @Override
+    public DataWatcher getDataWatcher() {
+        return null;
     }
 }

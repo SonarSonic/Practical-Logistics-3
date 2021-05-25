@@ -1,6 +1,10 @@
 package sonar.logistics.common.multiparts.displays;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import sonar.logistics.common.multiparts.base.NetworkedTile;
+import sonar.logistics.util.PL3Properties;
 import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.server.caches.displays.ConnectedDisplay;
@@ -9,7 +13,7 @@ import sonar.logistics.util.network.EnumSyncType;
 
 import javax.annotation.Nullable;
 
-public class LargeDisplayScreenTile extends DisplayScreenTile {
+public class LargeDisplayScreenTile extends DisplayScreenTile { //TODO MAKE IT NOT OVERRIDE DISPLAY, HAVE THE DISPLAY ELSEWHERE
 
     public int connectedDisplayID = -1;
     public ConnectedDisplay connectedDisplay;
@@ -21,6 +25,14 @@ public class LargeDisplayScreenTile extends DisplayScreenTile {
     @Nullable
     public ConnectedDisplay getConnectedDisplay(){
         return connectedDisplay;
+    }
+
+    public Direction getFacing() {
+        return entry.getBlockState().get(PL3Properties.ORIENTATION);
+    }
+
+    public BlockPos getPos() {
+        return getHostPos();
     }
 
     public boolean canConnect(){

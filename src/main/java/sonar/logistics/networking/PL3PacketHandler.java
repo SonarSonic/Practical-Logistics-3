@@ -16,8 +16,7 @@ public class PL3PacketHandler {
     public static void registerPackets(){
         INSTANCE.registerMessage(packetID++, MultipartRemovePacket.class, MultipartRemovePacket::encode, MultipartRemovePacket::new, MultipartRemovePacket::handle);
         INSTANCE.registerMessage(packetID++, TileSyncPacket.class, TileSyncPacket::encode, TileSyncPacket::new, TileSyncPacket::handle);
-        INSTANCE.registerMessage(packetID++, NetworkRequestPacket.class, NetworkRequestPacket::encode, NetworkRequestPacket::new, NetworkRequestPacket::handle);
-        INSTANCE.registerMessage(packetID++, NetworkGeneralPacket.class, NetworkGeneralPacket::encode, NetworkGeneralPacket::new, NetworkGeneralPacket::handle);
+        INSTANCE.registerMessage(packetID++, GeneralPacket.class, GeneralPacket::encode, GeneralPacket::new, GeneralPacket::handle);
         INSTANCE.registerMessage(packetID++, DataSyncPacket.class, DataSyncPacket::encode, DataSyncPacket::new, DataSyncPacket::handle);
         INSTANCE.registerMessage(packetID++, DataUpdatePacket.class, DataUpdatePacket::encode, DataUpdatePacket::new, DataUpdatePacket::handle);
     }

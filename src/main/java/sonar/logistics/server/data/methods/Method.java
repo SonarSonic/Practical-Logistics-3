@@ -9,20 +9,30 @@ import java.util.function.Function;
 
 public class Method {
 
-    private final String identifier;
+    private final MethodCategory category;
+    private final String methodName;
     private final DataRegistry.DataType dataType;
     private final Function<Environment, Boolean> canInvoke;
     private final Function<Environment, ?> invoke;
 
-    public Method(String identifier, DataRegistry.DataType dataType, Function<Environment, Boolean> canInvoke, Function<Environment, ?> invoke){
-        this.identifier = identifier;
+    public Method(MethodCategory category, String methodName, DataRegistry.DataType dataType, Function<Environment, Boolean> canInvoke, Function<Environment, ?> invoke){
+        this.category = category;
+        this.methodName = methodName;
         this.dataType = dataType;
         this.canInvoke = canInvoke;
         this.invoke = invoke;
     }
 
+    public MethodCategory getCategory() {
+        return category;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
     public String getIdentifier() {
-        return identifier;
+        return category.getID() + ":" + getMethodName();
     }
 
     public DataRegistry.DataType getDataType() {
@@ -43,14 +53,14 @@ public class Method {
 
     @Override
     public int hashCode() {
-        return identifier.hashCode();
+        return getIdentifier().hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Method){
             Method method = (Method) obj;
-            return method.identifier.equals(identifier);
+            return method.getIdentifier().equals(getIdentifier());
         }
         return super.equals(obj);
     }

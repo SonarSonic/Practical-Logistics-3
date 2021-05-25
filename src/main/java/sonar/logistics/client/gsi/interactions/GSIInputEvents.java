@@ -73,10 +73,10 @@ public class GSIInputEvents {
         if(focusedGSI != null){
             switch(event.getAction()){
                 case GLFW.GLFW_RELEASE:
-                    focusedGSI.mouseReleased(event.getButton());
+                    focusedGSI.interactionHandler.mouseReleased(0, 0, event.getButton());
                     break;
                 case GLFW.GLFW_PRESS:
-                    focusedGSI.mouseClicked(event.getButton());
+                    focusedGSI.interactionHandler.mouseClicked(0, 0, event.getButton());
                     break;
             }
         }
@@ -87,10 +87,10 @@ public class GSIInputEvents {
         if(focusedGSI != null){
             switch(event.getAction()){
                 case GLFW.GLFW_RELEASE:
-                    focusedGSI.keyReleased(event.getKey(), event.getScanCode(), event.getModifiers());
+                    focusedGSI.interactionHandler.keyReleased(event.getKey(), event.getScanCode(), event.getModifiers());
                     break;
                 case GLFW.GLFW_PRESS:
-                    focusedGSI.keyPressed(event.getKey(), event.getScanCode(), event.getModifiers());
+                    focusedGSI.interactionHandler.keyPressed(event.getKey(), event.getScanCode(), event.getModifiers());
                     break;
                 case GLFW.GLFW_REPEAT:
                     break;
@@ -102,7 +102,7 @@ public class GSIInputEvents {
     @SubscribeEvent
     public static void scrollEvent(InputEvent.MouseScrollEvent event){
         if(focusedGSI != null){
-            focusedGSI.mouseScrolled(event.getScrollDelta());
+            focusedGSI.interactionHandler.mouseScrolled(0, 0, event.getScrollDelta());
         }
     }
 }

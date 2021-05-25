@@ -3,17 +3,13 @@ package sonar.logistics.client.gsi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import sonar.logistics.client.gsi.components.basic.ElementComponent;
 import sonar.logistics.client.gsi.components.groups.GridGroup;
-import sonar.logistics.client.gsi.components.image.EnumImageFillType;
 import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.components.Component;
-import sonar.logistics.client.gsi.components.image.SimpleImageComponent;
-import sonar.logistics.client.gsi.components.input.SliderComponent;
 import sonar.logistics.client.gsi.elements.ItemStackElement;
 import sonar.logistics.client.gsi.interactions.api.INestedInteractionHandler;
-import sonar.logistics.client.gsi.interactions.resize.ResizingInteraction;
+import sonar.logistics.client.gsi.interactions.resize.ResizeInteraction;
 import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.components.text.StyledTextComponent;
 import sonar.logistics.client.gsi.components.text.StyledTextString;
@@ -22,12 +18,9 @@ import sonar.logistics.client.gsi.components.text.style.LineStyle;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
-import sonar.logistics.client.gui.GSIDesignScreen;
 import sonar.logistics.client.imgui.GSIEditorScreen;
-import sonar.logistics.client.imgui.ImGuiScreen;
 import sonar.logistics.common.items.PL3Items;
 import sonar.logistics.util.vectors.Quad2D;
 import sonar.logistics.util.vectors.Vector2D;
@@ -146,22 +139,30 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
             case GUI_INTERACTION:
                 break;
             case GUI_EDITING:
-                break;
-            case GUI_RESIZING:
-                if(focused instanceof ResizingInteraction && focused.isMouseOver()){
+                if(resizeInteraction == null){
+                    break;
+                }
+                boolean mouseClicked;
+                if(resizeInteraction.isMouseOver() || (mouseClicked = INestedInteractionHandler.super.mouseClicked(button))){
                     if(!isDragging()){
+                        isResizing = true;
                         tryStartDragging(button);
                     }
                     return true;
                 }
+                isResizing = false;
+                return mouseClicked;
+                /*
+
                 Component hovered = getComponent(components, c -> c.canInteract() && c.getBounds().outerSize().contains(interactionHandler.mousePos));
                 if(hovered != null) {
-                    setFocused(new ResizingInteraction(hovered));
+                    setFocused(new ResizeInteraction(hovered));
                     tryStartDragging(button);
                     return true;
                 }
                 setFocused(null);
                 return false;
+                 */
         }
         return INestedInteractionHandler.super.mouseClicked(button);
     }
@@ -294,8 +295,35 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
 
     ///
 
+    private boolean isResizing = false;
+    private ResizeInteraction resizeInteraction = null;
+
+    @Override
+    public void renderInteraction(GSIRenderContext context) {
+        INestedInteractionHandler.super.renderInteraction(context);
+        if(interactionHandler.getInteractionType() == GSIInteractionHandler.InteractionType.GUI_EDITING && resizeInteraction != null){
+            resizeInteraction.renderInteraction(context);
+        }
+    }
+
+    @Override
+    public void onDragFinished(int button) {
+        INestedInteractionHandler.super.onDragFinished(button);
+        if(isResizing){
+            isResizing = false;
+        }
+    }
+
     private IInteractionHandler focused = null;
     private IInteractionHandler hovered = null;
+
+    public void setSelectedComponent(Component component){
+        setFocused(component);
+    }
+
+    public Component getSelectedComponent(){
+        return focused instanceof Component ? (Component)focused : null;
+    }
 
     @Override
     public List<IInteractionHandler> getChildren() {
@@ -304,7 +332,7 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
 
     @Override
     public Optional<IInteractionHandler> getFocusedListener() {
-        return Optional.ofNullable(focused);
+        return Optional.ofNullable(isResizing ? resizeInteraction : focused);
     }
 
     @Override
@@ -315,6 +343,11 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
     @Override
     public void setFocused(IInteractionHandler listener) {
         this.focused = listener;
+        if(interactionHandler.getInteractionType() == GSIInteractionHandler.InteractionType.GUI_EDITING && listener instanceof Component){
+            resizeInteraction = new ResizeInteraction((Component) listener);
+        }else{
+            resizeInteraction = null;
+        }
     }
 
 

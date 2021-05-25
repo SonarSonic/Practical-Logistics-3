@@ -2,9 +2,7 @@ package sonar.logistics.client.imgui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import imgui.ImFont;
-import imgui.ImFontConfig;
-import imgui.ImGui;
+import imgui.*;
 import imgui.extension.imnodes.ImNodes;
 import imgui.extension.nodeditor.NodeEditor;
 import imgui.extension.nodeditor.NodeEditorContext;
@@ -37,80 +35,66 @@ import java.util.List;
  */
 public class ImGuiScreen extends SimpleWidgetScreen {
 
-    protected static ImGuiImplGl3 implGl3;
-    protected static ImGuiImplGlfw implGlfw;
-    protected static HashSet<Integer> keyBuffer = new HashSet<Integer>();
-    protected static NodeEditorContext nodeEditorContext;
+    public static ImGui imgGui;
+    public static ImGuiImplGl3 implGl3;
+    public static ImGuiImplGlfw implGlfw;
+    public static HashSet<Integer> keyBuffer = new HashSet<Integer>();
+    public static NodeEditorContext nodeEditorContext;
+
+    //// FONTS \\\\
+    public static ImFont DEFAULT_FONT;
+    public static ImFont OPEN_SANS;
+    public static ImFont OPEN_SANS_24PX;
 
     static {
         ImGui.createContext();
+        imgGui = new ImGui();
         ImNodes.createContext();
         nodeEditorContext = NodeEditor.createEditor();
 
-        /*
-        //// fancy font loader
-        byte[] fontData = null;
-        try {
-            InputStream stream = ImGuiScreen.class.getResourceAsStream("/assets/practicallogistics3/font/Cousine-Regular.ttf");
-            if(stream != null){
-                fontData = new byte[stream.available()];
-                stream.read(fontData);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            fontData = null;
-        }
-        if(fontData != null){
-            ImGui.getIO().getFonts().addFontFromMemoryTTF(fontData, 16);
-        }
-
-        //// fancy font loader
-        fontData = null;
-        try {
-            InputStream stream = ImGuiScreen.class.getResourceAsStream("/assets/practicallogistics3/font/Karla-Regular.ttf");
-            if(stream != null){
-                fontData = new byte[stream.available()];
-                stream.read(fontData);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            fontData = null;
-        }
-        if(fontData != null){
-            ImGui.getIO().getFonts().addFontFromMemoryTTF(fontData, 16);
-        }
-        */
-
         //// load icon font
+        byte[] openSans = loadFontData("opensans-regular.ttf");
+        byte[] fontAwesome = loadFontData("fontawesome-webfont.ttf");
 
-        byte[] fontData = null;
-        try {
-            InputStream stream = ImGuiScreen.class.getResourceAsStream("/assets/practicallogistics3/font/fontawesome-webfont.ttf");
-            if(stream != null){
-                fontData = new byte[stream.available()];
-                stream.read(fontData);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            fontData = null;
-        }
-
-        if(fontData != null){
-            // Merge icons into default tool font
-            ImGui.getIO().getFonts().addFontDefault();
+        if(fontAwesome == null || openSans == null){
+            DEFAULT_FONT = ImGui.getIO().getFonts().addFontDefault();
+        }else{
+            // Merge icon font into current font
             ImFontConfig config = new ImFontConfig();
             config.setMergeMode(true);
-            config.setGlyphMinAdvanceX(13.0F); // Use if you want to make the icon monospaced
+            config.setGlyphMinAdvanceX(14.0F); // Use if you want to make the icon monospaced
             short[] glyphRanges = {(short) FontAwesome.IconMin, (short) FontAwesome.IconMax, 0 };
-            ImGui.getIO().getFonts().addFontFromMemoryTTF(fontData, 13, config, glyphRanges);
-        }
 
+
+            OPEN_SANS = ImGui.getIO().getFonts().addFontFromMemoryTTF(openSans, 18);
+            ImGui.getIO().getFonts().addFontFromMemoryTTF(fontAwesome, 14, config, glyphRanges);
+
+            config.setGlyphMinAdvanceX(24.0F); // Use if you want to make the icon monospaced
+            OPEN_SANS_24PX = ImGui.getIO().getFonts().addFontFromMemoryTTF(openSans, 24);
+            ImGui.getIO().getFonts().addFontFromMemoryTTF(fontAwesome, 18, config, glyphRanges);
+        }
 
         implGlfw = new ImGuiImplGlfw();
         implGlfw.init(Minecraft.getInstance().getMainWindow().getHandle(), false);
         implGl3 = new ImGuiImplGl3();
         implGl3.init();
     }
+
+    public static byte[] loadFontData(String fileName){
+        byte[] fontData = null;
+        try {
+            InputStream stream = ImGuiScreen.class.getResourceAsStream("/assets/practicallogistics3/font/" + fileName);
+            if(stream != null){
+                fontData = new byte[stream.available()];
+                stream.read(fontData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            fontData = null;
+        }
+        return fontData;
+    }
+
 
     public ImGuiScreen() {
         super();
@@ -127,11 +111,13 @@ public class ImGuiScreen extends SimpleWidgetScreen {
 
         implGlfw.newFrame();
         ImGui.newFrame();
+        ImGui.pushFont(OPEN_SANS);
         startItemStackRenderer();
 
         renderImGui(x, y, partialTicks);
 
         finishItemStackRenderer();
+        ImGui.popFont();
         ImGui.render();
         implGl3.renderDrawData(ImGui.getDrawData());
 
@@ -205,6 +191,32 @@ public class ImGuiScreen extends SimpleWidgetScreen {
         return false;
     }
 
+    //// RENDER METHODS \\\\
+
+    public static void floatingLabel(String text, int r, int g, int b, int a){
+
+        ImGui.setCursorPosY(ImGui.getCursorPosY() - ImGui.getTextLineHeight());
+        ImVec2 size = imgGui.calcTextSize(text);
+
+        ImVec2 padding = ImGui.getStyle().getFramePadding();
+        ImVec2 spacing = ImGui.getStyle().getItemSpacing();
+
+        ImGui.getCursorPos();
+        ImGui.setCursorPos(ImGui.getCursorPos().x + spacing.x, ImGui.getCursorPos().y -spacing.y);
+
+        ImVec2 cursorScreenPos = ImGui.getCursorScreenPos();
+
+        float pMinX = cursorScreenPos.x - padding.x;
+        float pMinY = cursorScreenPos.y - padding.y;
+
+        float pMaxX = cursorScreenPos.x + size.x + padding.x;
+        float pMaxY = cursorScreenPos.y + size.y + padding.y;
+
+        ImDrawList drawList = ImGui.getWindowDrawList();
+        drawList.addRectFilled(pMinX, pMinY, pMaxX, pMaxY, ImColor.intToColor( r, g, b, a), size.y * 0.15f);
+        ImGui.textUnformatted(text);
+    }
+
     ///// ItemStack Helper Methods \\\\\
 
     public void itemStackImage(ItemStack stack){
@@ -218,6 +230,7 @@ public class ImGuiScreen extends SimpleWidgetScreen {
     }
 
     ///// ItemStack Renderer \\\\\
+    // Renders items to an offscreen frame buffer, which can then be used as textures when rendering the screen.
 
     public static OffscreenFrameBuffer itemStackframeBuffer = new OffscreenFrameBuffer(getItemStackFrameBufferSize(), getItemStackFrameBufferSize());
 
