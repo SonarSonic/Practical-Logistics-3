@@ -11,6 +11,7 @@ import sonar.logistics.server.data.api.IData;
 import sonar.logistics.util.ListHelper;
 import sonar.logistics.util.network.EnumSyncType;
 import sonar.logistics.util.network.INBTSyncable;
+import sonar.logistics.util.registry.Registries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,25 +36,13 @@ public abstract class DataWatcher implements INBTSyncable {
 
     @Override
     public CompoundNBT read(CompoundNBT nbt, EnumSyncType syncType) {
-        ListNBT listNBT = nbt.getList("watching", Constants.NBT.TAG_COMPOUND);
-        List<DataAddress> addressList = new ArrayList<>();
-        for(INBT nbtValue : listNBT){
-            Address address = Address.fromNBT((CompoundNBT) nbtValue);
-            if(address instanceof DataAddress){
-                addressList.add((DataAddress) address);
-            }
-        }
-        watchingData = addressList;
+        Registries.getAddressRegistry().readList(nbt, EnumSyncType.SAVE, "watching", watchingData);
         return nbt;
     }
 
     @Override
     public CompoundNBT write(CompoundNBT nbt, EnumSyncType syncType) {
-        ListNBT listNBT = new ListNBT();
-        for(DataAddress dataAddress : watchingData){
-            listNBT.add(Address.toNBT(dataAddress, new CompoundNBT()));
-        }
-        nbt.put("watching", listNBT);
+        Registries.getAddressRegistry().writeList(nbt, EnumSyncType.SAVE, "watching", watchingData);
         return nbt;
     }
 

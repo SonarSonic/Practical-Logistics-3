@@ -6,6 +6,7 @@ import sonar.logistics.client.ClientDataCache;
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.address.Address;
 import sonar.logistics.server.address.DataAddress;
+import sonar.logistics.util.registry.Registries;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class DataUpdatePacket {
     public void encode(PacketBuffer b){
         b.writeInt(dataMap.size());
         for(Map.Entry<DataAddress, IData> entry : dataMap.entrySet()){
-            Address.toPacketBuffer(entry.getKey(), b);
+            Registries.getAddressRegistry().write(entry.getKey(), b);
             entry.getKey().method.getDataFactory().saveUpdate(entry.getValue(), b);
         }
     }
@@ -34,7 +35,7 @@ public class DataUpdatePacket {
     public void decode(PacketBuffer b){
         int size = b.readInt();
         for(int i = 0; i < size; i++){
-            Address address = Address.fromPacketBuffer(b);
+            Address address = Registries.getAddressRegistry().read(b);
             assert address instanceof DataAddress;
             DataAddress dataAddress = (DataAddress) address;
             IData data = ClientDataCache.INSTANCE.dataMap.get(address);

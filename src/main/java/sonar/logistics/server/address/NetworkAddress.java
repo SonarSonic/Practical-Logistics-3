@@ -43,8 +43,8 @@ public class NetworkAddress extends Address {
     }
 
     @Override
-    public int getType() {
-        return NETWORK_ADDRESS;
+    public String getRegistryName() {
+        return "network";
     }
 
     @Override
@@ -64,7 +64,7 @@ public class NetworkAddress extends Address {
 
     @Override
     public int hashCode() {
-        return Objects.hash(NETWORK_ADDRESS, networkID);
+        return Objects.hash(getRegistryName(), networkID);
     }
 
     @Override

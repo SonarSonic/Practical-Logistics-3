@@ -10,12 +10,12 @@ import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gui.widgets.AbstractWidget;
 import sonar.logistics.util.MathUtils;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class GSIViewportWidget extends AbstractWidget implements IImGuiEventListener {
 
     public GSI gsi;
-    public Quad2D bounds;
+    public Quad2F bounds;
 
     public double centreX, centreY;
     public double defaultScale;
@@ -26,7 +26,7 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
 
     public GSIViewportWidget(GSI gsi, double x, double y, double width, double height){
         this.gsi = gsi;
-        this.bounds = new Quad2D(x, y, width, height);
+        this.bounds = new Quad2F(x, y, width, height);
         this.defaultCentre();
         this.defaultScaling();
     }
@@ -91,13 +91,13 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
     }
 
     //the bounds of the gsi, within the "fake" screen
-    public Quad2D getBoundsForGSI(){
-        return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * getScale(), gsi.getGSIBounds().getHeight() * getScale());
+    public Quad2F getBoundsForGSI(){
+        return new Quad2F(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * getScale(), gsi.getGSIBounds().getHeight() * getScale());
     }
 
     //the bounds of the gsi, including the fake screens borders
-    public Quad2D getBoundsForFakeDisplay(){
-        return new Quad2D(getCentreOffsetX() - (getGSIRenderWidth()* getScale())/2, getCentreOffsetY() - (getGSIRenderHeight()* getScale())/2, getGSIRenderWidth()* getScale(), getGSIRenderHeight()* getScale());
+    public Quad2F getBoundsForFakeDisplay(){
+        return new Quad2F(getCentreOffsetX() - (getGSIRenderWidth()* getScale())/2, getCentreOffsetY() - (getGSIRenderHeight()* getScale())/2, getGSIRenderWidth()* getScale(), getGSIRenderHeight()* getScale());
     }
 
     @Override
@@ -156,7 +156,7 @@ public class GSIViewportWidget extends AbstractWidget implements IImGuiEventList
     }
 
     @Override
-    public Quad2D getBounds() {
+    public Quad2F getBounds() {
         return bounds;
     }
 

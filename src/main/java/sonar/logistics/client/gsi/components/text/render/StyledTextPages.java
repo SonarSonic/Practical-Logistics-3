@@ -1,7 +1,7 @@
 package sonar.logistics.client.gsi.components.text.render;
 
 import sonar.logistics.client.gsi.components.text.StyledTextString;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Vector2F;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -176,7 +176,7 @@ public class StyledTextPages {
     public final static Function<GlyphRenderInfo, Boolean> FILTER_VISIBLE = glyphRenderInfo -> glyphRenderInfo.quad.width != 0 && glyphRenderInfo.glyph.isVisible();
     public final static Function<GlyphRenderInfo, Boolean> FILTER_INVISIBLE = glyphRenderInfo -> !glyphRenderInfo.glyph.isVisible();
 
-    public StyledTextLine getInteractedLine(Vector2D textHit){
+    public StyledTextLine getInteractedLine(Vector2F textHit){
         for (StyledTextLine line : getCurrentPage()) {
             if (line.renderSize.contains(textHit)) {
                 return line;
@@ -186,7 +186,7 @@ public class StyledTextPages {
     }
 
     @Nullable
-    public GlyphRenderInfo getGlyphHit(Vector2D textHit, Function<GlyphRenderInfo, Boolean> filter){
+    public GlyphRenderInfo getGlyphHit(Vector2F textHit, Function<GlyphRenderInfo, Boolean> filter){
         StyledTextLine line = getInteractedLine(textHit);
         if(line != null){
             return getGlyphHit(line, filter);

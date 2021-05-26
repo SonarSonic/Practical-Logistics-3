@@ -72,8 +72,8 @@ public class BlockAddress extends Address {
     }
 
     @Override
-    public int getType() {
-        return BLOCK_ADDRESS;
+    public String getRegistryName() {
+        return "block";
     }
 
     @Override
@@ -106,7 +106,7 @@ public class BlockAddress extends Address {
 
     @Override
     public int hashCode() {
-        return Objects.hash(BLOCK_ADDRESS, blockPos.toLong(), dimension.getId(), direction.ordinal());
+        return Objects.hash(getRegistryName(), blockPos.toLong(), dimension.getId(), direction.ordinal());
     }
 
     @Override

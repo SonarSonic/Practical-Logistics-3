@@ -12,7 +12,7 @@ import sonar.logistics.client.gsi.components.text.render.StyledTextLine;
 import sonar.logistics.client.gsi.components.text.render.StyledTextPages;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class StyledTextWrapper {
 
     /// building variables
     private ScaledFontType fontType;
-    private Quad2D bounds;
+    private Quad2F bounds;
     private int index;
 
     private LineStyle currentLineStyle;
@@ -40,7 +40,7 @@ public class StyledTextWrapper {
     public StyledTextPages styledTextPages;
 
     // builds wrapping pages
-    public void build(StyledTextPages pages, ScaledFontType fontType, Quad2D bounds, LineStyle defLineStyle, @Nullable GlyphStyle forceStyle){
+    public void build(StyledTextPages pages, ScaledFontType fontType, Quad2F bounds, LineStyle defLineStyle, @Nullable GlyphStyle forceStyle){
         pages.clearCache();
         this.fontType = fontType;
         this.bounds = bounds;
@@ -75,7 +75,7 @@ public class StyledTextWrapper {
     ///// building pages
 
     List<StyledTextLine> page;
-    double pageYAdvance;
+    float pageYAdvance;
 
     public void startPage(){
         page = new ArrayList<>();
@@ -261,7 +261,7 @@ public class StyledTextWrapper {
             boolean isLast = lineIndex == styledLines.size();
             currentLineStyle.justifyType.justify(line, bounds.width, isLast);
 
-            double offsetX = 0;
+            float offsetX = 0;
             for(GlyphRenderInfo glyphInfo : line.glyphInfo){
                 glyphInfo.quad.x = line.renderSize.getX() + offsetX;
                 glyphInfo.quad.y = line.renderSize.getY();
@@ -273,13 +273,13 @@ public class StyledTextWrapper {
     //this is a post build operation which will align pages vertically.
     public void alignPages(ComponentAlignment yAlign){
         for(List<StyledTextLine> page : styledTextPages.styledPages){
-            double pageHeight = 0;
+            float pageHeight = 0;
 
             for(StyledTextLine line : page){
                 pageHeight += line.renderSize.getHeight();
             }
 
-            double offsetY = yAlign.align(pageHeight, bounds.getHeight());
+            float offsetY = yAlign.align(pageHeight, bounds.getHeight());
 
             for(StyledTextLine line : page){
                 line.renderSize.translate(0, offsetY);

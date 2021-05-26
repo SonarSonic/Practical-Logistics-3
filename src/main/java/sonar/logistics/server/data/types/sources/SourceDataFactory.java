@@ -9,6 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
 import sonar.logistics.server.data.api.IDataFactory;
 import sonar.logistics.server.address.Address;
+import sonar.logistics.util.network.EnumSyncType;
+import sonar.logistics.util.registry.Registries;
 
 public class SourceDataFactory implements IDataFactory<SourceData> {
 
@@ -24,13 +26,8 @@ public class SourceDataFactory implements IDataFactory<SourceData> {
     public void save(SourceData data, String key, CompoundNBT tag) {
         CompoundNBT nbt = new CompoundNBT();
 
-        CompoundNBT addressNBT = new CompoundNBT();
-        Address.toNBT(data.address, addressNBT);
-        nbt.put(ADDRESS_KEY, addressNBT);
-
-        CompoundNBT stackNBT = new CompoundNBT();
-        data.stack.write(stackNBT);
-        nbt.put(STACK_KEY, stackNBT);
+        Registries.getAddressRegistry().write(data.address, nbt, ADDRESS_KEY, EnumSyncType.SAVE);
+        nbt.put(STACK_KEY, data.stack.write(new CompoundNBT()));
 
         tag.put(key, nbt);
     }
@@ -38,19 +35,19 @@ public class SourceDataFactory implements IDataFactory<SourceData> {
     @Override
     public void read(SourceData data, String key, CompoundNBT tag) {
         CompoundNBT nbt = tag.getCompound(key);
-        data.address = Address.fromNBT(nbt.getCompound(ADDRESS_KEY));
+        data.address = Registries.getAddressRegistry().read(nbt, ADDRESS_KEY, EnumSyncType.SAVE);
         data.stack = ItemStack.read(nbt.getCompound(STACK_KEY));
     }
 
     @Override
     public void saveUpdate(SourceData data, PacketBuffer buf) {
-        Address.toPacketBuffer(data.address, buf);
+        Registries.getAddressRegistry().write(data.address, buf);
         buf.writeItemStack(data.stack);
     }
 
     @Override
     public void readUpdate(SourceData data, PacketBuffer buf) {
-        data.address = Address.fromPacketBuffer(buf);
+        data.address = Registries.getAddressRegistry().read(buf);
         data.stack = buf.readItemStack();
     }
 

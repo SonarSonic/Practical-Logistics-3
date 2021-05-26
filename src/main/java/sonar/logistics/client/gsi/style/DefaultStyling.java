@@ -12,7 +12,6 @@ public final class DefaultStyling extends ComponentStyling {
     public static final DefaultStyling INSTANCE = new DefaultStyling();
 
     {
-
         absolute = false;
         zLayer = 0;
 
@@ -25,8 +24,8 @@ public final class DefaultStyling extends ComponentStyling {
         height = new LengthProperty(Unit.PERCENT, 1);
 
         ///offsets
-        marginWidth = new LengthProperty(Unit.PIXEL, 0.0625/2);
-        marginHeight = new LengthProperty(Unit.PIXEL, 0.0625/2);
+        marginWidth = new LengthProperty(Unit.PIXEL, 0.0625F/2F);
+        marginHeight = new LengthProperty(Unit.PIXEL, 0.0625F/2F);
         paddingWidth = new LengthProperty(Unit.PIXEL, 0);
         paddingHeight = new LengthProperty(Unit.PIXEL, 0);
         borderWidth = new LengthProperty(Unit.PIXEL, 0);

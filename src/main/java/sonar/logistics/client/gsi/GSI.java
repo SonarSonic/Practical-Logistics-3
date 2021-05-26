@@ -1,13 +1,8 @@
 package sonar.logistics.client.gsi;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import sonar.logistics.client.gsi.components.basic.ElementComponent;
-import sonar.logistics.client.gsi.components.groups.GridGroup;
 import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.components.Component;
-import sonar.logistics.client.gsi.elements.ItemStackElement;
 import sonar.logistics.client.gsi.interactions.api.INestedInteractionHandler;
 import sonar.logistics.client.gsi.interactions.resize.ResizeInteraction;
 import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
@@ -21,9 +16,9 @@ import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.imgui.GSIEditorScreen;
-import sonar.logistics.common.items.PL3Items;
-import sonar.logistics.util.vectors.Quad2D;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.client.nodes.*;
+import sonar.logistics.util.vectors.Quad2F;
+import sonar.logistics.util.vectors.Vector2F;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
 import javax.annotation.Nullable;
@@ -35,7 +30,9 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
     public GSIInteractionHandler interactionHandler = new GSIInteractionHandler(this, Minecraft.getInstance().player);
     public List<Component> components = new ArrayList<>();
     public List<IInteractionHandler> interactions = new ArrayList<>();
-    public Quad2D bounds;
+    public Quad2F bounds;
+
+    public AdvancedNodeGraph nodeGraph = new AdvancedNodeGraph();
 
     @Nullable //if the GSI is a GUI Interface only the display will be null.
     public IDisplay display;
@@ -43,15 +40,15 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
     //set bounds and rebuild should be called
     public GSI(){}
 
-    public GSI(Quad2D bounds){
+    public GSI(Quad2F bounds){
         this.bounds = bounds;
     }
 
-    public Quad2D getGSIBounds(){
+    public Quad2F getGSIBounds(){
         return bounds;
     }
 
-    public void setBoundsAndRebuild(Quad2D bounds){
+    public void setBoundsAndRebuild(Quad2F bounds){
         this.bounds = bounds;
         build();
     }
@@ -84,10 +81,13 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
         context.postRender();
     }
 
+    //// COMPONENTS \\\\
+
     public Component addComponent(Component component){
         component.setHost(this);
         components.add(component);
         interactions.add(component);
+        nodeGraph.addNode(component);
         return component;
     }
 
@@ -95,10 +95,11 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
         component.setHost(null);
         components.remove(component);
         interactions.remove(component);
+        nodeGraph.removeNode(component);
         return component;
     }
 
-    public Component getComponentAt(Vector2D mouseHit) {
+    public Component getComponentAt(Vector2F mouseHit) {
         return getComponent(components, component -> component.getBounds().outerSize().contains(mouseHit));
     }
 
@@ -119,6 +120,9 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
         return null;
     }
 
+    //// NODES \\\\
+
+    /// INTERACTIONS \\\
 
     @Override
     public boolean mouseClicked(int button) {
@@ -173,18 +177,12 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
         components.clear();
         interactions.clear();
         setFocused(null);
-        //addComponent(new ButtonComponent(0, 176, 0));
-
-        //components.add(new IconButtonComponent(EnumButtonIcons.MODE_SELECT, EmptyTrigger.INSTANCE));
-
-        //addComponent(new IconButtonComponent(EnumButtonIcons.STYLE_BOLD, new Trigger((b, h) -> GSIDesignSettings.toggleBoldStyling(), (b, h) -> GSIDesignSettings.glyphStyle.bold)));
-
 
         StyledTextComponent lines = new StyledTextComponent();
-        lines.getStyling().setSizing(0, 0, 1, 0.5, Unit.PERCENT);
+        lines.getStyling().setSizing(0F, 0F, 1F, 0.5F, Unit.PERCENT);
 
-        lines.getStyling().setBorderWidth(new LengthProperty(Unit.PIXEL, 0.0625/4));
-        lines.getStyling().setBorderHeight(new LengthProperty(Unit.PIXEL, 0.0625/4));
+        lines.getStyling().setBorderWidth(new LengthProperty(Unit.PIXEL, 0.0625F/4F));
+        lines.getStyling().setBorderHeight(new LengthProperty(Unit.PIXEL, 0.0625F/4F));
 
         StyledTextString element = new StyledTextString();
 
@@ -198,102 +196,7 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
         lines.pages.text = element;
 
         addComponent(lines);
-        /*
-        SliderComponent slider = new SliderComponent();
-        slider.getStyling().setSizing(0, 0.5, 1, 0.2, Unit.PERCENT);
-        addComponent(slider);
-
-
-        SimpleImageComponent imageComponent = new SimpleImageComponent(new ResourceLocation("minecraft", "textures/block/bedrock.png"), EnumImageFillType.IMAGE_FILL);
-        imageComponent.getStyling().setSizing(0, 0.7, 1, 0.3, Unit.PERCENT);
-        addComponent(imageComponent);
-        */
-
-        GridGroup grid = new GridGroup();
-        grid.getStyling().setSizing(0, 0, 1, 0.5, Unit.PERCENT);
-
-        grid.styling.setMarginWidth(new LengthProperty(Unit.PIXEL, 0.0625F/2));
-        grid.styling.setMarginHeight(new LengthProperty(Unit.PIXEL, 0.0625F/2));
-
-
-        grid.styling.setBorderWidth(new LengthProperty(Unit.PIXEL, 0.0625F/4));
-        grid.styling.setBorderHeight(new LengthProperty(Unit.PIXEL, 0.0625F/4));
-        grid.setGridSize(3, 3);
-
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.STONE), 200)));
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Items.SIGNALLING_PLATE), 200)));
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Items.SAPPHIRE_GEM), 200)));
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Items.STONE_PLATE), 200)));
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.DIAMOND), 200)));
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.ACACIA_LEAVES), 200)));
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.ACACIA_PLANKS), 200)));
-        grid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(Items.BELL), 200)));
-
-        addComponent(grid);
-
-
-        /*
-        GridContainer subGrid = new GridContainer();
-        subGrid.alignment.setAlignmentPercentages(new Vec3d(0, 0.5, 0), new Vec3d(1, 0.5 , 1));
-        subGrid.setGridSize(2, 1);
-
-        subGrid.addComponent(new ElementComponent(new ItemStackElement(new ItemStack(PL3Blocks.FORGING_HAMMER_BLOCK), 200)));
-        addComponent(subGrid);
-        */
-        /*
-
-        GridContainer subsubGrid = new GridContainer(subGrid);
-        subGrid.addComponent(subsubGrid);
-        subsubGrid.setGridSize(3, 3);
-
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.STONE), 200)));
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(PL3Items.SIGNALLING_PLATE), 200)));
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(PL3Items.SAPPHIRE_GEM), 200)));
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(PL3Items.STONE_PLATE), 200)));
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.DIAMOND), 200)));
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.ACACIA_LEAVES), 200)));
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.ACACIA_PLANKS), 200)));
-        subsubGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.BELL), 200)));
-
-
-
-
-        GridContainer subsubsubGrid = new GridContainer(subsubGrid);
-        subsubGrid.addComponent(subsubsubGrid);
-        subsubsubGrid.setGridSize(3, 3);
-
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(Items.STONE), 200)));
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(PL3Items.SIGNALLING_PLATE), 200)));
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(PL3Items.SAPPHIRE_GEM), 200)));
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(PL3Items.STONE_PLATE), 200)));
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(Items.DIAMOND), 200)));
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(Items.ACACIA_LEAVES), 200)));
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(Items.ACACIA_PLANKS), 200)));
-        subsubsubGrid.addComponent(new ElementComponent(subsubsubGrid, new ItemStackElement(new ItemStack(Items.BELL), 200)));
-
-        subGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.ENDER_PEARL), 200)));
-        subGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.CACTUS), 200)));
-        subGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.BROWN_BED), 200)));
-        subGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.NETHER_BRICK), 200)));
-        subGrid.addComponent(new ElementComponent(subsubGrid, new ItemStackElement(new ItemStack(Items.RABBIT), 200)));
-
-
-
-        addComponent(subGrid);
-        */
     }
-
-
-
-    public boolean toggle(Object source, int triggerId) {
-        return false;
-    }
-
-    public boolean isActive(Object source, int triggerId) {
-        return false;
-    }
-
-    ///
 
     private boolean isResizing = false;
     private ResizeInteraction resizeInteraction = null;
@@ -386,4 +289,5 @@ public class GSI implements IComponentHost, INestedInteractionHandler {
     public GSI getGSI() {
         return this;
     }
+
 }

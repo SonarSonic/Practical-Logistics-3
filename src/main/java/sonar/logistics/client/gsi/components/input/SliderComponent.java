@@ -6,16 +6,16 @@ import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.util.vectors.Quad2D;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2F;
+import sonar.logistics.util.vectors.Vector2F;
 import sonar.logistics.util.MathUtils;
 
 import javax.annotation.Nullable;
 
 public class SliderComponent extends Component implements IInteractionHandler {
 
-    public double sliderValue = 0;
-    public double stepSize = Double.MIN_VALUE;
+    public float sliderValue = 0;
+    public float stepSize = Float.MIN_VALUE;
 
     public boolean isVertical = false;
 
@@ -36,20 +36,20 @@ public class SliderComponent extends Component implements IInteractionHandler {
         return this;
     }
 
-    public double getSliderValue() {
+    public float getSliderValue() {
         return sliderValue;
     }
 
     @Override
     public void render(GSIRenderContext context) {
         super.render(context);
-        Quad2D sliderHandle;
+        Quad2F sliderHandle;
         if(!isVertical) {
-            sliderHandle = new Quad2D(0, 0, getBounds().innerSize().getWidth() / 16, getBounds().innerSize().getHeight());
+            sliderHandle = new Quad2F(0, 0, getBounds().innerSize().getWidth() / 16, getBounds().innerSize().getHeight());
             sliderHandle.x = getBounds().innerSize().getX() + ((getBounds().innerSize().width - sliderHandle.width) * sliderValue);
             sliderHandle.y = getBounds().innerSize().getY();
         }else{
-            sliderHandle = new Quad2D(0, 0, getBounds().innerSize().getWidth(), getBounds().innerSize().getHeight() / 16);
+            sliderHandle = new Quad2F(0, 0, getBounds().innerSize().getWidth(), getBounds().innerSize().getHeight() / 16);
             sliderHandle.x = getBounds().innerSize().getX();
             sliderHandle.y = getBounds().innerSize().getY() + ((getBounds().innerSize().height - sliderHandle.height) * sliderValue);
         }
@@ -57,7 +57,7 @@ public class SliderComponent extends Component implements IInteractionHandler {
 
     }
 
-    public void renderSliderHandle(GSIRenderContext context, Quad2D sliderHandle){
+    public void renderSliderHandle(GSIRenderContext context, Quad2F sliderHandle){
         GSIRenderHelper.pushLayerOffset(context, 1);
         GSIRenderHelper.renderColouredRect(context, true, sliderHandle, handleColour);
         GSIRenderHelper.popLayerOffset(context, 1);
@@ -66,7 +66,7 @@ public class SliderComponent extends Component implements IInteractionHandler {
     /// interactions
 
     public void updateSliderFromMouse(){
-        Vector2D relativeMouse = getRelativeMousePos();
+        Vector2F relativeMouse = getRelativeMousePos();
         if(!isVertical) {
             sliderValue = relativeMouse.x / getBounds().innerSize().width;
         }else{
@@ -105,7 +105,7 @@ public class SliderComponent extends Component implements IInteractionHandler {
     }
 
     public void checkSlider(){
-        sliderValue = MathUtils.roundTo(sliderValue, stepSize);
+        sliderValue = MathUtils.roundToF(sliderValue, stepSize);
 
         if (this.sliderValue < 0.0F){
             this.sliderValue = 0.0F;
@@ -116,11 +116,11 @@ public class SliderComponent extends Component implements IInteractionHandler {
         }
     }
 
-    public double getRangedValue(double minValue, double maxValue){
+    public double getRangedValue(float minValue, float maxValue){
         return this.sliderValue * (maxValue - minValue) + minValue;
     }
 
-    public void setRangedValue(double value, double minValue, double maxValue){
+    public void setRangedValue(float value, float minValue, float maxValue){
         this.sliderValue = (value - minValue) / (maxValue - minValue);
     }
 

@@ -8,7 +8,7 @@ import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.properties.Unit;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public abstract class SliderOptionGroup<O extends Object> extends AbstractGroup {
 
@@ -28,13 +28,13 @@ public abstract class SliderOptionGroup<O extends Object> extends AbstractGroup 
 
     /**called at the end of constructor by overriding class, TODO proper option init phase.*/
     public void initOption(){
-        addComponent(slider = new SliderComponent().setTrigger(this::updateOptionFromSlider)).getStyling().setSizing(0.2, 0.5, 0.6, 0.5, Unit.PERCENT);
-        addComponent(input = new TextInputComponent().setInputType(getInputType()).setTrigger(this::updateOptionFromTextInput)).getStyling().setSizing(0.8, 5/12D, 0.2, 1/6D, Unit.PERCENT);
-        addComponent(reset = new TextButtonComponent("\u21BA", (b, h) -> {})).getStyling().setSizing(0.8, 0.0, 0.2, 1.0, Unit.PERCENT);
+        addComponent(slider = new SliderComponent().setTrigger(this::updateOptionFromSlider)).getStyling().setSizing(0.2F, 0.5F, 0.6F, 0.5F, Unit.PERCENT);
+        addComponent(input = new TextInputComponent().setInputType(getInputType()).setTrigger(this::updateOptionFromTextInput)).getStyling().setSizing(0.8F, 5F/12F, 0.2F, 1F/6F, Unit.PERCENT);
+        addComponent(reset = new TextButtonComponent("\u21BA", (b, h) -> {})).getStyling().setSizing(0.8F, 0.0F, 0.2F, 1.0F, Unit.PERCENT);
     }
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         super.build(bounds);
         subComponents.forEach(component ->  component.build(getBounds().innerSize()));
     }
@@ -79,7 +79,7 @@ public abstract class SliderOptionGroup<O extends Object> extends AbstractGroup 
 
     public abstract O getOptionFromSlider(SliderComponent slider);
 
-    public abstract double getSliderValueFromOption(O option);
+    public abstract float getSliderValueFromOption(O option);
 
 
     public static class RangedInteger extends SliderOptionGroup<Integer>{
@@ -97,7 +97,7 @@ public abstract class SliderOptionGroup<O extends Object> extends AbstractGroup 
         @Override
         public void initOption() {
             super.initOption();
-            slider.stepSize = 1D/(maxValue - minValue);
+            slider.stepSize = 1F/(maxValue - minValue);
         }
 
         @Override
@@ -121,8 +121,8 @@ public abstract class SliderOptionGroup<O extends Object> extends AbstractGroup 
         }
 
         @Override
-        public double getSliderValueFromOption(Integer option) {
-            return (option.doubleValue() - minValue) / (maxValue - minValue);
+        public float getSliderValueFromOption(Integer option) {
+            return (option.floatValue() - minValue) / (maxValue - minValue);
         }
     }
 

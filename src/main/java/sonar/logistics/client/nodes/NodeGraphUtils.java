@@ -2,58 +2,46 @@ package sonar.logistics.client.nodes;
 
 import imgui.ImGui;
 import imgui.extension.nodeditor.NodeEditor;
-import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImLong;
-import sonar.logistics.client.gui.ScreenUtils;
+import net.minecraft.nbt.CompoundNBT;
 import sonar.logistics.client.imgui.FontAwesome;
 import sonar.logistics.client.imgui.ImGuiScreen;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NodeGraph {
+public class NodeGraphUtils {
 
-    public int nodeID = 1;
-    public List<Graph.Node> nodes = new ArrayList<>();
-    public List<Graph.Link> links = new ArrayList<>();
-
-    public Graph.Pin newLinkPin = null;
-
-    public int nextNodeID(){
-        return nodeID++;
-    }
-
-    public void render(){
+    public static void render(AdvancedNodeGraph nodeGraph){
         NodeEditor.setCurrentEditor(ImGuiScreen.nodeEditorContext);
-
         NodeEditor.begin("My Editor");
 
         // Render the nodes
-        for(Graph.Node node : nodes){
-            NodeEditor.beginNode(node.nodeID);
-            ImGui.textColored(120, 180, 255, 255, node.name);
+        for(Graph.INode node : nodeGraph.getNodes().values()){
+            NodeEditor.beginNode(node.getNodeID());
+            ImGui.textColored(120, 180, 255, 255, node.getNodeName());
             ImGui.beginGroup();
-            for(Graph.Pin inputPin : node.inputs){
+            for(Graph.DataPin inputPin : node.getInputPins()){
                 NodeEditor.beginPin(inputPin.pinID, inputPin.kind.getKind());
-                ImGui.textColored(0.25F, 1F, 0.25F, 1F, FontAwesome.CaretRight);
+                ImGui.textColored(inputPin.type.subType.getSubTypeColour(), FontAwesome.CaretRight);
                 NodeEditor.endPin();
                 ImGui.sameLine();
-                ImGui.text(inputPin.type.name());
+                ImGui.text(inputPin.type.getRegistryName());
             }
 
             ImGui.endGroup();
             ImGui.text("");
             ImGui.sameLine(0, 80);
             ImGui.beginGroup();
-            for(Graph.Pin outputPin : node.outputs){
-                ImGui.text(outputPin.type.name());
+            for(Graph.DataPin outputPin : node.getOutputPins()){
+                ImGui.text(outputPin.type.getRegistryName());
             }
             ImGui.endGroup();
             ImGui.sameLine();
             ImGui.beginGroup();
-            for(Graph.Pin outputPin : node.outputs){
+            for(Graph.DataPin outputPin : node.getOutputPins()){
                 NodeEditor.beginPin(outputPin.pinID, outputPin.kind.getKind());
-                ImGui.textColored(0.25F, 0.25F, 1F, 1F, FontAwesome.CaretRight);
+                ImGui.textColored(outputPin.type.subType.getSubTypeColour(), FontAwesome.CaretRight);
                 NodeEditor.endPin();
             }
             ImGui.endGroup();
@@ -61,7 +49,7 @@ public class NodeGraph {
         }
 
         // Render the links
-        for(Graph.Link link : links){
+        for(Graph.Link link : nodeGraph.getLinks().values()){
             NodeEditor.link(link.linkID, link.startPinID, link.endPinID);
         }
 
@@ -71,13 +59,13 @@ public class NodeGraph {
             ImLong endPinId = new ImLong(0);
 
             if(NodeEditor.queryNewLink(startPinId, endPinId)){
-                Graph.Pin startPin =  findPin((int)startPinId.get());
-                Graph.Pin endPin =  findPin((int)endPinId.get());
+                Graph.DataPin startPin =  findPin(nodeGraph, (int)startPinId.get());
+                Graph.DataPin endPin =  findPin(nodeGraph, (int)endPinId.get());
 
-                newLinkPin = startPin != null ? startPin : endPin;
+                //newLinkPin = startPin != null ? startPin : endPin;
 
                 if (startPin != null && startPin.kind == Graph.PinKind.Input){
-                    Graph.Pin swapPin = startPin;
+                    Graph.DataPin swapPin = startPin;
                     startPin = endPin;
                     endPin = swapPin;
                 }
@@ -97,15 +85,18 @@ public class NodeGraph {
                     else if (endPin.type != startPin.type){
                         ImGuiScreen.floatingLabel(FontAwesome.Times + " Incompatible Data Type", 128, 32, 32, 180);
                         NodeEditor.rejectNewItem(1, 0.5F, 0.5F, 1, 1.0F);
-                    }else if (isRecursiveLink(startPin, endPin)){
+                    }else if (isRecursiveLink(nodeGraph, startPin, endPin)){
                         ImGuiScreen.floatingLabel(FontAwesome.Times + " Recursive Link", 255, 32, 32, 180);
                         NodeEditor.rejectNewItem(1, 0F, 0F, 1, 4.0F);
                     }else{
                         ImGuiScreen.floatingLabel(FontAwesome.Check + " Create Link", 32, 128, 32, 180);
                         if(NodeEditor.acceptNewItem(0.5F, 1, 0.5F, 1, 4.0F)){
-                            Graph.Link link = new Graph.Link(nextNodeID(), startPin.pinID, endPin.pinID, null);
-                            unlinkPin(endPin.pinID); //remove existing links to input pin
-                            links.add(link);
+                            Graph.Link link = new Graph.Link(nodeGraph.nextNodeID(), startPin.pinID, endPin.pinID, null);
+                            if(unlinkPin(nodeGraph, endPin.pinID)){ //remove existing links to input pin
+                                if(nodeGraph.canAddLink(link)){
+                                    nodeGraph.addLink(link);
+                                }
+                            }
                         }
                     }
 
@@ -123,9 +114,9 @@ public class NodeGraph {
             ImLong endPinId = new ImLong(0);
             while (NodeEditor.queryDeletedLink(deletedLinkId, startPinId, endPinId)){
                 // If you agree that link can be deleted, accept deletion.
-                if (NodeEditor.acceptDeletedItem()){
-                    Graph.Link link = findLink((int)deletedLinkId.get());
-                    links.remove(link);
+                Graph.Link link = findLink(nodeGraph, (int)deletedLinkId.get());
+                if (nodeGraph.canRemoveLink(link) && NodeEditor.acceptDeletedItem()){
+                    nodeGraph.removeLink(link);
                 }
                 // You may reject link deletion by calling:
                 // ed::RejectDeletedItem();
@@ -133,9 +124,9 @@ public class NodeGraph {
 
             ImLong deletedNodeId = new ImLong(0);
             while (NodeEditor.queryDeletedNode(deletedNodeId)){
-                if (NodeEditor.acceptDeletedItem()){
-                    Graph.Node node = findNode((int)deletedNodeId.get());
-                    nodes.remove(node);
+                Graph.INode node = findNode(nodeGraph, (int)deletedNodeId.get());
+                if (nodeGraph.canRemoveNode(node) && NodeEditor.acceptDeletedItem()){
+                    nodeGraph.removeNode(node);
                 }
             }
         }
@@ -144,43 +135,21 @@ public class NodeGraph {
         NodeEditor.end();
     }
 
-    public Graph.Node findNode(int nodeID){
-        for (Graph.Node node : nodes){
-            if(node.nodeID == nodeID){
-                return node;
-            }
-        }
-        return null;
+    public static Graph.INode findNode(AdvancedNodeGraph graph, int nodeID){
+        return graph.getNodes().get(nodeID);
     }
 
-    public Graph.Link findLink(int linkID){
-        for (Graph.Link link : links){
-            if(link.linkID == linkID){
-                return link;
-            }
-        }
-        return null;
+    public static Graph.Link findLink(AdvancedNodeGraph graph, int linkID){
+        return graph.getLinks().get(linkID);
     }
 
-    public Graph.Pin findPin(int pinID){
-        for(Graph.Node node : nodes){
-            for(Graph.Pin inputPin : node.inputs){
-                if(inputPin.pinID == pinID){
-                    return inputPin;
-                }
-            }
-            for(Graph.Pin outputPin : node.outputs){
-                if(outputPin.pinID == pinID){
-                    return outputPin;
-                }
-            }
-        }
-        return null;
+    public static Graph.DataPin findPin(AdvancedNodeGraph graph, int pinID){
+        return graph.getPinMap().get(pinID);
     }
 
-    public List<Graph.Link> getLinks(int pinID){
+    public static List<Graph.Link> getLinks(AdvancedNodeGraph graph, int pinID){
         List<Graph.Link> connectedLinks = new ArrayList<>();
-        for(Graph.Link link : links){
+        for(Graph.Link link : graph.getLinks().values()){
             if(link.startPinID == pinID || link.endPinID == pinID){
                 connectedLinks.add(link);
             }
@@ -188,12 +157,20 @@ public class NodeGraph {
         return connectedLinks;
     }
 
-    public void unlinkPin(int pinID){
-        links.removeAll(getLinks(pinID));
+    public static boolean unlinkPin(AdvancedNodeGraph graph, int pinID){
+        boolean failed = false;
+        for(Graph.Link link : getLinks(graph, pinID)){
+            if(graph.canRemoveLink(link)){
+                graph.removeLink(link);
+            }else{
+                failed = true;
+            }
+        }
+        return !failed;
     }
 
-    public boolean isPinLinked(int pinID){
-        for(Graph.Link link : links){
+    public static boolean isPinLinked(AdvancedNodeGraph graph, int pinID){
+        for(Graph.Link link : graph.getLinks().values()){
             if(link.startPinID == pinID || link.endPinID == pinID){
                 return true;
             }
@@ -201,21 +178,21 @@ public class NodeGraph {
         return false;
     }
 
-    public boolean isRecursiveLink(Graph.Pin startPin, Graph.Pin endPin){
-        return recursiveNodeCheck(new ArrayList<>(), endPin.node, startPin.node);
+    public static boolean isRecursiveLink(AdvancedNodeGraph graph, Graph.DataPin startPin, Graph.DataPin endPin){
+        return recursiveNodeCheck(graph, new ArrayList<>(), endPin.node, startPin.node);
     }
 
-    private boolean recursiveNodeCheck(List<Integer> checking, Graph.Node invalid, Graph.Node toCheck){
-        for(Graph.Pin inputs : toCheck.inputs){
-            for(Graph.Link link : getLinks(inputs.pinID)){
-                Graph.Pin startPin = findPin(link.startPinID);
+    private static boolean recursiveNodeCheck(AdvancedNodeGraph graph, List<Integer> checking, Graph.INode invalid, Graph.INode toCheck){
+        for(Graph.DataPin inputs : toCheck.getInputPins()){
+            for(Graph.Link link : getLinks(graph, inputs.pinID)){
+                Graph.DataPin startPin = findPin(graph, link.startPinID);
                 if(startPin != null){
                     if(startPin.node == invalid){
                         return true;
                     }
-                    if(!checking.contains(startPin.node.nodeID)){
-                        checking.add(startPin.node.nodeID);
-                        if(recursiveNodeCheck(checking, invalid, startPin.node)){
+                    if(!checking.contains(startPin.node.getNodeID())){
+                        checking.add(startPin.node.getNodeID());
+                        if(recursiveNodeCheck(graph, checking, invalid, startPin.node)){
                             return true;
                         }
                     }
@@ -225,11 +202,33 @@ public class NodeGraph {
         return false;
     }
 
-    public boolean canCreateLink(Graph.Pin pinA, Graph.Pin pinB){
+    public static boolean canCreateLink(Graph.DataPin pinA, Graph.DataPin pinB){
         if(pinA == null || pinB == null || pinA.kind == pinB.kind || pinA.type != pinB.type || pinA.node == pinB.node){
             return false;
         }
         return true;
     }
+
+    public static void writePinIDs(CompoundNBT nbt, String key, List<Graph.DataPin> dataPins){
+        if(dataPins.size() != 0){
+            int[] pinIDArray = new int[dataPins.size()];
+            for(int i = 0; i < pinIDArray.length; i ++){
+                pinIDArray[i] = dataPins.get(i).pinID;
+            }
+            nbt.putIntArray(key, pinIDArray);
+        }
+    }
+
+    public static void readPinIDs(CompoundNBT nbt, String key, List<Graph.DataPin> dataPins){
+        if(nbt.contains(key)){
+            int[] pinIDArray = nbt.getIntArray(key);
+            for(int i = 0; i < pinIDArray.length; i ++){
+                if(i < dataPins.size()){
+                    dataPins.get(i).pinID = pinIDArray[i];
+                }
+            }
+        }
+    }
+
 
 }

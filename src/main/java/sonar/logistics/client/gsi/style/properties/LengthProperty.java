@@ -1,5 +1,9 @@
 package sonar.logistics.client.gsi.style.properties;
 
+import net.minecraft.nbt.CompoundNBT;
+import sonar.logistics.util.network.EnumSyncType;
+import sonar.logistics.util.network.INBTSyncable;
+
 /**
  * Defines a length which is calculated with a {@link Unit}
  */
@@ -13,14 +17,14 @@ public class LengthProperty {
     public static final LengthProperty MAX_PERCENT = new LengthProperty(Unit.PERCENT, 1);
 
     public Unit unitType;
-    public double value;
+    public float value;
 
-    public LengthProperty(Unit unitType, double value){
+    public LengthProperty(Unit unitType, float value){
         this.unitType = unitType;
         this.value = value;
     }
 
-    public double getValue(double maxValue){
+    public float getValue(float maxValue){
         switch (unitType){
             case AUTO:
                 return Float.MAX_VALUE;
@@ -31,11 +35,16 @@ public class LengthProperty {
         }
     }
 
-    public static double getLengthSafe(LengthProperty length, double maxValue) {
+    public static float getLengthSafe(LengthProperty length, float maxValue) {
         return length == null ? 0 : length.getValue(maxValue);
     }
 
-    public static float getLengthSafeF(LengthProperty length, double maxValue) {
-        return (float)getLengthSafe(length, maxValue);
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof LengthProperty){
+            LengthProperty property = (LengthProperty) obj;
+            return property.unitType == this.unitType && property.value == value;
+        }
+        return super.equals(obj);
     }
 }

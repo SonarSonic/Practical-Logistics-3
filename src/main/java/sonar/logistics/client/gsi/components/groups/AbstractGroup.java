@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
-import sonar.logistics.client.gsi.render.GSIRenderContext;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -36,12 +35,14 @@ public class AbstractGroup extends Component implements IComponentHost, IInterac
     public <C extends Component> C addComponent(C component){
         component.setHost(this);
         subComponents.add(component);
+        getGSI().nodeGraph.addNode(component);
         return component;
     }
 
     public <C extends Component> C removeComponent(C component){
         component.setHost(null);
         subComponents.remove(component);
+        getGSI().nodeGraph.removeNode(component);
         return component;
     }
 

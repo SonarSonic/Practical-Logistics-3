@@ -9,7 +9,7 @@ import sonar.logistics.client.gsi.interactions.text.StyledTextInteraction;
 import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionHandler;
 import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class StyledTextComponent extends AbstractTextComponent implements IFlexibleInteractionHandler {
 
@@ -20,7 +20,7 @@ public class StyledTextComponent extends AbstractTextComponent implements IFlexi
     public StyledTextComponent() {}
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         super.build(bounds);
         StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.innerSize(), new LineStyle(), null);
         StyledTextWrapper.INSTANCE.buildSubComponents(host);

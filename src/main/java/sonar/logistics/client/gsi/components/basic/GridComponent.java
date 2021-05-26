@@ -3,8 +3,8 @@ package sonar.logistics.client.gsi.components.basic;
 import sonar.logistics.client.gsi.elements.IRenderableElement;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.components.Component;
-import sonar.logistics.util.vectors.Quad2D;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2F;
+import sonar.logistics.util.vectors.Vector2F;
 import sonar.logistics.client.gsi.style.ComponentAlignment;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class GridComponent extends Component {
     public boolean setCellSize;
 
     public boolean forceUniform;
-    public Vector2D uniformScaling, cellSize, uniformAlignment;
+    public Vector2F uniformScaling, cellSize, uniformAlignment;
     public ComponentAlignment xAlign = ComponentAlignment.CENTERED, yAlign = ComponentAlignment.CENTERED;
 
     public GridComponent() {
@@ -33,7 +33,7 @@ public class GridComponent extends Component {
         this.rows = rows;
     }
 
-    public void setCellSize(Vector2D cellSizing){
+    public void setCellSize(Vector2F cellSizing){
         this.cellSize = cellSizing;
         this.setCellSize = true;
     }
@@ -52,9 +52,9 @@ public class GridComponent extends Component {
                 if(element != null && element.canRender(context)){
                     context.matrix.push();
                     if(forceUniform || element.isUniformScaling(context)) {
-                        element.render(context, new Quad2D((c * cellSize.getX()) + uniformAlignment.getX(), (r * cellSize.getY()) + uniformAlignment.getY(), uniformScaling.getX(), uniformScaling.getY()));
+                        element.render(context, new Quad2F((c * cellSize.getX()) + uniformAlignment.getX(), (r * cellSize.getY()) + uniformAlignment.getY(), uniformScaling.getX(), uniformScaling.getY()));
                     }else{
-                        element.render(context, new Quad2D(c * cellSize.getX(), r * cellSize.getY(), cellSize.getX(), cellSize.getY()));
+                        element.render(context, new Quad2F(c * cellSize.getX(), r * cellSize.getY(), cellSize.getX(), cellSize.getY()));
                     }
                     context.matrix.pop();
                 }
@@ -63,18 +63,18 @@ public class GridComponent extends Component {
     }
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         super.build(bounds);
 
         if(setCellSize) {
             this.rows = (int)Math.floor(this.bounds.innerSize().getHeight()/ cellSize.getY());
             this.columns = (int)Math.floor(this.bounds.innerSize().getWidth()/ cellSize.getX());
         }else {
-            this.cellSize = this.bounds.innerSize().getSizing().mul(1D / columns, 1D / rows);
+            this.cellSize = this.bounds.innerSize().getSizing().mul(1F / columns, 1F / rows);
         }
 
         double uniformScale = Math.min(cellSize.x, cellSize.y);
-        this.uniformScaling = new Vector2D(uniformScale, uniformScale);
-        this.uniformAlignment = Vector2D.align(uniformScaling, cellSize, xAlign, yAlign);
+        this.uniformScaling = new Vector2F(uniformScale, uniformScale);
+        this.uniformAlignment = Vector2F.align(uniformScaling, cellSize, xAlign, yAlign);
     }
 }

@@ -14,9 +14,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import sonar.logistics.PL3;
-import sonar.logistics.server.data.DataRegistry;
+import sonar.logistics.server.data.types.DataType;
 import sonar.logistics.server.data.api.IData;
+import sonar.logistics.util.registry.Registries;
 
+import java.util.Collection;
 import java.util.List;
 
 public class DebugCommands {
@@ -33,12 +35,12 @@ public class DebugCommands {
     private static int testEmptyDataSynchronisation(CommandContext<CommandSource> commandContext) {
         sendMessage(commandContext, TextFormatting.BLUE + "Starting Data Synchronisation Test");
 
-        List<DataRegistry.DataType> types = DataRegistry.INSTANCE.DATA_TYPES;
+        Collection<DataType> types = Registries.getDataTypeRegistry().registry.values();
 
         boolean success = true;
 
         try{
-            for(DataRegistry.DataType type : types){
+            for(DataType type : types){
                 for(boolean emptyTest : new boolean[]{true, false}){
                     String testType = emptyTest ? "Null Test" : "Data Test";
 

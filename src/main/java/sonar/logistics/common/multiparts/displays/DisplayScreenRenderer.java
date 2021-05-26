@@ -10,7 +10,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.util.vectors.VectorHelper;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 import sonar.logistics.common.multiparts.base.IMultipartRenderer;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 
@@ -31,7 +31,7 @@ public class DisplayScreenRenderer implements IMultipartRenderer<DisplayScreenTi
 
         ////
 
-        Quad2D sizing = tile.getGSI().getGSIBounds();
+        Quad2F sizing = tile.getGSI().getGSIBounds();
         Vec3d origin = new Vec3d(0.5, 0.5, 0.5);
         origin = origin.add(VectorHelper.getFaceOffset(tile.getFacing(), 0.5));
 

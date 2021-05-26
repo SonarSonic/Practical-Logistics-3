@@ -332,13 +332,13 @@ public class VectorHelper {
      * @param vertical the screens vertical vector
      * @return the exact click position, taking into account the origin*/
     @Nullable
-    public static Vector2D getClickedPosition(Quad2D sizing, Vec3d origin, Vec3d intersect, Vec3d horizontal, Vec3d vertical, boolean withinBounds){
+    public static Vector2F getClickedPosition(Quad2F sizing, Vec3d origin, Vec3d intersect, Vec3d horizontal, Vec3d vertical, boolean withinBounds){
         Vec3d pos = intersect.subtract(origin);
         double intersect_hoz = pos.dotProduct(horizontal);
         double intersect_ver = pos.dotProduct(vertical);
 
         if(!withinBounds || -sizing.getWidth()/2D < intersect_hoz && intersect_hoz < sizing.getWidth()/2D && -sizing.getHeight()/2D < intersect_ver && intersect_ver < sizing.getHeight()/2D){
-            return new Vector2D(sizing.getWidth() - (pos.dotProduct(horizontal)+sizing.getWidth()/2D), sizing.getHeight() - (pos.dotProduct(vertical)+sizing.getHeight()/2D));
+            return new Vector2F(sizing.getWidth() - (pos.dotProduct(horizontal)+sizing.getWidth()/2F), sizing.getHeight() - (pos.dotProduct(vertical)+sizing.getHeight()/2F));
         }
         return null;
     }
@@ -353,7 +353,7 @@ public class VectorHelper {
      * @param maxDist the maximum block reach of the player
      * @return the exact click position, taking into account the origin*/
     @Nullable
-    public static Vector2D getEntityLook(Entity from, IDisplay to, double maxDist, boolean withinBounds){
+    public static Vector2F getEntityLook(Entity from, IDisplay to, double maxDist, boolean withinBounds){
         if(from == null || to == null){
             return null;
         }

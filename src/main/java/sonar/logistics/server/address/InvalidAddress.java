@@ -9,8 +9,8 @@ public class InvalidAddress extends Address{
     public static InvalidAddress INSTANCE = new InvalidAddress();
 
     @Override
-    public int getType() {
-        return INVALID_ADDRESS;
+    public String getRegistryName() {
+        return "invalid";
     }
 
     @Override

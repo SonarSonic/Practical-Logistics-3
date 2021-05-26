@@ -3,9 +3,8 @@ package sonar.logistics.common.multiparts.displays;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import sonar.logistics.common.multiparts.base.NetworkedTile;
 import sonar.logistics.util.PL3Properties;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.server.caches.displays.ConnectedDisplay;
 import sonar.logistics.server.caches.displays.ConnectedDisplayManager;
@@ -18,7 +17,7 @@ public class LargeDisplayScreenTile extends DisplayScreenTile { //TODO MAKE IT N
     public int connectedDisplayID = -1;
     public ConnectedDisplay connectedDisplay;
 
-    public LargeDisplayScreenTile(MultipartEntry entry, Quad2D scaling) {
+    public LargeDisplayScreenTile(MultipartEntry entry, Quad2F scaling) {
         super(entry, scaling);
     }
 

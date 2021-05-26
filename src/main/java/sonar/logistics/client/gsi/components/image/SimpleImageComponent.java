@@ -9,8 +9,8 @@ import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.util.vectors.Quad2D;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2F;
+import sonar.logistics.util.vectors.Vector2F;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class SimpleImageComponent extends Component {
 
     ///
     private int nativeHeight, nativeWidth;
-    private Quad2D imageQuad;
+    private Quad2F imageQuad;
     private float minU, maxU, minV, maxV;
 
     public SimpleImageComponent(ResourceLocation loc, EnumImageFillType fillType){
@@ -44,7 +44,7 @@ public class SimpleImageComponent extends Component {
     }
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         super.build(bounds);
 
         minU = 0; maxU = 1; minV = 0; maxV = 1;
@@ -65,8 +65,8 @@ public class SimpleImageComponent extends Component {
                 imageQuad = getBounds().innerSize();
                 break;
             case IMAGE_FIT:
-                Vector2D sizing = Vector2D.getSizingFromRatio(getBounds().innerSize().getSizing(), new Vector2D(nativeWidth, nativeHeight));
-                imageQuad = new Quad2D(0, 0, sizing.getX(), sizing.getY()).align(getBounds().innerSize(), ComponentAlignment.CENTERED, ComponentAlignment.CENTERED);
+                Vector2F sizing = Vector2F.getSizingFromRatio(getBounds().innerSize().getSizing(), new Vector2F(nativeWidth, nativeHeight));
+                imageQuad = new Quad2F(0, 0, sizing.getX(), sizing.getY()).align(getBounds().innerSize(), ComponentAlignment.CENTERED, ComponentAlignment.CENTERED);
                 break;
             case IMAGE_STRETCH:
                 imageQuad = getBounds().innerSize();

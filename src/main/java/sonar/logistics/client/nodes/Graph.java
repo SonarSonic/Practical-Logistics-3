@@ -3,17 +3,22 @@ package sonar.logistics.client.nodes;
 import imgui.ImVec2;
 import imgui.extension.nodeditor.flag.NodeEditorPinKind;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
+import sonar.logistics.client.gui.ScreenUtils;
+import sonar.logistics.server.address.DataAddress;
+import sonar.logistics.server.data.types.DataType;
+import sonar.logistics.server.data.api.IData;
+import sonar.logistics.util.network.INBTSyncable;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 ///Based on: https://github.com/thedmd/imgui-node-editor/blob/master/examples/blueprints-example/blueprints-example.cpp
 public class Graph {
 
+    /*
     public enum PinType{
-        Flow,
-        Bool,
+        Boolean,
         Int,
         Float,
         String,
@@ -26,6 +31,8 @@ public class Graph {
         NBT
     };
 
+     */
+
     public enum PinKind {
         Input,
         Output;
@@ -36,50 +43,66 @@ public class Graph {
     };
 
     public enum NodeType {
-        Blueprint,
-        Simple,
-        Tree,
-        Comment,
-        Houdini
+        Source,
+        Method,
+        Component;
     };
 
-    public static class  Pin {
+    public static class DataPin {
         public int pinID;
-        public Node node;
+        public INode node;
         public String name;
-        public PinType type;
+        public DataType type;
         public PinKind kind;
 
-        public Pin(int pinID, Node node, String name, PinType type, PinKind kind) {
-            this.pinID = pinID;
+        public DataPin(INode node, String name, DataType type, PinKind kind) {
+            this.pinID = -1;
             this.node = node;
             this.name = name;
             this.type = type;
             this.kind = kind;
         }
-    };
+    }
 
-    public static class Node {
-        public int nodeID;
-        public String name;
-        public List<Pin> inputs;
-        public List<Pin> outputs;
-        public ColourProperty colour;
-        public NodeType type;
-        public ImVec2 size;
+    public interface INode extends INBTSyncable {
 
-        public String state;
-        public String savedState;
+        ImVec2 defaultSize = new ImVec2(0, 0);
 
-        public Node(int nodeID, String name, List<Pin> inputs, List<Pin> outputs, NodeType type, @Nullable ColourProperty colour, @Nullable ImVec2 size) {
-            this.nodeID = nodeID;
-            this.name = name;
-            this.inputs = inputs;
-            this.outputs = outputs;
-            this.type = type;
-            this.colour = colour == null ? new ColourProperty(255, 255, 255) : colour;
-            this.size = size == null ? new ImVec2(0, 0) : size;
+        void setupNodePins();
+
+        void destroyNodePins();
+
+        void setNodeID(int nodeID);
+
+        int getNodeID();
+
+        String getNodeName();
+
+        List<Graph.DataPin> getInputPins();
+
+        List<Graph.DataPin> getOutputPins();
+
+        Graph.NodeType getNodeType();
+
+        default void updateOutputs(Map<Integer, Object> inputs, IPinResultCache resultCache){
+
         }
+
+        default ColourProperty getNodeColour(){
+            return ScreenUtils.white;
+        }
+
+        default ImVec2 getNodeSize(){
+            return defaultSize;
+        }
+
+
+    }
+
+    @FunctionalInterface
+    public interface IPinResultCache{
+
+        void cachePinOutput(int pinID, @Nullable DataAddress address, IData data);
 
     }
 

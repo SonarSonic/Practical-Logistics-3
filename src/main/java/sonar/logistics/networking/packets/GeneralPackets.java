@@ -16,6 +16,7 @@ import sonar.logistics.server.data.methods.VanillaMethods;
 import sonar.logistics.server.address.Address;
 import sonar.logistics.server.address.Environment;
 import sonar.logistics.server.data.types.sources.SourceData;
+import sonar.logistics.util.registry.Registries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,24 +51,24 @@ public class GeneralPackets {
 
     public static void encodeRequestMethodList(PacketBuffer b, int networkID, Address address){
         b.writeInt(networkID);
-        Address.toPacketBuffer(address, b);
+        Registries.getAddressRegistry().write(address, b);
     }
 
     public static Object decodeRequestMethodList(PacketBuffer b){
         int networkID = b.readInt();
-        Address address = Address.fromPacketBuffer(b);
+        Address address = Registries.getAddressRegistry().read(b);
         return new GeneralPacket(Types.METHOD_LIST, networkID, address);
     }
 
     public static void encodeMethodList(PacketBuffer b, int networkID, Address address) {
         b.writeInt(networkID);
-        Address.toPacketBuffer(address, b);
+        Registries.getAddressRegistry().write(address, b);
 
         PL3Network network = PL3NetworkManager.INSTANCE.getCachedData(networkID);
         if(network != null && network.externalAddressList.contains(address)){ //TODO GLOBAL / LOCAL TOO?
             b.writeBoolean(true);
             Environment environment = DataManager.getEnvironment(address);
-            List<Method> methods = DataManager.getAvailableMethods(MethodRegistry.methods.values(), environment);
+            List<Method> methods = DataManager.getAvailableMethods(Registries.getMethodRegistry().registry.values(), environment);
             List<IData> dataList = DataManager.invokeMethods(methods, environment);
 
             CompoundNBT mainNBT = new CompoundNBT();
@@ -80,7 +81,7 @@ public class GeneralPackets {
             b.writeCompoundTag(mainNBT);
             b.writeInt(methods.size());
             for(Method method : methods){
-                b.writeString(method.getIdentifier());
+                Registries.getMethodRegistry().write(method, b);
             }
             return;
         }
@@ -89,14 +90,13 @@ public class GeneralPackets {
 
     public static Object decodeMethodList(PacketBuffer b) {
         int networkID = b.readInt();
-        Address address = Address.fromPacketBuffer(b);
+        Address address = Registries.getAddressRegistry().read(b);
         if(b.readBoolean()){
             CompoundNBT mainNBT = b.readCompoundTag();
             int size = b.readInt();
             Map<MethodCategory, Map<Method, IData>> methods = new HashMap<>();
             for(int i = 0; i < size; i++){
-                String identifier = b.readString();
-                Method method = MethodRegistry.getMethodFromIdentifier(identifier);
+                Method method = Registries.getMethodRegistry().read(b);
                 if(method != null){
                     IData data = method.getDataFactory().create();
                     method.getDataFactory().read(data, String.valueOf(i), mainNBT);
@@ -156,21 +156,21 @@ public class GeneralPackets {
     }
 
     public static void encodeDataAddressSelection(PacketBuffer b, Address address, boolean add, List<DataAddress> dataAddresses){
-        Address.toPacketBuffer(address, b);
+        Registries.getAddressRegistry().write(address, b);
         b.writeBoolean(add);
         b.writeInt(dataAddresses.size());
         for(DataAddress dataAddress : dataAddresses){
-            Address.toPacketBuffer(dataAddress, b);
+            Registries.getAddressRegistry().write(dataAddress, b);
         }
     }
 
     public static Object decodeDataAddressSelection(PacketBuffer b){
-        Address address = Address.fromPacketBuffer(b);
+        Address address = Registries.getAddressRegistry().read(b);
         boolean add = b.readBoolean();
         int size = b.readInt();
         List<DataAddress> addressList = new ArrayList<>();
         for(int i = 0; i < size; i++){
-            Address dataAddress = Address.fromPacketBuffer(b);
+            Address dataAddress = Registries.getAddressRegistry().read(b);
             if(dataAddress instanceof DataAddress){
                 addressList.add((DataAddress)dataAddress);
             }

@@ -8,7 +8,7 @@ import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Vector2F;
 
 /**
  * TODO make this useable as a dropdown button.
@@ -64,8 +64,8 @@ public class HeaderGroup extends LayoutGroup {
 
     ////moving group -- TODO: make a more universal way of moving windows??
 
-    private Vector2D dragStart;
-    private Vector2D oldAlignment;
+    private Vector2F dragStart;
+    private Vector2F oldAlignment;
     private boolean moveDrag;
 
     public void startDrag(){
@@ -81,7 +81,7 @@ public class HeaderGroup extends LayoutGroup {
             //n.b. this assumes the Window has absolute bounds, should we change this? if also allows positions outside of the hosts bounds.
             ComponentBounds bounds = getBounds();
             dragStart = getInteractionHandler().mousePos.copy();
-            oldAlignment = new Vector2D(styling.getXPos().getValue(bounds.hostBounds.getWidth()), styling.getYPos().getValue(bounds.hostBounds.getHeight()));
+            oldAlignment = new Vector2F(styling.getXPos().getValue(bounds.hostBounds.getWidth()), styling.getYPos().getValue(bounds.hostBounds.getHeight()));
         }else{
             super.onDragStarted(button);
         }

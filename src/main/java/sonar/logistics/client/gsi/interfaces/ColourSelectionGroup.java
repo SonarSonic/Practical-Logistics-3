@@ -11,7 +11,7 @@ import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 //TODO Z DEPTH FOR WINDOWS
 public abstract class ColourSelectionGroup extends AbstractGroup {
@@ -24,9 +24,9 @@ public abstract class ColourSelectionGroup extends AbstractGroup {
     }
 
     public void init() {
-        addComponent(red = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 1/12D, 0.2, 1/6D, Unit.PERCENT);
-        addComponent(green = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 5/12D, 0.2, 1/6D, Unit.PERCENT);
-        addComponent(blue = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8, 9/12D, 0.2, 1/6D, Unit.PERCENT);
+        addComponent(red = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8F, 1F/12F, 0.2F, 1/6F, Unit.PERCENT);
+        addComponent(green = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8F, 5F/12F, 0.2F, 1/6F, Unit.PERCENT);
+        addComponent(blue = new TextInputComponent().setInputType(TextInputComponent.EnumTextInputType.RGB_COLOUR_VALUE).setTrigger(this::updateColourFromTextBox)).getStyling().setSizing(0.8F, 9F/12F, 0.2F, 1/6F, Unit.PERCENT);
 
         //set default gui font height
         red.inputGlyphStyle.fontHeight = 9;
@@ -37,9 +37,9 @@ public abstract class ColourSelectionGroup extends AbstractGroup {
         green.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
         blue.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
 
-        addComponent(redSlider = new SliderComponent().setHandleColour(ScreenUtils.red_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 1/12D, 0.7, 1/6D, Unit.PERCENT);
-        addComponent(greenSlider = new SliderComponent().setHandleColour(ScreenUtils.green_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 5/12D, 0.7, 1/6D, Unit.PERCENT);
-        addComponent(blueSlider = new SliderComponent().setHandleColour(ScreenUtils.blue_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1, 9/12D, 0.7, 1/6D, Unit.PERCENT);
+        addComponent(redSlider = new SliderComponent().setHandleColour(ScreenUtils.red_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1F, 1/12F, 0.7F, 1/6F, Unit.PERCENT);
+        addComponent(greenSlider = new SliderComponent().setHandleColour(ScreenUtils.green_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1F, 5/12F, 0.7F, 1/6F, Unit.PERCENT);
+        addComponent(blueSlider = new SliderComponent().setHandleColour(ScreenUtils.blue_button.rgba).setTrigger(this::updateColourFromSlider)).getStyling().setSizing(0.1F, 9/12F, 0.7F, 1/6F, Unit.PERCENT);
 
         redSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
         greenSlider.styling.setOuterBackgroundColour(ScreenUtils.transparent_disabled_button);
@@ -51,7 +51,7 @@ public abstract class ColourSelectionGroup extends AbstractGroup {
     }
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         super.build(bounds);
         subComponents.forEach(c -> c.build(getBounds().innerSize()));
     }
@@ -82,9 +82,9 @@ public abstract class ColourSelectionGroup extends AbstractGroup {
     }
 
     public void updateSliders(){
-        redSlider.sliderValue = GSIDesignSettings.selectedColour.getRed() / 255D;
-        greenSlider.sliderValue = GSIDesignSettings.selectedColour.getGreen() / 255D;
-        blueSlider.sliderValue = GSIDesignSettings.selectedColour.getBlue() / 255D;
+        redSlider.sliderValue = GSIDesignSettings.selectedColour.getRed() / 255F;
+        greenSlider.sliderValue = GSIDesignSettings.selectedColour.getGreen() / 255F;
+        blueSlider.sliderValue = GSIDesignSettings.selectedColour.getBlue() / 255F;
     }
 
     public void updateTextBoxes(){

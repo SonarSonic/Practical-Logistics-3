@@ -6,6 +6,7 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.PacketDistributor;
+import sonar.logistics.client.nodes.AdvancedNodeGraph;
 import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.DataSyncPacket;
 import sonar.logistics.networking.packets.DataUpdatePacket;
@@ -14,8 +15,11 @@ import sonar.logistics.server.data.methods.Method;
 import sonar.logistics.server.address.Address;
 import sonar.logistics.server.address.DataAddress;
 import sonar.logistics.server.address.Environment;
+import sonar.logistics.server.data.types.DataType;
 import sonar.logistics.server.data.watchers.DataWatcher;
 import sonar.logistics.util.ListHelper;
+import sonar.logistics.util.network.EnumSyncType;
+import sonar.logistics.util.registry.Registries;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -26,6 +30,7 @@ public class DataManager {
 
     public Map<Address, DataWatcher> watchers = new HashMap<>();
     public Map<Address, DataSource> dataSources = new HashMap<>();
+    public Map<Integer, AdvancedNodeGraph> nodeGraphMap = new HashMap<>();
 
     public Map<ServerPlayerEntity, List<DataAddress>> updatePackets = new HashMap<>();
     public Map<ServerPlayerEntity, List<DataAddress>> syncPackets = new HashMap<>();
@@ -46,6 +51,7 @@ public class DataManager {
         watchers.values().forEach(DataWatcher::tick);
         watchers.values().forEach(DataWatcher::preDataUpdate);
         dataSources.values().forEach(DataSource::tick);
+        nodeGraphMap.values().forEach(AdvancedNodeGraph::processNodeGraph);
         watchers.values().forEach(DataWatcher::postDataUpdate);
 
         //send sync packets to players who require full data packets
@@ -219,29 +225,27 @@ public class DataManager {
 
     public static CompoundNBT writeData(IData data){
         CompoundNBT nbt = new CompoundNBT();
-        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(data.getClass());
-        nbt.putInt("type", dataType.id);
+        DataType dataType = DataType.getDataType(data.getClass());
+        Registries.getDataTypeRegistry().write(dataType, nbt, "type", EnumSyncType.SAVE);
         dataType.factory.save(data, "data", nbt);
         return nbt;
     }
 
     public static IData readData(CompoundNBT nbt){
-        int type = nbt.getInt("type");
-        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(type);
+        DataType dataType = Registries.getDataTypeRegistry().read(nbt, "type", EnumSyncType.SAVE);
         IData data = dataType.factory.create();
         dataType.factory.read(data, "data", nbt);
         return data;
     }
 
     public static void writeDataUpdate(IData data, PacketBuffer buffer){
-        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(data.getClass());
-        buffer.writeInt(dataType.id);
+        DataType dataType = DataType.getDataType(data.getClass());
+        Registries.getDataTypeRegistry().write(dataType, buffer);
         dataType.factory.saveUpdate(data, buffer);
     }
 
     public static void readDataUpdate(IData data, PacketBuffer buffer){
-        int type = buffer.readInt();
-        DataRegistry.DataType dataType = DataRegistry.INSTANCE.getDataType(type);
+        DataType dataType = Registries.getDataTypeRegistry().read(buffer);
         dataType.factory.readUpdate(data, buffer);
     }
 }

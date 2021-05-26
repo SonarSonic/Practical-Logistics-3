@@ -1,32 +1,39 @@
 package sonar.logistics.client.gsi.components;
 
+import net.minecraft.nbt.CompoundNBT;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
-import sonar.logistics.client.gsi.interactions.main.EmptyInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.style.ComponentStyling;
 import sonar.logistics.client.gsi.style.ComponentBounds;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.util.vectors.Quad2D;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.client.nodes.Graph;
+import sonar.logistics.client.nodes.NodeGraphUtils;
+import sonar.logistics.util.network.EnumSyncType;
+import sonar.logistics.util.network.INBTSyncable;
+import sonar.logistics.util.vectors.Quad2F;
+import sonar.logistics.util.vectors.Vector2F;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A component is a user interface widget that can be rendered in the world or in a gui
  */
-public abstract class Component implements IInteractionHandler {
+public abstract class Component implements IInteractionHandler, Graph.INode, INBTSyncable {
 
     public transient IComponentHost host;
-
     public transient ComponentBounds bounds = new ComponentBounds();
-    public ComponentStyling styling = new ComponentStyling();
+    public transient List<Graph.DataPin> inputPins = new ArrayList<>();
+    public transient List<Graph.DataPin> outputPins = new ArrayList<>();
 
     public boolean isVisible = true;
+    public int nodeID = -1;
+    public ComponentStyling styling = new ComponentStyling();
 
     public Component(){}
 
@@ -70,7 +77,7 @@ public abstract class Component implements IInteractionHandler {
     /**this method "builds" the layout for the component based on the bounds passed to it, it should always be called before interacting with the component
      * the bounds are passed by the "host" - typically a GSI but could also be passed by containers like GridContainer / FloatingContainer
      * this method should set the ComponentBounds, keeping the x, y alignment of the passed "host's" bounds*/
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         this.bounds.build(bounds, styling);
     }
 
@@ -111,6 +118,70 @@ public abstract class Component implements IInteractionHandler {
         return null;
     }
 
+    //// NODES \\\\\
+
+    @Override
+    public void setupNodePins(){}
+
+    @Override
+    public void destroyNodePins(){}
+
+    @Override
+    public void setNodeID(int nodeID) {
+        this.nodeID = nodeID;
+    }
+
+    @Override
+    public int getNodeID() {
+        return nodeID;
+    }
+
+    @Override
+    public String getNodeName() {
+        return toString();
+    }
+
+    @Override
+    public List<Graph.DataPin> getInputPins() {
+        return inputPins;
+    }
+
+    @Override
+    public List<Graph.DataPin> getOutputPins() {
+        return outputPins;
+    }
+
+    @Override
+    public Graph.NodeType getNodeType() {
+        return Graph.NodeType.Component;
+    }
+
+    /// SAVING \\\
+
+    @Override
+    public CompoundNBT read(CompoundNBT nbt, EnumSyncType syncType) {
+        isVisible = nbt.getBoolean("visible");
+        nodeID = nbt.getInt("nodeID");
+        styling.read(nbt, syncType);
+
+        setupNodePins();
+        NodeGraphUtils.readPinIDs(nbt,"input", inputPins);
+        NodeGraphUtils.readPinIDs(nbt,"output", outputPins);
+        return nbt;
+    }
+
+    @Override
+    public CompoundNBT write(CompoundNBT nbt, EnumSyncType syncType) {
+        nbt.putBoolean("visible", isVisible);
+        nbt.putInt("nodeID", nodeID);
+        styling.write(nbt, syncType);
+
+        NodeGraphUtils.writePinIDs(nbt,"input", inputPins);
+        NodeGraphUtils.writePinIDs(nbt,"output", outputPins);
+        return nbt;
+    }
+
+
     /// helper methods
 
     public GSI getGSI(){
@@ -121,11 +192,11 @@ public abstract class Component implements IInteractionHandler {
         return getGSI().interactionHandler;
     }
 
-    public Vector2D getMousePos(){
+    public Vector2F getMousePos(){
         return getInteractionHandler().mousePos;
     }
 
-    public Vector2D getRelativeMousePos(){
+    public Vector2F getRelativeMousePos(){
         return getMousePos().copy().sub(getBounds().innerSize().getAlignment());
     }
 

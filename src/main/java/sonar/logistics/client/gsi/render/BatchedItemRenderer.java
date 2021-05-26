@@ -8,8 +8,8 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.item.ItemStack;
-import sonar.logistics.util.vectors.Quad2D;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2F;
+import sonar.logistics.util.vectors.Vector2F;
 import sonar.logistics.client.gsi.style.ComponentAlignment;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class BatchedItemRenderer {
     }
 
 
-    public void addBatchedItemStack(ItemStack toRender, Quad2D bounds){
+    public void addBatchedItemStack(ItemStack toRender, Quad2F bounds){
         BatchedItemStack batchedItemStack = new BatchedItemStack(toRender, bounds);
         if(batchedItemStack.isGui3D){
             batched3DItemStacks.add(batchedItemStack);
@@ -91,19 +91,19 @@ public class BatchedItemRenderer {
 
     public static class BatchedItemStack{
 
-        public static Vector2D ITEM_RATIO = new Vector2D(1,1);
+        public static Vector2F ITEM_RATIO = new Vector2F(1,1);
 
         public ItemStack toRender;
         public IBakedModel model;
-        public Vector2D alignment;
-        public Vector2D scaling;
+        public Vector2F alignment;
+        public Vector2F scaling;
         public boolean isGui3D;
 
-        public BatchedItemStack(ItemStack toRender, Quad2D bounds){
+        public BatchedItemStack(ItemStack toRender, Quad2F bounds){
             this.toRender = toRender;
             this.model = itemRenderer.getItemModelWithOverrides(toRender, null, null);
-            this.scaling = Vector2D.getSizingFromRatio(bounds.getSizing(), ITEM_RATIO);
-            this.alignment = bounds.getAlignment().add(scaling.x/2, scaling.y/2).add(Vector2D.align(scaling, bounds.getSizing(), ComponentAlignment.CENTERED, ComponentAlignment.CENTERED));
+            this.scaling = Vector2F.getSizingFromRatio(bounds.getSizing(), ITEM_RATIO);
+            this.alignment = bounds.getAlignment().add(scaling.x/2, scaling.y/2).add(Vector2F.align(scaling, bounds.getSizing(), ComponentAlignment.CENTERED, ComponentAlignment.CENTERED));
             this.isGui3D = model.isGui3d();
         }
 

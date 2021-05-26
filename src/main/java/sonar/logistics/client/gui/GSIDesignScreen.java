@@ -4,7 +4,7 @@ import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
 import sonar.logistics.client.gui.widgets.GSIViewportWidget;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class GSIDesignScreen extends SimpleWidgetScreen {
 
@@ -22,10 +22,10 @@ public class GSIDesignScreen extends SimpleWidgetScreen {
     protected void init() {
         super.init();
 
-        DesignInterfaces.normalToolsWidget.setBoundsAndRebuild(new Quad2D(guiLeft, guiTop, xSize, ySize));
+        DesignInterfaces.normalToolsWidget.setBoundsAndRebuild(new Quad2F(guiLeft, guiTop, xSize, ySize));
         addWidget(DesignInterfaces.normalToolsWidget);
 
-        DesignInterfaces.textToolsWidget.setBoundsAndRebuild(new Quad2D(guiLeft, guiTop, xSize, ySize));
+        DesignInterfaces.textToolsWidget.setBoundsAndRebuild(new Quad2F(guiLeft, guiTop, xSize, ySize));
         addWidget(DesignInterfaces.textToolsWidget);
 
         addWidget(gsiViewportWidget = new GSIViewportWidget(displayGSI, this.guiLeft + 32, this.guiTop + 32, this.xSize - 64, this.ySize - 64));

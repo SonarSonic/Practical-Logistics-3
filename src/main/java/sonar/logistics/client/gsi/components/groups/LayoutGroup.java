@@ -3,7 +3,7 @@ package sonar.logistics.client.gsi.components.groups;
 import sonar.logistics.client.gsi.components.layouts.Layout;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class LayoutGroup extends AbstractGroup {
 
@@ -15,7 +15,7 @@ public class LayoutGroup extends AbstractGroup {
     }
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         super.build(bounds);
         layout.buildComponents(getBounds().innerSize(), subComponents);
     }

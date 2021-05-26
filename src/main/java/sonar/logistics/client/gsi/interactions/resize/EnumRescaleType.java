@@ -1,9 +1,5 @@
 package sonar.logistics.client.gsi.interactions.resize;
 
-import sonar.logistics.util.vectors.Quad2D;
-
-import javax.annotation.Nullable;
-
 public enum EnumRescaleType {
     TOP_LEFT_RESCALE(0.0F, 0.0F),
     TOP_MIDDLE_RESCALE(0.5F, 0.0F),

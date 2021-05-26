@@ -19,7 +19,7 @@ import sonar.logistics.client.gsi.interactions.triggers.ITrigger;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class TextInputComponent extends AbstractTextComponent implements IFlexibleInteractionHandler {
 
@@ -70,7 +70,7 @@ public class TextInputComponent extends AbstractTextComponent implements IFlexib
     }
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         super.build(bounds);
         StyledTextWrapper.INSTANCE.build(pages, fontType, this.bounds.innerSize(), inputLineStyle, inputGlyphStyle);
         StyledTextWrapper.INSTANCE.alignPages(ComponentAlignment.CENTERED);

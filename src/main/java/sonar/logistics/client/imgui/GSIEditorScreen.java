@@ -2,7 +2,6 @@ package sonar.logistics.client.imgui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import imgui.ImColor;
 import imgui.ImGui;
 import imgui.flag.*;
 import net.minecraft.client.Minecraft;
@@ -14,13 +13,9 @@ import sonar.logistics.client.ClientDataCache;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.components.buttons.EnumButtonIcons;
-import sonar.logistics.client.gsi.components.buttons.TextButtonComponent;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyleAttributes;
 import sonar.logistics.client.gsi.components.text.style.LineStyle;
-import sonar.logistics.client.gsi.interactions.AbstractComponentInteraction;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
-import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
-import sonar.logistics.client.gsi.interactions.resize.ResizeInteraction;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
@@ -28,8 +23,7 @@ import sonar.logistics.client.gui.DesignInterfaces;
 import sonar.logistics.client.gui.EnumLineBreakGlyphTypes;
 import sonar.logistics.client.gui.GSIDesignSettings;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.client.nodes.NodeGraph;
-import sonar.logistics.client.nodes.Graph;
+import sonar.logistics.client.nodes.NodeGraphUtils;
 import sonar.logistics.networking.PL3PacketHandler;
 import sonar.logistics.networking.packets.GeneralPacket;
 import sonar.logistics.networking.packets.GeneralPackets;
@@ -42,8 +36,6 @@ import sonar.logistics.server.data.methods.MethodCategory;
 import sonar.logistics.server.data.types.sources.SourceData;
 import sonar.logistics.util.MathUtils;
 
-import javax.xml.crypto.Data;
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -52,7 +44,6 @@ public class GSIEditorScreen extends ImGuiScreen{
     private static Texture buttonTexture;
     private static OffscreenFrameBuffer viewportFrameBuffer = new OffscreenFrameBuffer(1024, 768);
     public GSIViewportWidget widget = null;
-    public NodeGraph nodeBuilder = null;
 
     public GSI displayGSI;
 
@@ -74,38 +65,41 @@ public class GSIEditorScreen extends ImGuiScreen{
             Minecraft.getInstance().getTextureManager().bindTexture(ScreenUtils.BUTTONS_ALPHA);
             buttonTexture = Minecraft.getInstance().getTextureManager().getTexture(ScreenUtils.BUTTONS_ALPHA);
         }
-        nodeBuilder = new NodeGraph();
-        Graph.Node getInventory = new Graph.Node(nodeBuilder.nextNodeID(), "getInventory", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Simple, null, null);
-        getInventory.outputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), getInventory, "Inventory", Graph.PinType.Inventory, Graph.PinKind.Output));
+        /* TODO REMOVE ME
+        nodeBuilder = new NodeGraphUtils();
+        DefaultNode getInventory = new DefaultNode(nodeBuilder.nextNodeID(), "getInventory", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Method, null, null);
+        getInventory.outputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), getInventory, "Inventory", Graph.PinType.Inventory, Graph.PinKind.Output));
         nodeBuilder.nodes.add(getInventory);
 
-        Graph.Node getItem = new Graph.Node(nodeBuilder.nextNodeID(), "getItem", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Simple, null, null);
-        getItem.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), getItem, "Inventory", Graph.PinType.Inventory, Graph.PinKind.Input));
-        getItem.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), getItem, "Slot", Graph.PinType.Int, Graph.PinKind.Input));
-        getItem.outputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), getItem, "ItemStack", Graph.PinType.ItemStack, Graph.PinKind.Output));
+        DefaultNode getItem = new DefaultNode(nodeBuilder.nextNodeID(), "getItem", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Method, null, null);
+        getItem.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), getItem, "Inventory", Graph.PinType.Inventory, Graph.PinKind.Input));
+        getItem.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), getItem, "Slot", Graph.PinType.Int, Graph.PinKind.Input));
+        getItem.outputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), getItem, "ItemStack", Graph.PinType.ItemStack, Graph.PinKind.Output));
         nodeBuilder.nodes.add(getItem);
 
-        Graph.Node readItemStack = new Graph.Node(nodeBuilder.nextNodeID(), "readItemStack", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Simple, null, null);
-        readItemStack.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), readItemStack, "ItemStack", Graph.PinType.ItemStack, Graph.PinKind.Input));
-        readItemStack.outputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), readItemStack, "Item", Graph.PinType.Item, Graph.PinKind.Output));
-        readItemStack.outputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), readItemStack, "Count", Graph.PinType.Int, Graph.PinKind.Output));
-        readItemStack.outputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), readItemStack, "NBT", Graph.PinType.NBT, Graph.PinKind.Output));
+        DefaultNode readItemStack = new DefaultNode(nodeBuilder.nextNodeID(), "readItemStack", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Method, null, null);
+        readItemStack.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), readItemStack, "ItemStack", Graph.PinType.ItemStack, Graph.PinKind.Input));
+        readItemStack.outputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), readItemStack, "Item", Graph.PinType.Item, Graph.PinKind.Output));
+        readItemStack.outputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), readItemStack, "Count", Graph.PinType.Int, Graph.PinKind.Output));
+        readItemStack.outputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), readItemStack, "NBT", Graph.PinType.NBT, Graph.PinKind.Output));
         nodeBuilder.nodes.add(readItemStack);
 
 
-        Graph.Node createItemStack = new Graph.Node(nodeBuilder.nextNodeID(), "createItemStack", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Simple, null, null);
-        createItemStack.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), createItemStack, "Item", Graph.PinType.Item, Graph.PinKind.Input));
-        createItemStack.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), createItemStack, "Count", Graph.PinType.Int, Graph.PinKind.Input));
-        createItemStack.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), createItemStack, "NBT", Graph.PinType.NBT, Graph.PinKind.Input));
-        createItemStack.outputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), createItemStack, "ItemStack", Graph.PinType.ItemStack, Graph.PinKind.Output));
+        DefaultNode createItemStack = new DefaultNode(nodeBuilder.nextNodeID(), "createItemStack", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Method, null, null);
+        createItemStack.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), createItemStack, "Item", Graph.PinType.Item, Graph.PinKind.Input));
+        createItemStack.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), createItemStack, "Count", Graph.PinType.Int, Graph.PinKind.Input));
+        createItemStack.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), createItemStack, "NBT", Graph.PinType.NBT, Graph.PinKind.Input));
+        createItemStack.outputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), createItemStack, "ItemStack", Graph.PinType.ItemStack, Graph.PinKind.Output));
         nodeBuilder.nodes.add(createItemStack);
 
 
-        Graph.Node addItemStack = new Graph.Node(nodeBuilder.nextNodeID(), "addItemStack", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Simple, null, null);
-        addItemStack.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), addItemStack, "Inventory", Graph.PinType.Item, Graph.PinKind.Input));
-        addItemStack.inputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), addItemStack, "ItemStack", Graph.PinType.Int, Graph.PinKind.Input));
-        addItemStack.outputs.add(new Graph.Pin(nodeBuilder.nextNodeID(), addItemStack, "Boolean", Graph.PinType.Bool, Graph.PinKind.Output));
+        DefaultNode addItemStack = new DefaultNode(nodeBuilder.nextNodeID(), "addItemStack", new ArrayList<>(), new ArrayList<>(), Graph.NodeType.Method, null, null);
+        addItemStack.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), addItemStack, "Inventory", Graph.PinType.Item, Graph.PinKind.Input));
+        addItemStack.inputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), addItemStack, "ItemStack", Graph.PinType.Int, Graph.PinKind.Input));
+        addItemStack.outputs.add(new Graph.DataPin(nodeBuilder.nextNodeID(), addItemStack, "Boolean", Graph.PinType.Bool, Graph.PinKind.Output));
         nodeBuilder.nodes.add(addItemStack);
+
+         */
     }
 
 
@@ -241,8 +235,8 @@ public class GSIEditorScreen extends ImGuiScreen{
             inputArray = new float[]{(float)component.getStyling().getXPos().value, (float)component.getStyling().getYPos().value};
             ImGui.pushItemWidth(200);
             if(ImGui.dragFloat2("Position", inputArray, 0.005F, 0, 1, "%.2f")){
-                double maxX = 1F - component.getStyling().getWidth().getValue(1.0F);
-                double maxY = 1F - component.getStyling().getHeight().getValue(1.0F);
+                float maxX = 1F - component.getStyling().getWidth().getValue(1.0F);
+                float maxY = 1F - component.getStyling().getHeight().getValue(1.0F);
                 component.getStyling().setXPos(new LengthProperty(Unit.PERCENT, Math.min(maxX, inputArray[0])));
                 component.getStyling().setYPos(new LengthProperty(Unit.PERCENT, Math.min(maxY, inputArray[1])));
                 component.rebuild();
@@ -250,8 +244,8 @@ public class GSIEditorScreen extends ImGuiScreen{
 
             inputArray = new float[]{(float)component.getStyling().getWidth().value, (float)component.getStyling().getHeight().value};
             if(ImGui.dragFloat2("Size", inputArray, 0.005F, 0, 1, "%.2f")){
-                double maxWidth = 1F - component.getStyling().getXPos().getValue(1.0F);
-                double maxHeight = 1F - component.getStyling().getYPos().getValue(1.0F);
+                float maxWidth = 1F - component.getStyling().getXPos().getValue(1.0F);
+                float maxHeight = 1F - component.getStyling().getYPos().getValue(1.0F);
                 component.getStyling().setWidth(new LengthProperty(Unit.PERCENT, Math.min(maxWidth, inputArray[0])));
                 component.getStyling().setHeight(new LengthProperty(Unit.PERCENT, Math.min(maxHeight, inputArray[1])));
                 component.rebuild();
@@ -357,7 +351,7 @@ public class GSIEditorScreen extends ImGuiScreen{
                 for(Map.Entry<DataAddress, IData> dataEntry : entry.getValue().entrySet()){
                     ImGui.tableNextRow(ImGuiTableRowFlags.None, 18);
                     ImGui.tableSetColumnIndex(0);
-                    ImGui.textColored(dataEntry.getKey().method.getDataType().subType.getSubTypeColour(), dataEntry.getKey().method.getDataType().displayName);
+                    ImGui.textColored(dataEntry.getKey().method.getDataType().subType.getSubTypeColour(), dataEntry.getKey().method.getDataType().getRegistryName());
                     ImGui.sameLine(60, 0);
                     ImGui.textColored(ScreenUtils.light_grey.getARGB(), dataEntry.getKey().method.getMethodName() + " ");
                     ImGui.sameLine(190, 0);
@@ -495,7 +489,7 @@ public class GSIEditorScreen extends ImGuiScreen{
                                 ImGui.tableSetColumnIndex(column);
                                 switch (column){
                                     case 0:
-                                        ImGui.pushID(methodEntry.getKey().getIdentifier());
+                                        ImGui.pushID(methodEntry.getKey().getRegistryName());
                                         if(ImGui.selectable(methodEntry.getKey().getMethodName(), isSelected,ImGuiSelectableFlags.DontClosePopups | ImGuiSelectableFlags.SpanAllColumns, 0, 24)){
                                             if(isSelected){
                                                 selectedMethods.remove(methodEntry.getKey());
@@ -509,7 +503,7 @@ public class GSIEditorScreen extends ImGuiScreen{
                                         ImGui.text(String.valueOf(methodEntry.getValue()));
                                         break;
                                     case 2:
-                                        ImGui.textColored(methodEntry.getKey().getDataType().subType.getSubTypeColour(), methodEntry.getKey().getDataType().displayName);
+                                        ImGui.textColored(methodEntry.getKey().getDataType().subType.getSubTypeColour(), methodEntry.getKey().getDataType().getRegistryName());
                                         break;
                                 }
                             }
@@ -552,7 +546,7 @@ public class GSIEditorScreen extends ImGuiScreen{
     }
 
     public void renderNodeEditor(int x, int y, float partialTicks) {
-        nodeBuilder.render();
+        NodeGraphUtils.render(displayGSI.nodeGraph);
     }
 
     public void renderViewport(int x, int y, float partialTicks) {

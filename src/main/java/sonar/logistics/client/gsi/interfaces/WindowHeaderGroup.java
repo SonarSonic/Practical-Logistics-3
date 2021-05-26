@@ -10,7 +10,7 @@ import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class WindowHeaderGroup extends LayoutGroup {
 
@@ -19,7 +19,7 @@ public class WindowHeaderGroup extends LayoutGroup {
 
     private ColouredButtonComponent windowBar;
     private TextButtonComponent headerButton;
-    private double headerSize = 12;
+    private float headerSize = 12;
 
     public WindowHeaderGroup(String windowName, boolean isDropdown){
         this.windowName = windowName;
@@ -41,7 +41,7 @@ public class WindowHeaderGroup extends LayoutGroup {
     }
 
     @Override
-    public void build(Quad2D bounds) {
+    public void build(Quad2F bounds) {
         this.bounds.build(bounds, styling);
         windowBar.getStyling().setSizing(0, 0, getBounds().innerSize().width - headerSize, headerSize, Unit.PIXEL);
         headerButton.getStyling().setSizing(getBounds().innerSize().width - headerSize, 0, headerSize, headerSize, Unit.PIXEL);

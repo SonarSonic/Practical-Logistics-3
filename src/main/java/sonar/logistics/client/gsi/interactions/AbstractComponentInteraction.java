@@ -4,7 +4,7 @@ import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.components.text.IComponentHost;
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Vector2F;
 
 public class AbstractComponentInteraction<C extends Component> implements IInteractionHandler {
 
@@ -33,7 +33,7 @@ public class AbstractComponentInteraction<C extends Component> implements IInter
         return getGSI().interactionHandler;
     }
 
-    public Vector2D getMousePos(){
+    public Vector2F getMousePos(){
         return getInteractionHandler().mousePos;
     }
 

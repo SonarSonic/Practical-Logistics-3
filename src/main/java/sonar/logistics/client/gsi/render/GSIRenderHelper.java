@@ -16,7 +16,7 @@ import sonar.logistics.client.gsi.style.ComponentStyling;
 import sonar.logistics.client.gsi.style.properties.LengthProperty;
 import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class GSIRenderHelper {
 
@@ -63,18 +63,18 @@ public class GSIRenderHelper {
 
     ///// COLOURED RECTS \\\\\
 
-    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2D bounds, int rgba){
+    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2F bounds, int rgba){
         renderColouredRect(context, batched, (float)bounds.getX(), (float)bounds.getY(), (float)bounds.getMaxX(), (float)bounds.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba));
     }
 
-    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2D bounds, ColourProperty colourProperty){
+    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2F bounds, ColourProperty colourProperty){
         renderColouredRect(context, batched, (float)bounds.getX(), (float)bounds.getY(), (float)bounds.getMaxX(), (float)bounds.getMaxY(), colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
     }
-    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2D bounds, double x, double y, double width, double height, ColourProperty colourProperty){
+    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2F bounds, double x, double y, double width, double height, ColourProperty colourProperty){
         renderColouredRect(context, batched, bounds, x, y, width, height, colourProperty.getRed(), colourProperty.getGreen(), colourProperty.getBlue(), colourProperty.getAlpha());
     }
 
-    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2D bounds, double x, double y, double width, double height, int red, int green, int blue, int alpha){
+    public static void renderColouredRect(GSIRenderContext context, boolean batched, Quad2F bounds, double x, double y, double width, double height, int red, int green, int blue, int alpha){
         renderColouredRect(context, batched, (float) (bounds.getX() + x), (float) (bounds.getY() + y), (float) (bounds.getX() + x + width), (float) (bounds.getY() + y + height), red, green, blue, alpha);
     }
 
@@ -91,7 +91,7 @@ public class GSIRenderHelper {
 
     ///// TEXTURED RECTS \\\\\
 
-    public static void renderTexturedRect(GSIRenderContext context, RenderType type, boolean batched, Quad2D quad, int rgba, float minU, float maxU, float minV, float maxV) {
+    public static void renderTexturedRect(GSIRenderContext context, RenderType type, boolean batched, Quad2F quad, int rgba, float minU, float maxU, float minV, float maxV) {
         renderTexturedRect(context, type, batched, quad.getX(), quad.getY(), quad.getMaxX(), quad.getMaxY(), ColourProperty.getRed(rgba), ColourProperty.getGreen(rgba), ColourProperty.getBlue(rgba), ColourProperty.getAlpha(rgba), minU, maxU, minV, maxV);
     }
 
@@ -118,8 +118,8 @@ public class GSIRenderHelper {
 
     public static void renderComponentBorder(GSIRenderContext context, ComponentBounds bounds, ComponentStyling styling){
 
-        double borderWidth = LengthProperty.getLengthSafe(styling.getBorderWidth(), bounds.outerSize().getWidth());
-        double borderHeight = LengthProperty.getLengthSafe(styling.getBorderHeight(), bounds.outerSize().getHeight());
+        float borderWidth = LengthProperty.getLengthSafe(styling.getBorderWidth(), bounds.outerSize().getWidth());
+        float borderHeight = LengthProperty.getLengthSafe(styling.getBorderHeight(), bounds.outerSize().getHeight());
 
         if(borderWidth > 0 || borderHeight > 0) {
 

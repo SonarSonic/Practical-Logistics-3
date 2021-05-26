@@ -4,7 +4,7 @@ public enum ComponentAlignment {
 
 	LEFT, CENTERED, RIGHT;
 
-	public double align(double scale, double max) {
+	public float align(float scale, float max) {
 		switch (this) {
 			case CENTERED:
 				return (max / 2) - (scale / 2);

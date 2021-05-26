@@ -5,7 +5,7 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import sonar.logistics.client.gsi.GSI;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Vector2F;
 import sonar.logistics.util.vectors.VectorHelper;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 
@@ -17,7 +17,7 @@ public class GSIInteractionHandler implements IGuiEventListener {
     public PlayerEntity player;
     private InteractionType interactionType = InteractionType.WORLD_INTERACTION;
 
-    public Vector2D mousePos = new Vector2D(-1, -1);
+    public Vector2F mousePos = new Vector2F(-1, -1);
 
     public boolean isDoubleClick = false;
     public boolean isTripleClick = false;
@@ -43,7 +43,7 @@ public class GSIInteractionHandler implements IGuiEventListener {
         if(!interactionType.isUsingGui()){
             setInteractionType(InteractionType.GUI_INTERACTION);
         }
-        update(new Vector2D(mouseX, mouseY));
+        update(new Vector2F(mouseX, mouseY));
     }
 
     public void updateMouseFromDisplay(PlayerEntity player, IDisplay display){
@@ -55,8 +55,8 @@ public class GSIInteractionHandler implements IGuiEventListener {
         }
     }
 
-    public void update(@Nullable  Vector2D mousePos){ //click position relative to the display
-        this.mousePos = mousePos == null ? new Vector2D(-1, -1 ): mousePos;
+    public void update(@Nullable Vector2F mousePos){ //click position relative to the display
+        this.mousePos = mousePos == null ? new Vector2F(-1, -1 ): mousePos;
         //
     }
 
@@ -83,14 +83,14 @@ public class GSIInteractionHandler implements IGuiEventListener {
         return false;
     }
 
-    ///
+    /// TODO DELETE THIS???
 
     public boolean trigger(Object source, int triggerId){
-        return gsi.toggle(source, triggerId);
+        return false;///gsi.toggle(source, triggerId);
     }
 
     public boolean isActive(Object source, int triggerId){
-        return gsi.isActive(source, triggerId);
+        return false;///gsi.isActive(source, triggerId);
     }
 
     /// IGuiEventListener

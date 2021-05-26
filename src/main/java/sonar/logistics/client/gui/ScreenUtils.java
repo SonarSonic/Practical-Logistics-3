@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import sonar.logistics.PL3;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class ScreenUtils {
 
@@ -51,7 +51,7 @@ public class ScreenUtils {
     GL_ALWAYS   = 0x207; - 519
     */
 
-    public static void fillDouble(Quad2D quad, int rgba) {
+    public static void fillDouble(Quad2F quad, int rgba) {
         fillDouble(quad.getX(), quad.getY(), quad.getMaxX(), quad.getMaxY(), rgba);
     }
 
@@ -89,7 +89,7 @@ public class ScreenUtils {
     }
 
 
-    public static void blitDouble(Quad2D quad, int uv_width, int uv_height, int uv_left, int uvTop, int texX, int texY) {
+    public static void blitDouble(Quad2F quad, int uv_width, int uv_height, int uv_left, int uvTop, int texX, int texY) {
         blitDouble(quad.getX(), quad.getMaxX(), quad.getY(), quad.getMaxY(), uv_left, uvTop, texX, texY, uv_width, uv_height);
     }
 
@@ -97,7 +97,7 @@ public class ScreenUtils {
         blitDouble(x, maxX, y, maxY, (uv_left + 0.0F) / (float)texX, (uv_left + (float)uv_width) / (float)texX, (uvTop + 0.0F) / (float)texY, (uvTop + (float)uv_height) / (float)texY);
     }
 
-    public static void blitDouble(Quad2D quad, int uv_left, int uvTop) {
+    public static void blitDouble(Quad2F quad, int uv_left, int uvTop) {
         blitDouble(quad.getX(), quad.getY(), quad.getWidth(), quad.getHeight(), uv_left, uvTop);
     }
 

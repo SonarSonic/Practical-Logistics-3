@@ -2,111 +2,118 @@ package sonar.logistics.util.vectors;
 
 import sonar.logistics.client.gsi.style.ComponentAlignment;
 
-public class Quad2D {
+public class Quad2F {
 
-    public static final Quad2D DEFAULT_PERCENTAGES = new Quad2D(0, 0, 1, 1);
+    public static final Quad2F DEFAULT_PERCENTAGES = new Quad2F(0, 0, 1, 1);
 
-    public double x, y, width, height;
+    public float x, y, width, height;
 
-    public Quad2D() {
+    public Quad2F() {
         super();
     }
 
-    public Quad2D(Quad2D quad) {
+    public Quad2F(Quad2F quad) {
         this(quad.x, quad.y, quad.width, quad.height);
     }
 
-    public Quad2D(Vector2D alignment, Vector2D sizing) {
+    public Quad2F(Vector2F alignment, Vector2F sizing) {
         this(alignment.x, alignment.y, sizing.x, sizing.y);
     }
 
-    public Quad2D(double x, double y, double w, double h) {
+    public Quad2F(float x, float y, float w, float h) {
         this.x = x;
         this.y = y;
         this.width = w;
         this.height = h;
     }
 
+    public Quad2F(double x, double y, double w, double h) {
+        this.x = (float)x;
+        this.y = (float)y;
+        this.width = (float)w;
+        this.height = (float)h;
+    }
+
     /////
 
-    public double getX(){
+    public float getX(){
         return x;
     }
 
-    public double getY(){
+    public float getY(){
         return y;
     }
 
-    public double getWidth(){
+    public float getWidth(){
         return width;
     }
 
-    public double getHeight(){
+    public float getHeight(){
         return height;
     }
 
-    public double getMaxX(){
+    public float getMaxX(){
         return x + width;
     }
 
-    public double getMaxY(){
+    public float getMaxY(){
         return y + height;
     }
 
-    public double getCentreX(){
+    public float getCentreX(){
         return x + width / 2;
     }
 
-    public double getCentreY(){
+    public float getCentreY(){
         return y + height / 2;
     }
 
     /////
 
-    public Vector2D getAlignment(){
-        return new Vector2D(x, y);
+    public Vector2F getAlignment(){
+        return new Vector2F(x, y);
     }
 
-    public Vector2D getSizing(){
-        return new Vector2D(width, height);
-    }
-
-    /////
-
-    public Vector2D getTopLeft(){
-        return new Vector2D(x, y);
-    }
-
-    public Vector2D getTopRight(){
-        return new Vector2D(x + width, y);
-    }
-
-    public Vector2D getBottomLeft(){
-        return new Vector2D(x, y + height);
-    }
-
-    public Vector2D getBottomRight(){
-        return new Vector2D(x + width, y + height);
+    public Vector2F getSizing(){
+        return new Vector2F(width, height);
     }
 
     /////
 
-    public Quad2D setX(double x) {
+    public Vector2F getTopLeft(){
+        return new Vector2F(x, y);
+    }
+
+    public Vector2F getTopRight(){
+        return new Vector2F(x + width, y);
+    }
+
+    public Vector2F getBottomLeft(){
+        return new Vector2F(x, y + height);
+    }
+
+    public Vector2F getBottomRight(){
+        return new Vector2F(x + width, y + height);
+    }
+
+    /////
+
+    public Quad2F setX(float x) {
         this.x = x;
         return this;
     }
 
-    public Quad2D setY(double y) {
+    public Quad2F setY(float y) {
         this.y = y;
         return this;
     }
 
-    public Quad2D setWidth(double width) {
+    public Quad2F setWidth(float width) {
         this.width = width;
         return this;
     }
 
-    public Quad2D setHeight(double height) {
+    public Quad2F setHeight(float height) {
         this.height = height;
         return this;
     }
@@ -114,19 +121,19 @@ public class Quad2D {
 
     /////
 
-    public Quad2D setAlignment(double x, double y){
+    public Quad2F setAlignment(float x, float y){
         this.x = x;
         this.y = y;
         return this;
     }
 
-    public Quad2D setSizing(double width, double height){
+    public Quad2F setSizing(float width, float height){
         this.width = width;
         this.height = height;
         return this;
     }
 
-    public Quad2D setMax(double maxX, double maxY){
+    public Quad2F setMax(float maxX, float maxY){
         this.width = maxX-x;
         this.height = maxY-y;
         return this;
@@ -134,7 +141,7 @@ public class Quad2D {
 
     /////
 
-    public Quad2D factor(double factor){
+    public Quad2F factor(float factor){
         this.x *= factor;
         this.y *= factor;
         this.width *= factor;
@@ -142,26 +149,26 @@ public class Quad2D {
         return this;
     }
 
-    public Quad2D translate(double xV, double yV){
+    public Quad2F translate(float xV, float yV){
         this.x += xV;
         this.y += yV;
         return this;
     }
 
 
-    public Quad2D translate(Vector2D v){
+    public Quad2F translate(Vector2F v){
         this.x += v.x;
         this.y += v.y;
         return this;
     }
 
-    public Quad2D scale(double xV, double yV) {
+    public Quad2F scale(float xV, float yV) {
         this.width *= xV;
         this.height *= yV;
         return this;
     }
 
-    public Quad2D scale(Vector2D v) {
+    public Quad2F scale(Vector2F v) {
         this.width *= v.x;
         this.height *= v.y;
         return this;
@@ -173,8 +180,8 @@ public class Quad2D {
         return width != 0 && height != 0;
     }
 
-    public Quad2D flipNegatives(){
-        double value = 0;
+    public Quad2F flipNegatives(){
+        float value = 0;
         if(width < 0){ // flip negative width
             x += width;
             width = -width;
@@ -191,58 +198,58 @@ public class Quad2D {
     /////
 
 
-    public boolean contains(Vector2D v){
+    public boolean contains(Vector2F v){
         return containsX(v.x) && containsY(v.y);
     }
 
-    public boolean contains(double xV, double yV){
+    public boolean contains(float xV, float yV){
         return containsX(xV) && containsY(yV);
     }
 
-    public boolean containsX(double xV){
+    public boolean containsX(float xV){
         return width != 0 && xV >= getX() && xV <= getMaxX();
     }
 
-    public boolean containsY(double yV){
+    public boolean containsY(float yV){
         return height != 0 && yV >= getY() && yV <= getMaxY();
     }
 
-    public static boolean contains(double xV, double yV, double wV, double hV, Vector2D v){
+    public static boolean contains(float xV, float yV, float wV, float hV, Vector2F v){
         return contains(xV, yV, wV, hV, v.x, v.y);
     }
 
-    public static boolean contains(double xV, double yV, double wV, double hV, double hitX, double hitY){
+    public static boolean contains(float xV, float yV, float wV, float hV, float hitX, float hitY){
         return hitX >= xV && hitX <= xV + wV && hitY >= yV && hitY <= yV + hV;
     }
 
-    public boolean inside(Vector2D v){
+    public boolean inside(Vector2F v){
         return v.x > getX() && v.x < getMaxX() && v.y > getY() && v.y < getMaxY();
     }
 
-    public boolean inside(double xV, double yV){
+    public boolean inside(float xV, float yV){
         return xV > getX() && xV < getMaxX() && yV > getY() && yV < getMaxY();
     }
 
-    public boolean canFit(Quad2D quad){
+    public boolean canFit(Quad2F quad){
         return quad.width <= width && quad.height <= height;
     }
 
-    public boolean canFit(double w, double h){
+    public boolean canFit(float w, float h){
         return w <= width && h <= height;
     }
 
-    public boolean intersects(Quad2D quad2D){
+    public boolean intersects(Quad2F quad2D){
         return intersects(quad2D.x, quad2D.y, quad2D.width, quad2D.height);
     }
 
-    public boolean intersects(double xV, double yV, double wV, double hV){
+    public boolean intersects(float xV, float yV, float wV, float hV){
         if (wV <= 0 || hV <= 0 || width <= 0 || height <= 0) {
             return false;
         }
-        double tw = width;
-        double th = height;
-        double tx = x;
-        double ty = y;
+        float tw = width;
+        float th = height;
+        float tx = x;
+        float ty = y;
         wV += xV;
         hV += yV;
         tw += tx;
@@ -255,17 +262,17 @@ public class Quad2D {
 
     /////
 
-    public static Quad2D multiply(Quad2D quad2D, Quad2D scalar){
-        return new Quad2D(quad2D.x * scalar.x, quad2D.y * scalar.y, quad2D.width * scalar.width, quad2D.height * scalar.height);
+    public static Quad2F multiply(Quad2F quad2D, Quad2F scalar){
+        return new Quad2F(quad2D.x * scalar.x, quad2D.y * scalar.y, quad2D.width * scalar.width, quad2D.height * scalar.height);
     }
 
     /**this method multiplies the given quad's width / height to obtain the translation and size*/
-    public static Quad2D getQuadFromPercentage(Quad2D quad2D, Quad2D percentages){
-        return new Quad2D(quad2D.getX() + (quad2D.width * percentages.x), quad2D.getY() + (quad2D.height * percentages.y), quad2D.width * percentages.width, quad2D.height * percentages.height);
+    public static Quad2F getQuadFromPercentage(Quad2F quad2D, Quad2F percentages){
+        return new Quad2F(quad2D.getX() + (quad2D.width * percentages.x), quad2D.getY() + (quad2D.height * percentages.y), quad2D.width * percentages.width, quad2D.height * percentages.height);
     }
 
-    public static Quad2D getQuadFromAbsolutes(Quad2D quad2D, Quad2D scaleables, boolean[] absolutes){
-        return new Quad2D (
+    public static Quad2F getQuadFromAbsolutes(Quad2F quad2D, Quad2F scaleables, boolean[] absolutes){
+        return new Quad2F(
                 absolutes[0] ? quad2D.getX() + scaleables.getX() : quad2D.getX() + (quad2D.width * scaleables.x),
                 absolutes[1] ? quad2D.getY() + scaleables.getY() : quad2D.getY() + (quad2D.height * scaleables.y),
                 absolutes[2] ? scaleables.getWidth() : quad2D.width * scaleables.width,
@@ -273,14 +280,14 @@ public class Quad2D {
     }
 
     /**aligns the quad within the given alignments, the adjusts the quad it is called on.*/
-    public Quad2D align(Quad2D bounds, ComponentAlignment alignX, ComponentAlignment alignY){
+    public Quad2F align(Quad2F bounds, ComponentAlignment alignX, ComponentAlignment alignY){
         x = alignX.align(width, bounds.getWidth()) + bounds.getX();
         y = alignY.align(height, bounds.getHeight()) + bounds.getY();
         return this;
     }
 
-    public Quad2D copy(){
-        return new Quad2D(x, y, width, height);
+    public Quad2F copy(){
+        return new Quad2F(x, y, width, height);
     }
 
 }

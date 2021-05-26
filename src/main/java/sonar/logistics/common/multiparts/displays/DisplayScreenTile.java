@@ -7,7 +7,7 @@ import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.common.multiparts.base.NetworkedTile;
 import sonar.logistics.server.data.watchers.DataWatcher;
 import sonar.logistics.server.data.watchers.RadiusDataWatcher;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 import sonar.logistics.common.multiparts.base.MultipartEntry;
 import sonar.logistics.common.multiparts.displays.api.IDisplay;
 import sonar.logistics.util.PL3Properties;
@@ -18,11 +18,11 @@ import javax.annotation.Nullable;
 //for small displays which don't connect to other displays
 public class DisplayScreenTile extends NetworkedTile implements IDisplay {
 
-    public final Quad2D bounds;
+    public final Quad2F bounds;
     public final GSI gsi;
     public final DataWatcher dataWatcher;
 
-    public DisplayScreenTile(MultipartEntry entry, Quad2D bounds) {
+    public DisplayScreenTile(MultipartEntry entry, Quad2F bounds) {
         super(entry);
         this.bounds = bounds;
         this.gsi = new GSI(bounds);

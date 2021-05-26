@@ -6,7 +6,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 public class PL3Shapes {
 
@@ -26,17 +26,17 @@ public class PL3Shapes {
     //// MINI DISPLAY SCREEN
     public static final AxisAlignedBB MINI_DISPLAY_BB_SHAPE = getBBFromPixels(4, 0, 4, 12, 1, 12);
     public static final VoxelShape[] MINI_DISPLAY_ROTATED_VOXELS = getRotatedVoxels(MINI_DISPLAY_BB_SHAPE, Direction.values());
-    public static final Quad2D MINI_DISPLAY_SCREEN_SCALING = new Quad2D(0, 0, 6, 6).factor(0.0625);
+    public static final Quad2F MINI_DISPLAY_SCREEN_SCALING = new Quad2F(0, 0, 6, 6).factor(0.0625F);
 
     //// DISPLAY SCREEN
     public static final AxisAlignedBB DISPLAY_BB_SHAPE = getBBFromPixels(1, 0, 4, 15, 1, 12);
     public static final VoxelShape[] DISPLAY_ROTATED_VOXELS = getRotatedVoxels(DISPLAY_BB_SHAPE, Direction.values());
-    public static final Quad2D DISPLAY_SCREEN_SCALING = new Quad2D(0, 0, 12, 6).factor(0.0625);
+    public static final Quad2F DISPLAY_SCREEN_SCALING = new Quad2F(0, 0, 12, 6).factor(0.0625F);
 
     //// LARGE DISPLAY SCREEN
     public static final AxisAlignedBB LARGE_DISPLAY_BB_SHAPE = getBBFromPixels(0, 0, 0, 16, 1, 16);
     public static final VoxelShape[] LARGE_DISPLAY_ROTATED_VOXELS = getRotatedVoxels(LARGE_DISPLAY_BB_SHAPE, Direction.values());
-    public static final Quad2D LARGE_DISPLAY_SCREEN_SCALING = new Quad2D(0, 0, 14, 14).factor(0.0625);
+    public static final Quad2F LARGE_DISPLAY_SCREEN_SCALING = new Quad2F(0, 0, 14, 14).factor(0.0625F);
 
 
     public static final double PIXEL = 0.0625;

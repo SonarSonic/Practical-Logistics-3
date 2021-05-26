@@ -2,6 +2,7 @@ package sonar.logistics.server.address;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import sonar.logistics.util.registry.Registries;
 import sonar.logistics.server.data.DataManager;
 import sonar.logistics.server.data.methods.Method;
 import sonar.logistics.server.data.methods.MethodRegistry;
@@ -24,36 +25,33 @@ public class DataAddress extends Address {
 
     @Override
     public CompoundNBT read(CompoundNBT nbt, EnumSyncType syncType) {
-        CompoundNBT subTag = nbt.getCompound("source");
-        source = Address.fromNBT(subTag);
-        method = MethodRegistry.getMethodFromIdentifier(nbt.getString("method"));
+        source = Registries.getAddressRegistry().read(nbt, "source", EnumSyncType.SAVE);
+        method = Registries.getMethodRegistry().read(nbt, "method", EnumSyncType.SAVE);
         return nbt;
     }
 
     @Override
     public CompoundNBT write(CompoundNBT nbt, EnumSyncType syncType) {
-        CompoundNBT subTag = new CompoundNBT();
-        Address.toNBT(source, subTag);
-        nbt.put("source", subTag);
-        nbt.putString("method", method.getIdentifier());
+        Registries.getAddressRegistry().write(source, nbt, "source", EnumSyncType.SAVE);
+        Registries.getMethodRegistry().write(method, nbt, "method", EnumSyncType.SAVE);
         return nbt;
     }
 
     @Override
     public void read(PacketBuffer buffer) {
-        source = Address.fromPacketBuffer(buffer);
-        method = MethodRegistry.getMethodFromIdentifier(buffer.readString());
+        source = Registries.getAddressRegistry().read(buffer);
+        method = Registries.getMethodRegistry().read(buffer);
     }
 
     @Override
     public void write(PacketBuffer buffer) {
-        Address.toPacketBuffer(source, buffer);
-        buffer.writeString(method.getIdentifier());
+        Registries.getAddressRegistry().write(source, buffer);
+        Registries.getMethodRegistry().write(method, buffer);
     }
 
     @Override
-    public int getType() {
-        return DATA_ADDRESS;
+    public String getRegistryName() {
+        return "data";
     }
 
     @Override
@@ -74,12 +72,12 @@ public class DataAddress extends Address {
 
     @Override
     public int hashCode() {
-        return Objects.hash(DATA_ADDRESS, source, method);
+        return Objects.hash(getRegistryName(), source, method);
     }
 
     @Override
     public String toString() {
-        return String.format("Source: (%s), Method (%s)", source.toString(), method.getIdentifier().toString());
+        return String.format("Source: (%s), Method (%s)", source.toString(), method.getRegistryName().toString());
     }
 
 }

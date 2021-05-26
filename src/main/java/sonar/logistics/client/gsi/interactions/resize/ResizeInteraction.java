@@ -4,16 +4,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import sonar.logistics.client.gsi.components.Component;
 import sonar.logistics.client.gsi.interactions.AbstractComponentInteraction;
 import sonar.logistics.client.gsi.interactions.GSIInteractionHandler;
-import sonar.logistics.client.gsi.interactions.api.IFlexibleInteractionHandler;
-import sonar.logistics.client.gsi.interactions.api.IInteractionHandler;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
 import sonar.logistics.client.gsi.style.properties.ColourProperty;
 import sonar.logistics.client.gsi.style.properties.Unit;
 import sonar.logistics.client.gui.GSIDesignSettings;
-import sonar.logistics.client.gui.ScreenUtils;
-import sonar.logistics.util.vectors.Quad2D;
-import sonar.logistics.util.vectors.Vector2D;
+import sonar.logistics.util.vectors.Quad2F;
+import sonar.logistics.util.vectors.Vector2F;
 
 import javax.annotation.Nullable;
 
@@ -21,11 +18,11 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
 
     private static ColourProperty normal = new ColourProperty(120, 120, 255, 255);
     private static ColourProperty highlighted = new ColourProperty(255, 255, 255, 255);
-    private Vector2D dragStart;
+    private Vector2F dragStart;
 
     private EnumRescaleType currentRescaleType = null;
     private float clickBoxSize = 0.0625F/2;
-    private Quad2D[] moveBoxes = new Quad2D[0];
+    private Quad2F[] moveBoxes = new Quad2F[0];
 
     public ResizeInteraction(Component component) {
         super(component);
@@ -36,7 +33,7 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
         super.renderInteraction(context);
         RenderSystem.disableDepthTest();
         clickBoxSize = 16 / context.gsiScaling;
-        Quad2D rescaledBounds = getRescaledBounds();
+        Quad2F rescaledBounds = getRescaledBounds();
         if(rescaledBounds == null){
             return; //TODO hmmm
         }
@@ -45,14 +42,14 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
         EnumRescaleType currentType = currentRescaleType != null ? currentRescaleType : getRescaleTypeFromMouse(component, getInteractionHandler());
 
 
-        for(Quad2D quad2D : getMoveBoxes(rescaledBounds, 4 / context.gsiScaling)){
+        for(Quad2F quad2D : getMoveBoxes(rescaledBounds, 4 / context.gsiScaling)){
             GSIRenderHelper.renderColouredRect(context, false, quad2D, new ColourProperty(255, 255, 255, 50));
         }
 
         for (EnumRescaleType type : EnumRescaleType.values()) { //render selection box
             boolean isHighlighted = currentType == type;
             if (type != EnumRescaleType.MOVE) {
-                Quad2D clickBox = getClickBox(type, rescaledBounds, 12 / context.gsiScaling);
+                Quad2F clickBox = getClickBox(type, rescaledBounds, 12 / context.gsiScaling);
                 GSIRenderHelper.renderColouredRect(context, false, clickBox, isHighlighted ? normal : highlighted);
             }
         }
@@ -82,12 +79,12 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
     @Override
     public void onDragFinished(int button) {
         super.onDragFinished(button);
-        Quad2D gsiBounds = getGSI().getGSIBounds();
-        Quad2D componentBounds = getRescaledBounds();
-        double x = (componentBounds.x - gsiBounds.x) / gsiBounds.width;
-        double y = (componentBounds.y - gsiBounds.y) / gsiBounds.height;
-        double width = componentBounds.width / gsiBounds.width;
-        double height = componentBounds.height / gsiBounds.height;
+        Quad2F gsiBounds = getGSI().getGSIBounds();
+        Quad2F componentBounds = getRescaledBounds();
+        float x = (componentBounds.x - gsiBounds.x) / gsiBounds.width;
+        float y = (componentBounds.y - gsiBounds.y) / gsiBounds.height;
+        float width = componentBounds.width / gsiBounds.width;
+        float height = componentBounds.height / gsiBounds.height;
         component.getStyling().setSizing(x, y, width, height, Unit.PERCENT);
         component.rebuild();
         currentRescaleType = null;
@@ -99,13 +96,13 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
         return getRescaleTypeFromMouse(component, getInteractionHandler()) != null;
     }
 
-    public Quad2D getRescaledBounds(){
+    public Quad2F getRescaledBounds(){
         return currentRescaleType == null ? component.getBounds().outerSize() : rescaleWindow(currentRescaleType, component.getBounds().outerSize(), getGSI().getGSIBounds(), GSIDesignSettings.snapToNormalGrid(getMousePos().x - dragStart.x), GSIDesignSettings.snapToNormalGrid(getMousePos().y - dragStart.y), getInteractionHandler().hasShiftDown());
     }
 
     //// MOVING / RESIZING METHODS \\\\
 
-    public static Quad2D moveWindow(Quad2D window, Quad2D bounds, double dragX, double dragY, boolean isShifting){
+    public static Quad2F moveWindow(Quad2F window, Quad2F bounds, double dragX, double dragY, boolean isShifting){
         if(isShifting){
             if(Math.abs(dragX) >= Math.abs(dragY)){ // snap to axis with biggest drag
                 dragY = 0;
@@ -127,11 +124,11 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
             newY = bounds.y + bounds.height - window.height;
         }
 
-        return new Quad2D(newX, newY, window.width, window.height);
+        return new Quad2F(newX, newY, window.width, window.height);
     }
 
 
-    public static Quad2D rescaleWindow(EnumRescaleType type, Quad2D window, Quad2D bounds, double dragX, double dragY, boolean isShifting){
+    public static Quad2F rescaleWindow(EnumRescaleType type, Quad2F window, Quad2F bounds, double dragX, double dragY, boolean isShifting){
         if(type == EnumRescaleType.MOVE){ // moving this method is for neatness but may also be useful later
             return moveWindow(window, bounds, dragX, dragY, isShifting);
         }
@@ -182,7 +179,7 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
             newH = -newH;
         }
 
-        return new Quad2D(newX, newY, newW, newH);
+        return new Quad2F(newX, newY, newW, newH);
     }
 
     //// RESCALE TYPE BOXES \\\\
@@ -192,7 +189,7 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
     }
 
     @Nullable
-    public EnumRescaleType getRescaleTypeFromMouse(Quad2D window, double mouseX, double mouseY, float boxSize){
+    public EnumRescaleType getRescaleTypeFromMouse(Quad2F window, float mouseX, float mouseY, float boxSize){
         for(EnumRescaleType box : EnumRescaleType.values()){
             if(isMouseOver(box, window, mouseX, mouseY, boxSize)){
                 return box;
@@ -201,9 +198,9 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
         return null;
     }
 
-    public boolean isMouseOver(EnumRescaleType type, Quad2D window, double mouseX, double mouseY, float boxSize){
+    public boolean isMouseOver(EnumRescaleType type, Quad2F window, float mouseX, float mouseY, float boxSize){
         if(type == EnumRescaleType.MOVE){
-            for(Quad2D quad2D : getMoveBoxes(window, boxSize)){
+            for(Quad2F quad2D : getMoveBoxes(window, boxSize)){
                 if(quad2D.inside(mouseX, mouseY)){
                     return true;
                 }
@@ -212,17 +209,17 @@ public class ResizeInteraction extends AbstractComponentInteraction<Component>{
         return getClickBox(type, window, boxSize).inside(mouseX, mouseY);
     }
 
-    public Quad2D[] getMoveBoxes(Quad2D window, float boxSize){
-        return new Quad2D[]{
-                new Quad2D(window.getX(), window.getY() - boxSize/2F, window.getWidth(), boxSize),
-                new Quad2D(window.getX(), window.getMaxY() - boxSize/2F, window.getWidth(), boxSize),
-                new Quad2D(window.getX() - boxSize/2F, window.getY(), boxSize, window.getHeight()),
-                new Quad2D(window.getMaxX() - boxSize/2F, window.getY(), boxSize, window.getHeight())
+    public Quad2F[] getMoveBoxes(Quad2F window, float boxSize){
+        return new Quad2F[]{
+                new Quad2F(window.getX(), window.getY() - boxSize/2F, window.getWidth(), boxSize),
+                new Quad2F(window.getX(), window.getMaxY() - boxSize/2F, window.getWidth(), boxSize),
+                new Quad2F(window.getX() - boxSize/2F, window.getY(), boxSize, window.getHeight()),
+                new Quad2F(window.getMaxX() - boxSize/2F, window.getY(), boxSize, window.getHeight())
         };
     }
 
-    public Quad2D getClickBox(EnumRescaleType type, Quad2D window, float boxSize){
-        return new Quad2D(window.x + type.xPos * window.width - boxSize/2F, window.y + type.yPos * window.height - boxSize/2F, boxSize, boxSize);
+    public Quad2F getClickBox(EnumRescaleType type, Quad2F window, float boxSize){
+        return new Quad2F(window.x + type.xPos * window.width - boxSize/2F, window.y + type.yPos * window.height - boxSize/2F, boxSize, boxSize);
     }
 
 }

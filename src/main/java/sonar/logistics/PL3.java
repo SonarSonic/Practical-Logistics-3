@@ -1,6 +1,5 @@
 package sonar.logistics;
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -9,12 +8,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sonar.logistics.client.ClientDataCache;
+import sonar.logistics.util.registry.Registries;
 import sonar.logistics.common.blocks.ores.SapphireOreGen;
 import sonar.logistics.common.multiparts.PL3Multiparts;
 import sonar.logistics.networking.PL3PacketHandler;
@@ -26,7 +25,6 @@ import sonar.logistics.server.caches.displays.ConnectedDisplayManager;
 import sonar.logistics.server.caches.network.PL3Network;
 import sonar.logistics.server.caches.network.PL3NetworkManager;
 import sonar.logistics.server.data.DataManager;
-import sonar.logistics.server.data.DataRegistry;
 import sonar.logistics.server.data.methods.MethodRegistry;
 import sonar.logistics.util.debug.DebugCommands;
 
@@ -59,11 +57,8 @@ public class PL3 {
         LOGGER.info("Registering Packet Handler");
         PL3PacketHandler.registerPackets();
 
-        LOGGER.info("Registering Data Types");
-        DataRegistry.INSTANCE.init();
-
-        LOGGER.info("Registering Methods");
-        MethodRegistry.init();
+        LOGGER.info("Init Registry");
+        Registries.INSTANCE.init();
         //TODO RECIPES
     }
 
@@ -85,6 +80,7 @@ public class PL3 {
         DataManager.INSTANCE.clear();
         ClientDataCache.INSTANCE.clear();
         ServerDataCache.INSTANCE.clear();
+        Registries.INSTANCE.clear();
     }
 
     @SubscribeEvent

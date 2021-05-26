@@ -45,6 +45,14 @@ public class MathUtils {
         return mod >= mult/2D ? x + mult - mod : x - mod;
     }
 
+    public static float roundToF(float x, float mult) {
+        if (mult == 0F) {
+            return x;
+        }
+        float mod = x % mult;
+        return mod >= mult/2F ? x + mult - mod : x - mod;
+    }
+
     public static long clamp(long value, long min, long max){
         if (value < min) return min;
         if (value > max) return max;

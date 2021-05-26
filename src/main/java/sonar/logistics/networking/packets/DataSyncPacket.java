@@ -7,6 +7,7 @@ import sonar.logistics.client.ClientDataCache;
 import sonar.logistics.server.data.api.IData;
 import sonar.logistics.server.address.Address;
 import sonar.logistics.server.address.DataAddress;
+import sonar.logistics.util.registry.Registries;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class DataSyncPacket {
         b.writeCompoundTag(mainNBT);
 
         for(Map.Entry<DataAddress, IData> entry : dataMap.entrySet()){
-            Address.toPacketBuffer(entry.getKey(), b);
+            Registries.getAddressRegistry().write(entry.getKey(), b);
         }
     }
 
@@ -45,7 +46,7 @@ public class DataSyncPacket {
         CompoundNBT mainNBT = b.readCompoundTag();
 
         for(int i = 0; i < size; i++){
-            Address address = Address.fromPacketBuffer(b);
+            Address address = Registries.getAddressRegistry().read(b);
             assert address instanceof DataAddress;
             DataAddress dataAddress = (DataAddress) address;
             IData data = dataAddress.method.getDataFactory().create();

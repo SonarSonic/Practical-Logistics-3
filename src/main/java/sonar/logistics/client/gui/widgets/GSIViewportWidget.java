@@ -10,7 +10,7 @@ import sonar.logistics.client.gui.ScreenUtils;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
 import sonar.logistics.client.gsi.render.GSIRenderHelper;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 import java.text.DecimalFormat;
 
@@ -19,14 +19,14 @@ public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEve
 
     public GSI gsi;
 
-    public Quad2D bounds;
+    public Quad2F bounds;
 
     public double centreX, centreY;
     public double scaling;
 
     public GSIViewportWidget(GSI gsi, double x, double y, double width, double height){
         this.gsi = gsi;
-        this.bounds = new Quad2D(x, y, width, height);
+        this.bounds = new Quad2F(x, y, width, height);
         this.defaultCentre();
         this.defaultScaling();
     }
@@ -86,13 +86,13 @@ public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEve
     }
 
     //the bounds of the gsi, within the "fake" screen
-    public Quad2D getBoundsForGSI(){
-        return new Quad2D(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * scaling, gsi.getGSIBounds().getHeight() * scaling);
+    public Quad2F getBoundsForGSI(){
+        return new Quad2F(getRenderOffsetX(), getRenderOffsetY(), gsi.getGSIBounds().getWidth() * scaling, gsi.getGSIBounds().getHeight() * scaling);
     }
 
     //the bounds of the gsi, including the fake screens borders
-    public Quad2D getBoundsForFakeDisplay(){
-        return new Quad2D(getCentreOffsetX() - (getGSIRenderWidth()*scaling)/2, getCentreOffsetY() - (getGSIRenderHeight()*scaling)/2, getGSIRenderWidth()*scaling, getGSIRenderHeight()*scaling);
+    public Quad2F getBoundsForFakeDisplay(){
+        return new Quad2F(getCentreOffsetX() - (getGSIRenderWidth()*scaling)/2, getCentreOffsetY() - (getGSIRenderHeight()*scaling)/2, getGSIRenderWidth()*scaling, getGSIRenderHeight()*scaling);
     }
 
     @Override
@@ -147,17 +147,17 @@ public class GSIViewportWidget extends AbstractWidget implements IFlexibleGuiEve
     }
 
     @Override
-    public Quad2D getBounds() {
+    public Quad2F getBounds() {
         return bounds;
     }
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return bounds.contains(mouseX, mouseY);
+        return bounds.contains((float) mouseX, (float)mouseY);
     }
 
     public boolean isMouseOverGSI(double mouseX, double mouseY){
-        return getBoundsForGSI().contains(mouseX, mouseY);
+        return getBoundsForGSI().contains((float)mouseX, (float)mouseY);
     }
 
     @Override

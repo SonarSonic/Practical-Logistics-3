@@ -5,21 +5,21 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.IGuiEventListener;
 import sonar.logistics.client.gsi.GSI;
 import sonar.logistics.client.gsi.render.GSIRenderContext;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 //used for rendering a GSI within a GUI - this default implementation has no scaling / scissoring.
 public class GSIWidget extends AbstractWidget implements IFlexibleGuiEventListener {
 
-    public Quad2D bounds;
+    public Quad2F bounds;
     public GSI gsi;
 
     public GSIWidget(){
         this.gsi = new GSI();
     }
 
-    public void setBoundsAndRebuild(Quad2D bounds){
+    public void setBoundsAndRebuild(Quad2F bounds){
         this.bounds = bounds;
-        this.gsi.setBoundsAndRebuild(new Quad2D(0, 0, bounds.width, bounds.height));
+        this.gsi.setBoundsAndRebuild(new Quad2F(0, 0, bounds.width, bounds.height));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class GSIWidget extends AbstractWidget implements IFlexibleGuiEventListen
     }
 
     @Override
-    public Quad2D getBounds() {
+    public Quad2F getBounds() {
         return bounds;
     }
 }

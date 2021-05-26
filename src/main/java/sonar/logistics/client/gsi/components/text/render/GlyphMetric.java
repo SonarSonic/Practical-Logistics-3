@@ -2,7 +2,7 @@ package sonar.logistics.client.gsi.components.text.render;
 
 import sonar.logistics.client.gsi.components.text.glyph.Glyph;
 import sonar.logistics.client.gsi.components.text.style.GlyphStyle;
-import sonar.logistics.util.vectors.Quad2D;
+import sonar.logistics.util.vectors.Quad2F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,15 +10,15 @@ import java.util.List;
 public class GlyphMetric {
 
     public List<GlyphRenderInfo> glyphInfo;
-    public Quad2D renderSize;
+    public Quad2F renderSize;
 
 
     public GlyphMetric(){
         this.glyphInfo = new ArrayList<>();
-        this.renderSize = new Quad2D();
+        this.renderSize = new Quad2F();
     }
 
-    public void addGlyph(int index, Glyph glyph, GlyphStyle style, double width, double height){
+    public void addGlyph(int index, Glyph glyph, GlyphStyle style, float width, float height){
         addGlyphInfo(new GlyphRenderInfo(index, glyph, style, width, height));
     }
 

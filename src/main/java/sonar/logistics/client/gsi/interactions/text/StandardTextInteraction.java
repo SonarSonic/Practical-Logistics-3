@@ -412,7 +412,7 @@ public class StandardTextInteraction<C extends AbstractTextComponent> extends Ab
     ////
 
     //moves the given cursor to the nearest glyph to the given x hit within the line
-    public void updateCursorFromXHit(CursorPoint cursor, StyledTextLine line, double xHit){
+    public void updateCursorFromXHit(CursorPoint cursor, StyledTextLine line, float xHit){
 
         ///if the line contains the text hit a specific glyph will be found
         if(line.renderSize.containsX(xHit)){

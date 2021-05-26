@@ -44,8 +44,8 @@ public class IdentityAddress extends Address {
     }
 
     @Override
-    public int getType() {
-        return IDENTITY_ADDRESS;
+    public String getRegistryName() {
+        return "identity";
     }
 
     @Override
@@ -65,7 +65,7 @@ public class IdentityAddress extends Address {
 
     @Override
     public int hashCode() {
-        return Objects.hash(IDENTITY_ADDRESS, identity);
+        return Objects.hash(getClass(), identity);
     }
 
     @Override
